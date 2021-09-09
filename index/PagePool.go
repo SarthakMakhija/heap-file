@@ -6,8 +6,8 @@ type PagePool struct {
 	pageCount int
 }
 
-func New(indexFile *IndexFile, options Options) PagePool {
-	pagePool := PagePool{
+func New(indexFile *IndexFile, options Options) *PagePool {
+	pagePool := &PagePool{
 		indexFile: indexFile,
 	}
 	pagePool.pageSize = options.PageSize
