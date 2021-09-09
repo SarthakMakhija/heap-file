@@ -25,11 +25,17 @@ func (pagePool *PagePool) Allocate(pageCount int) error {
 	return nil
 }
 
-func (pagePool PagePool) Read(pageId int) ([]byte, error) {
+func (pagePool PagePool) Read(pageId int) (*Page, error) {
 	offset := func() int64 {
 		return int64(pagePool.pageSize * pageId)
 	}
-	return pagePool.indexFile.readFrom(offset(), pagePool.pageSize)
+	bytes, err := pagePool.indexFile.readFrom(offset(), pagePool.pageSize)
+	if err != nil {
+		return nil, err
+	}
+	page := &Page{}
+	page.UnMarshalBinary(bytes)
+	return page, nil
 }
 
 func (pagePool PagePool) numberOfPages() int {

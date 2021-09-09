@@ -1,7 +1,6 @@
 package index
 
 import (
-	"bytes"
 	"os"
 	"testing"
 )
@@ -40,7 +39,7 @@ func TestReturnsFalseGivenIndexFileContainsMoreThanZeroPages(t *testing.T) {
 		PageSize: os.Getpagesize(),
 		FileName: "./test",
 	}
-	createATestFileWithEmptyPage(options.FileName, options.PageSize)
+	writeToATestFileWithEmptyPage(options.FileName, options.PageSize)
 
 	indexFile, _ := Open(options)
 	defer deleteFile(indexFile)
@@ -89,52 +88,75 @@ func TestAllocationOf5PagesShouldIncreaseTheFileSize(t *testing.T) {
 
 func TestReadsAPageIdentifiedByPageId0(t *testing.T) {
 	options := Options{
-		PageSize: 10,
+		PageSize: os.Getpagesize(),
 		FileName: "./test",
 	}
-	createATestFileWith(options.FileName, []byte("helloAdam0"))
+	page := Page{
+		keyValuePairs: []KeyValuePair{
+			{
+				key:   []byte("A"),
+				value: uint64(100),
+			},
+		},
+	}
+
+	writeToATestFileWithEmptyPage(options.FileName, options.PageSize)
+	writeToAATestFileWith(options.FileName, page.MarshalBinary())
 
 	indexFile, _ := Open(options)
 	pagePool := New(indexFile, options)
 	defer deleteFile(indexFile)
 
 	pageId := 0
-	content, _ := pagePool.Read(pageId)
-	expected := []byte("helloAdam0")
+	readPage, _ := pagePool.Read(pageId)
+	expectedKeyValuePair := page.keyValuePairs[0]
 
-	if !bytes.Equal(content, expected) {
-		t.Fatalf("Expected page %v to be %v, received %v", pageId, string(expected), string(content))
+	if !expectedKeyValuePair.Equals(readPage.keyValuePairs[0]) {
+		t.Fatalf("Expected key value pair to be %v, received %v", expectedKeyValuePair, readPage.keyValuePairs[0])
 	}
 }
 
 func TestReadsAPageIdentifiedByPageId1(t *testing.T) {
 	options := Options{
-		PageSize: 10,
+		PageSize: os.Getpagesize(),
 		FileName: "./test",
 	}
-	createATestFileWith(options.FileName, []byte("helloAdam0helloBrad1"))
+	page := Page{
+		keyValuePairs: []KeyValuePair{
+			{
+				key:   []byte("B"),
+				value: uint64(200),
+			},
+		},
+	}
+	pageOffset := int64(options.PageSize)
+	writeToATestFileWithEmptyPage(options.FileName, options.PageSize*2)
+	writeToAATestFileAtOffset(options.FileName, page.MarshalBinary(), pageOffset)
 
 	indexFile, _ := Open(options)
 	pagePool := New(indexFile, options)
 	defer deleteFile(indexFile)
 
 	pageId := 1
-	content, _ := pagePool.Read(pageId)
-	expected := []byte("helloBrad1")
+	readPage, _ := pagePool.Read(pageId)
+	expectedKeyValuePair := page.keyValuePairs[0]
 
-	if !bytes.Equal(content, expected) {
-		t.Fatalf("Expected page %v to be %v, received %v", pageId, string(expected), string(content))
+	if !expectedKeyValuePair.Equals(readPage.keyValuePairs[0]) {
+		t.Fatalf("Expected key value pair to be %v, received %v", expectedKeyValuePair, readPage.keyValuePairs[0])
 	}
 }
 
-func createATestFileWithEmptyPage(fileName string, pageSize int) {
-	file, _ := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR, 0644)
-	_, _ = file.Write(make([]byte, pageSize))
-	_ = file.Close()
+func writeToATestFileWithEmptyPage(fileName string, pageSize int) {
+	writeToAATestFileWith(fileName, make([]byte, pageSize))
 }
 
-func createATestFileWith(fileName string, content []byte) {
+func writeToAATestFileWith(fileName string, content []byte) {
+	writeToAATestFileAtOffset(fileName, content, 0)
+}
+
+func writeToAATestFileAtOffset(fileName string, content []byte, offset int64) {
 	file, _ := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR, 0644)
+	_, _ = file.Seek(offset, 0)
 	_, _ = file.Write(content)
 	_ = file.Close()
 }
