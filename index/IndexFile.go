@@ -6,11 +6,9 @@ import (
 )
 
 type IndexFile struct {
-	file         *os.File
-	size         int64
-	pageSize     int
-	pageCount    int
-	memoryMapped mmap.MMap
+	file      *os.File
+	size      int64
+	memoryMap mmap.MMap
 }
 
 func Open(options Options) (*IndexFile, error) {
@@ -21,36 +19,23 @@ func Open(options Options) (*IndexFile, error) {
 		return nil, err
 	}
 	indexFile := &IndexFile{
-		file:     file,
-		pageSize: options.PageSize,
+		file: file,
 	}
 	indexFile.size, _ = indexFile.fileSize()
-	indexFile.pageCount = indexFile.numberOfPages()
 	return indexFile, nil
 }
 
-func (indexFile IndexFile) ContainsZeroPages() bool {
-	return indexFile.pageCount == 0
-}
-
-func (indexFile *IndexFile) Allocate(pageCount int) error {
+func (indexFile *IndexFile) ResizeTo(sizeInBytes int64) error {
 	err := indexFile.unMap()
 	if err != nil {
 		return err
 	}
-	targetSize := indexFile.size + int64(pageCount*indexFile.pageSize)
-	if err := indexFile.file.Truncate(targetSize); err != nil {
+	if err := indexFile.file.Truncate(sizeInBytes); err != nil {
 		return err
 	}
 
-	indexFile.size = targetSize
-	indexFile.pageCount = indexFile.numberOfPages()
-
+	indexFile.size = sizeInBytes
 	return indexFile.mMap()
-}
-
-func (indexFile *IndexFile) numberOfPages() int {
-	return int(indexFile.size) / indexFile.pageSize
 }
 
 func (indexFile *IndexFile) fileSize() (int64, error) {
@@ -62,10 +47,10 @@ func (indexFile *IndexFile) fileSize() (int64, error) {
 }
 
 func (indexFile *IndexFile) unMap() error {
-	if indexFile.file == nil || indexFile.memoryMapped == nil {
+	if indexFile.file == nil || indexFile.memoryMap == nil {
 		return nil
 	}
-	return indexFile.memoryMapped.Unmap()
+	return indexFile.memoryMap.Unmap()
 }
 
 func (indexFile *IndexFile) mMap() error {
@@ -76,6 +61,6 @@ func (indexFile *IndexFile) mMap() error {
 	if err != nil {
 		return err
 	}
-	indexFile.memoryMapped = memoryMapped
+	indexFile.memoryMap = memoryMapped
 	return nil
 }
