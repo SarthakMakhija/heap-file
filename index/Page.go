@@ -33,7 +33,7 @@ func (page Page) Get(key []byte) (Page, int, bool) {
 }
 
 func (page Page) MarshalBinary() []byte {
-	buffer := make([]byte, 400) //will be replaced with page.Size()
+	buffer := make([]byte, 30) //will be replaced with page.Size()
 	offset := 0
 
 	writeLeafPageType := func() {
