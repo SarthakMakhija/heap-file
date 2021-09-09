@@ -6,7 +6,7 @@ import (
 
 func TestGetsTheIndexForAKey(t *testing.T) {
 	page := Page{
-		keyValuePairs: []keyValuePair{
+		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("A"),
 				value: uint64(100),
@@ -31,7 +31,7 @@ func TestGetsTheIndexForAKey(t *testing.T) {
 
 func TestReturnsTrueIfKeyIsPresentInThePage(t *testing.T) {
 	page := Page{
-		keyValuePairs: []keyValuePair{
+		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("A"),
 				value: uint64(100),
@@ -55,7 +55,7 @@ func TestReturnsTrueIfKeyIsPresentInThePage(t *testing.T) {
 
 func TestReturnsFalseIfKeyIsNotPresentInThePage(t *testing.T) {
 	page := Page{
-		keyValuePairs: []keyValuePair{
+		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("C"),
 				value: uint64(300),
@@ -71,7 +71,7 @@ func TestReturnsFalseIfKeyIsNotPresentInThePage(t *testing.T) {
 
 func TestUnMarshalsAPageWithKeyValuePairCountAs1(t *testing.T) {
 	page := Page{
-		keyValuePairs: []keyValuePair{
+		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("C"),
 				value: uint64(300),
@@ -91,7 +91,7 @@ func TestUnMarshalsAPageWithKeyValuePairCountAs1(t *testing.T) {
 
 func TestUnMarshalsAPageWithKey(t *testing.T) {
 	page := Page{
-		keyValuePairs: []keyValuePair{
+		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("C"),
 				value: uint64(300),
@@ -111,7 +111,7 @@ func TestUnMarshalsAPageWithKey(t *testing.T) {
 
 func TestUnMarshalsAPageWithValue(t *testing.T) {
 	page := Page{
-		keyValuePairs: []keyValuePair{
+		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("C"),
 				value: uint64(300),
@@ -131,7 +131,7 @@ func TestUnMarshalsAPageWithValue(t *testing.T) {
 
 func TestUnMarshalsAPageWithMultipleKeyValuePairs(t *testing.T) {
 	page := Page{
-		keyValuePairs: []keyValuePair{
+		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("A"),
 				value: uint64(100),
@@ -152,23 +152,17 @@ func TestUnMarshalsAPageWithMultipleKeyValuePairs(t *testing.T) {
 		t.Fatalf("Expected keyValuePairCount to be 2, received %v", keyValuePairCount)
 	}
 
-	key := string(newPage.keyValuePairs[0].key)
-	if key != "A" {
-		t.Fatalf("Expected first key to be A, received %v", key)
+	expectedFirstKeyValuePair := page.keyValuePairs[0]
+	firstKeyValuePair := newPage.keyValuePairs[0]
+
+	if !expectedFirstKeyValuePair.Equals(firstKeyValuePair) {
+		t.Fatalf("Expected first key value pair to be %v, received %v", expectedFirstKeyValuePair, firstKeyValuePair)
 	}
 
-	value := newPage.keyValuePairs[0].value
-	if value != 100 {
-		t.Fatalf("Expected first value to be 100, received %v", value)
-	}
+	expectedSecondKeyValuePair := page.keyValuePairs[1]
+	secondKeyValuePair := newPage.keyValuePairs[1]
 
-	key = string(newPage.keyValuePairs[1].key)
-	if key != "B" {
-		t.Fatalf("Expected second key to be B, received %v", key)
-	}
-
-	value = newPage.keyValuePairs[1].value
-	if value != 200 {
-		t.Fatalf("Expected second value to be 200, received %v", value)
+	if !expectedSecondKeyValuePair.Equals(secondKeyValuePair) {
+		t.Fatalf("Expected second key value pair to be %v, received %v", expectedSecondKeyValuePair, secondKeyValuePair)
 	}
 }

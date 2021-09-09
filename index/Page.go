@@ -14,12 +14,7 @@ const (
 
 type Page struct {
 	id            int
-	keyValuePairs []keyValuePair
-}
-
-type keyValuePair struct {
-	key   []byte
-	value uint64
+	keyValuePairs []KeyValuePair
 }
 
 func NewPage(id int) *Page {
@@ -103,7 +98,7 @@ func (page *Page) UnMarshalBinary(buffer []byte) {
 	if buffer[0]&LeafPage == 0 {
 		keyValuePairCount := readKeyValuePairCount()
 		for index := 0; index < keyValuePairCount; index++ {
-			pair := keyValuePair{}
+			pair := KeyValuePair{}
 			pair.value = readValue()
 			pair.key = readKey()
 			page.keyValuePairs = append(page.keyValuePairs, pair)
