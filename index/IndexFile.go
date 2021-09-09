@@ -2,6 +2,7 @@ package index
 
 import (
 	"github.com/edsrzf/mmap-go"
+	"io"
 	"os"
 )
 
@@ -18,10 +19,14 @@ func Open(options Options) (*IndexFile, error) {
 	if err != nil {
 		return nil, err
 	}
-	indexFile := &IndexFile{
-		file: file,
-	}
+	indexFile := &IndexFile{file: file}
 	indexFile.size, _ = indexFile.fileSize()
+
+	if indexFile.size > 0 {
+		if err := indexFile.mMap(); err != nil {
+			return nil, err
+		}
+	}
 	return indexFile, nil
 }
 
@@ -36,6 +41,15 @@ func (indexFile *IndexFile) ResizeTo(sizeInBytes int64) error {
 
 	indexFile.size = sizeInBytes
 	return indexFile.mMap()
+}
+
+func (indexFile *IndexFile) readFrom(offset int64, size int) ([]byte, error) {
+	buf := make([]byte, size)
+	elementsCopied := copy(buf, indexFile.memoryMap[offset:])
+	if elementsCopied < size {
+		return nil, io.EOF
+	}
+	return buf, nil
 }
 
 func (indexFile *IndexFile) fileSize() (int64, error) {
