@@ -41,7 +41,7 @@ func (tree *BPlusTree) initialize(options Options) error {
 	if err != nil {
 		return err
 	}
-	tree.rootPage = NewPage(1)
+	tree.rootPage = NewPage(0)
 	tree.pageById[tree.rootPage.id] = tree.rootPage
 	return nil
 }
