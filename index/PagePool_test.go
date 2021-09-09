@@ -1,6 +1,7 @@
 package index
 
 import (
+	"bytes"
 	"os"
 	"testing"
 )
@@ -86,8 +87,54 @@ func TestAllocationOf5PagesShouldIncreaseTheFileSize(t *testing.T) {
 	}
 }
 
+func TestReadsAPageIdentifiedByPageId0(t *testing.T) {
+	options := Options{
+		PageSize: 10,
+		FileName: "./test",
+	}
+	createATestFileWith(options.FileName, []byte("helloAdam0"))
+
+	indexFile, _ := Open(options)
+	pagePool := New(indexFile, options)
+	defer deleteFile(indexFile)
+
+	pageId := 0
+	content, _ := pagePool.Read(pageId)
+	expected := []byte("helloAdam0")
+
+	if !bytes.Equal(content, expected) {
+		t.Fatalf("Expected page %v to be %v, received %v", pageId, string(expected), string(content))
+	}
+}
+
+func TestReadsAPageIdentifiedByPageId1(t *testing.T) {
+	options := Options{
+		PageSize: 10,
+		FileName: "./test",
+	}
+	createATestFileWith(options.FileName, []byte("helloAdam0helloBrad1"))
+
+	indexFile, _ := Open(options)
+	pagePool := New(indexFile, options)
+	defer deleteFile(indexFile)
+
+	pageId := 1
+	content, _ := pagePool.Read(pageId)
+	expected := []byte("helloBrad1")
+
+	if !bytes.Equal(content, expected) {
+		t.Fatalf("Expected page %v to be %v, received %v", pageId, string(expected), string(content))
+	}
+}
+
 func createATestFileWithEmptyPage(fileName string, pageSize int) {
 	file, _ := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR, 0644)
 	_, _ = file.Write(make([]byte, pageSize))
+	_ = file.Close()
+}
+
+func createATestFileWith(fileName string, content []byte) {
+	file, _ := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR, 0644)
+	_, _ = file.Write(content)
 	_ = file.Close()
 }
