@@ -15,6 +15,7 @@ const (
 type Page struct {
 	id            int
 	keyValuePairs []KeyValuePair
+	childPageIds  []int
 }
 
 func NewPage(id int) *Page {
@@ -23,13 +24,12 @@ func NewPage(id int) *Page {
 	}
 }
 
-func (page Page) Get(key []byte) (Page, int, bool) {
-	index, found := page.binarySearch(key)
-	if page.isLeaf() {
-		return page, index, found
-	}
-	//else :: handle non leaf and found, which means load the child page..
-	return Page{}, 0, false
+func (page Page) Get(key []byte) (int, bool) {
+	return page.binarySearch(key)
+}
+
+func (page Page) GetKeyValuePairAt(index int) KeyValuePair {
+	return page.keyValuePairs[index]
 }
 
 func (page Page) MarshalBinary() []byte {
@@ -120,5 +120,5 @@ func (page Page) binarySearch(key []byte) (int, bool) {
 }
 
 func (page Page) isLeaf() bool {
-	return true //for now this is true
+	return len(page.childPageIds) == 0
 }

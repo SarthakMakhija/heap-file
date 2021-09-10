@@ -22,7 +22,7 @@ func TestGetsTheIndexForAKey(t *testing.T) {
 		},
 	}
 	expectedIndex := 0
-	_, index, _ := page.Get([]byte("A"))
+	index, _ := page.Get([]byte("A"))
 
 	if index != expectedIndex {
 		t.Fatalf("Expected index of searched key A to be %v, received %v", expectedIndex, index)
@@ -46,7 +46,7 @@ func TestReturnsTrueIfKeyIsPresentInThePage(t *testing.T) {
 			},
 		},
 	}
-	_, _, found := page.Get([]byte("B"))
+	_, found := page.Get([]byte("B"))
 
 	if found != true {
 		t.Fatalf("Expected A to be found")
@@ -62,7 +62,7 @@ func TestReturnsFalseIfKeyIsNotPresentInThePage(t *testing.T) {
 			},
 		},
 	}
-	_, _, found := page.Get([]byte("D"))
+	_, found := page.Get([]byte("D"))
 
 	if found != false {
 		t.Fatalf("Expected A to not be found")
