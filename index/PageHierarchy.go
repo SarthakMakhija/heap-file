@@ -16,6 +16,12 @@ func NewPageHierarchy(pagePool *PagePool) *PageHierarchy {
 	return pageHierarchy
 }
 
+func (pageHierarchy PageHierarchy) Put(keyValuePair KeyValuePair) {
+	getResult := pageHierarchy.Get(keyValuePair.key)
+	//assume key does not exist and page is not full
+	getResult.page.insertAt(getResult.index, keyValuePair)
+}
+
 func (pageHierarchy PageHierarchy) Get(key []byte) GetResult {
 	return pageHierarchy.get(key, pageHierarchy.rootPage)
 }

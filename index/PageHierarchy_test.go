@@ -2,6 +2,7 @@ package index
 
 import (
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -273,5 +274,36 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 
 	if !expectedKeyValuePair.Equals(getResult.keyValuePair) {
 		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, getResult.keyValuePair)
+	}
+}
+
+func TestPutsAKeyValuePairInRootPage(t *testing.T) {
+	options := DefaultOptions()
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	pageHierarchy := NewPageHierarchy(pagePool)
+
+	defer deleteFile(pagePool.indexFile)
+
+	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
+		{
+			key:   []byte("A"),
+			value: []byte("Database"),
+		},
+		{
+			key:   []byte("C"),
+			value: []byte("Systems"),
+		},
+	}
+	pageHierarchy.Put(KeyValuePair{key: []byte("B"), value: []byte("Storage")})
+	expected := []KeyValuePair{
+		{key: []byte("A"), value: []byte("Database")},
+		{key: []byte("B"), value: []byte("Storage")},
+		{key: []byte("C"), value: []byte("Systems")},
+	}
+
+	pageKeyValuePairs := pageHierarchy.rootPage.keyValuePairs
+	if !reflect.DeepEqual(expected, pageKeyValuePairs) {
+		t.Fatalf("Expected Key value pairs to be %v, received %v", expected, pageKeyValuePairs)
 	}
 }

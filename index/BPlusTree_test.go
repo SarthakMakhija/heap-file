@@ -2,6 +2,7 @@ package index
 
 import (
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -118,5 +119,32 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 
 	if !expectedKeyValuePair.Equals(getResult.keyValuePair) {
 		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, getResult.keyValuePair)
+	}
+}
+
+func TestPutsAKeyValuePair(t *testing.T) {
+	options := Options{
+		PageSize:                 os.Getpagesize(),
+		FileName:                 "./test",
+		PreAllocatedPagePoolSize: 8,
+	}
+	tree, _ := CreateBPlusTree(options)
+	defer deleteFile(tree.pagePool.indexFile)
+
+	tree.pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
+		{
+			key:   []byte("B"),
+			value: []byte("Database"),
+		},
+	}
+	tree.Put([]byte("C"), []byte("Storage"))
+	expected := []KeyValuePair{
+		{key: []byte("B"), value: []byte("Database")},
+		{key: []byte("C"), value: []byte("Storage")},
+	}
+
+	pageKeyValuePairs := tree.pageHierarchy.rootPage.keyValuePairs
+	if !reflect.DeepEqual(expected, pageKeyValuePairs) {
+		t.Fatalf("Expected Key value pairs to be %v, received %v", expected, pageKeyValuePairs)
 	}
 }

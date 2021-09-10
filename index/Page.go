@@ -131,3 +131,9 @@ func (page Page) binarySearch(key []byte) (int, bool) {
 func (page Page) isLeaf() bool {
 	return len(page.childPageIds) == 0
 }
+
+func (page *Page) insertAt(index int, keyValuePair KeyValuePair) {
+	page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{})
+	copy(page.keyValuePairs[index+1:], page.keyValuePairs[index:])
+	page.keyValuePairs[index] = keyValuePair
+}
