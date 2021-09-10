@@ -40,13 +40,16 @@ func (tree BPlusTree) get(key []byte, page *Page) (KeyValuePair, bool, error) {
 			return page.GetKeyValuePairAt(index), found, nil
 		}
 		return KeyValuePair{}, false, nil
+	} else {
+		if found {
+			index = index + 1
+		}
+		child, err := tree.fetchPage(page.childPageIds[index])
+		if err != nil {
+			return KeyValuePair{}, false, err
+		}
+		return tree.get(key, child)
 	}
-	//handle if found in non-leaf??
-	child, err := tree.fetchPage(page.childPageIds[index])
-	if err != nil {
-		return KeyValuePair{}, false, err
-	}
-	return tree.get(key, child)
 }
 
 func (tree BPlusTree) fetchPage(pageId int) (*Page, error) {
