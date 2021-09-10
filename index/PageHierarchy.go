@@ -20,6 +20,14 @@ func (pageHierarchy PageHierarchy) Get(key []byte) (KeyValuePair, bool, error) {
 	return pageHierarchy.get(key, pageHierarchy.rootPage)
 }
 
+func (pageHierarchy PageHierarchy) RootPageId() int {
+	return pageHierarchy.rootPage.id
+}
+
+func (pageHierarchy PageHierarchy) PageById(id int) *Page {
+	return pageHierarchy.pageById[id]
+}
+
 func (pageHierarchy PageHierarchy) get(key []byte, page *Page) (KeyValuePair, bool, error) {
 	index, found := page.Get(key)
 	if page.isLeaf() {

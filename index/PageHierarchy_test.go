@@ -5,6 +5,38 @@ import (
 	"testing"
 )
 
+func TestReturnsPageById(t *testing.T) {
+	options := DefaultOptions()
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy.pageById[0] = &Page{
+		id: 0,
+	}
+
+	defer deleteFile(pagePool.indexFile)
+
+	page := pageHierarchy.PageById(0)
+	if page.id != 0 {
+		t.Fatalf("Expected page id to be 0 received %v", page.id)
+	}
+}
+
+func TestReturnsTheRootPageId(t *testing.T) {
+	options := DefaultOptions()
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy.rootPage = &Page{id: 100}
+
+	defer deleteFile(pagePool.indexFile)
+
+	rootPageId := pageHierarchy.RootPageId()
+	if rootPageId != 100 {
+		t.Fatalf("Expected root page id to be 100 received %v", rootPageId)
+	}
+}
+
 func TestDoesNotGetByKey(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)

@@ -37,8 +37,8 @@ func TestCreatesABPlusTreeByCachingRootPage(t *testing.T) {
 	tree, _ := CreateBPlusTree(options)
 	defer deleteFile(tree.pagePool.indexFile)
 
-	rootPageId := tree.pageHierarchy.rootPage.id
-	rootPage := tree.pageHierarchy.pageById[rootPageId]
+	rootPageId := tree.pageHierarchy.RootPageId()
+	rootPage := tree.pageHierarchy.PageById(rootPageId)
 
 	if rootPage == nil {
 		t.Fatalf("Expected root page in page cache to be non-nil received nil")
