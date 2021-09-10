@@ -27,7 +27,7 @@ func TestCreatesABPlusTreeWithARootPage(t *testing.T) {
 	tree, _ := Create(options)
 	defer deleteFile(tree.pagePool.indexFile)
 
-	if tree.rootPage == nil {
+	if tree.pageHierarchy.rootPage == nil {
 		t.Fatalf("Expected root page to be non-nil received nil")
 	}
 }
@@ -37,20 +37,20 @@ func TestCreatesABPlusTreeByCachingRootPage(t *testing.T) {
 	tree, _ := Create(options)
 	defer deleteFile(tree.pagePool.indexFile)
 
-	rootPageId := tree.rootPage.id
-	rootPage := tree.pageById[rootPageId]
+	rootPageId := tree.pageHierarchy.rootPage.id
+	rootPage := tree.pageHierarchy.pageById[rootPageId]
 
 	if rootPage == nil {
 		t.Fatalf("Expected root page in page cache to be non-nil received nil")
 	}
 }
 
-func TestDoesNotGetByKey(t *testing.T) {
+func TestDoesNotGetByKeyAsSearchedKeyDoesNotExist(t *testing.T) {
 	options := DefaultOptions()
 	tree, _ := Create(options)
 	defer deleteFile(tree.pagePool.indexFile)
 
-	tree.rootPage.keyValuePairs = []KeyValuePair{
+	tree.pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
 		{
 			key:   []byte("A"),
 			value: uint64(100),
@@ -68,34 +68,7 @@ func TestDoesNotGetByKey(t *testing.T) {
 	}
 }
 
-func TestGetsByKeyInRootLeafPage(t *testing.T) {
-	options := DefaultOptions()
-	tree, _ := Create(options)
-	defer deleteFile(tree.pagePool.indexFile)
-
-	tree.rootPage.keyValuePairs = []KeyValuePair{
-		{
-			key:   []byte("A"),
-			value: uint64(100),
-		},
-		{
-			key:   []byte("B"),
-			value: uint64(200),
-		},
-	}
-
-	expectedKeyValuePair := KeyValuePair{
-		key:   []byte("B"),
-		value: uint64(200),
-	}
-	keyValuePair, _, _ := tree.Get([]byte("B"))
-
-	if !expectedKeyValuePair.Equals(keyValuePair) {
-		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, keyValuePair)
-	}
-}
-
-func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
+func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 	writeLeftPageToFile := func(fileName string, pageSize int) {
 		leftPage := Page{
 			id: 1,
@@ -133,7 +106,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 	tree, _ := Create(options)
 	defer deleteFile(tree.pagePool.indexFile)
 
-	tree.rootPage.keyValuePairs = []KeyValuePair{
+	tree.pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
 		{
 			key:   []byte("B"),
 			value: uint64(200),
@@ -141,125 +114,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 	}
 	writeLeftPageToFile(options.FileName, options.PageSize)
 	writeRightPageToFile(options.FileName, options.PageSize)
-	tree.rootPage.childPageIds = []int{1, 2}
-
-	expectedKeyValuePair := KeyValuePair{
-		key:   []byte("A"),
-		value: uint64(100),
-	}
-	keyValuePair, _, _ := tree.Get([]byte("A"))
-
-	if !expectedKeyValuePair.Equals(keyValuePair) {
-		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, keyValuePair)
-	}
-}
-
-func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
-	writeLeftPageToFile := func(fileName string, pageSize int) {
-		leftPage := Page{
-			id: 1,
-			keyValuePairs: []KeyValuePair{
-				{
-					key:   []byte("A"),
-					value: uint64(100),
-				},
-			},
-		}
-		writeToAATestFileAtOffset(fileName, leftPage.MarshalBinary(), int64(pageSize*leftPage.id))
-	}
-	writeRightPageToFile := func(fileName string, pageSize int) {
-		rightPage := Page{
-			id: 2,
-			keyValuePairs: []KeyValuePair{
-				{
-					key:   []byte("B"),
-					value: uint64(200),
-				},
-				{
-					key:   []byte("C"),
-					value: uint64(300),
-				},
-			},
-		}
-		writeToAATestFileAtOffset(fileName, rightPage.MarshalBinary(), int64(pageSize*rightPage.id))
-	}
-
-	options := Options{
-		PageSize:                 os.Getpagesize(),
-		FileName:                 "./test",
-		PreAllocatedPagePoolSize: 8,
-	}
-	tree, _ := Create(options)
-	defer deleteFile(tree.pagePool.indexFile)
-
-	tree.rootPage.keyValuePairs = []KeyValuePair{
-		{
-			key:   []byte("B"),
-			value: uint64(200),
-		},
-	}
-	writeLeftPageToFile(options.FileName, options.PageSize)
-	writeRightPageToFile(options.FileName, options.PageSize)
-	tree.rootPage.childPageIds = []int{1, 2}
-
-	expectedKeyValuePair := KeyValuePair{
-		key:   []byte("C"),
-		value: uint64(300),
-	}
-	keyValuePair, _, _ := tree.Get([]byte("C"))
-
-	if !expectedKeyValuePair.Equals(keyValuePair) {
-		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, keyValuePair)
-	}
-}
-
-func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
-	writeLeftPageToFile := func(fileName string, pageSize int) {
-		leftPage := Page{
-			id: 1,
-			keyValuePairs: []KeyValuePair{
-				{
-					key:   []byte("A"),
-					value: uint64(100),
-				},
-			},
-		}
-		writeToAATestFileAtOffset(fileName, leftPage.MarshalBinary(), int64(pageSize*leftPage.id))
-	}
-	writeRightPageToFile := func(fileName string, pageSize int) {
-		rightPage := Page{
-			id: 2,
-			keyValuePairs: []KeyValuePair{
-				{
-					key:   []byte("B"),
-					value: uint64(200),
-				},
-				{
-					key:   []byte("C"),
-					value: uint64(300),
-				},
-			},
-		}
-		writeToAATestFileAtOffset(fileName, rightPage.MarshalBinary(), int64(pageSize*rightPage.id))
-	}
-
-	options := Options{
-		PageSize:                 os.Getpagesize(),
-		FileName:                 "./test",
-		PreAllocatedPagePoolSize: 8,
-	}
-	tree, _ := Create(options)
-	defer deleteFile(tree.pagePool.indexFile)
-
-	tree.rootPage.keyValuePairs = []KeyValuePair{
-		{
-			key:   []byte("B"),
-			value: uint64(200),
-		},
-	}
-	writeLeftPageToFile(options.FileName, options.PageSize)
-	writeRightPageToFile(options.FileName, options.PageSize)
-	tree.rootPage.childPageIds = []int{1, 2}
+	tree.pageHierarchy.rootPage.childPageIds = []int{1, 2}
 
 	expectedKeyValuePair := KeyValuePair{
 		key:   []byte("B"),

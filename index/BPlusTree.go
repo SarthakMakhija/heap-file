@@ -1,10 +1,9 @@
 package index
 
 type BPlusTree struct {
-	fileName string
-	pagePool *PagePool
-	rootPage *Page
-	pageById map[int]*Page
+	fileName      string
+	pagePool      *PagePool
+	pageHierarchy *PageHierarchy
 }
 
 const metaPageCount = 1
@@ -18,10 +17,9 @@ func Create(options Options) (*BPlusTree, error) {
 		return nil, err
 	}
 	tree := &BPlusTree{
-		fileName: options.FileName,
-		pagePool: pagePool,
-		rootPage: nil,
-		pageById: map[int]*Page{},
+		fileName:      options.FileName,
+		pagePool:      pagePool,
+		pageHierarchy: InstantiateHierarchy(pagePool),
 	}
 	if err := tree.create(options); err != nil {
 		return nil, err
@@ -30,39 +28,7 @@ func Create(options Options) (*BPlusTree, error) {
 }
 
 func (tree BPlusTree) Get(key []byte) (KeyValuePair, bool, error) {
-	return tree.get(key, tree.rootPage)
-}
-
-func (tree BPlusTree) get(key []byte, page *Page) (KeyValuePair, bool, error) {
-	index, found := page.Get(key)
-	if page.isLeaf() {
-		if found {
-			return page.GetKeyValuePairAt(index), found, nil
-		}
-		return KeyValuePair{}, false, nil
-	} else {
-		if found {
-			index = index + 1
-		}
-		child, err := tree.fetchPage(page.childPageIds[index])
-		if err != nil {
-			return KeyValuePair{}, false, err
-		}
-		return tree.get(key, child)
-	}
-}
-
-func (tree BPlusTree) fetchPage(pageId int) (*Page, error) {
-	page, found := tree.pageById[pageId]
-	if found {
-		return page, nil
-	}
-	page, err := tree.pagePool.Read(pageId)
-	if err != nil {
-		return nil, err
-	}
-	tree.pageById[page.id] = page
-	return page, nil
+	return tree.pageHierarchy.Get(key)
 }
 
 func (tree *BPlusTree) create(options Options) error {
@@ -77,7 +43,5 @@ func (tree *BPlusTree) initialize(options Options) error {
 	if err != nil {
 		return err
 	}
-	tree.rootPage = NewPage(0)
-	tree.pageById[tree.rootPage.id] = tree.rootPage
 	return nil
 }
