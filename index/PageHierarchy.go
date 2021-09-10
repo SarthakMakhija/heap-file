@@ -16,13 +16,13 @@ func NewPageHierarchy(pagePool *PagePool) *PageHierarchy {
 	return pageHierarchy
 }
 
-func (pageHierarchy PageHierarchy) Put(keyValuePair KeyValuePair) {
+func (pageHierarchy *PageHierarchy) Put(keyValuePair KeyValuePair) {
 	getResult := pageHierarchy.Get(keyValuePair.key)
 	//assume key does not exist and page is not full
 	getResult.page.insertAt(getResult.index, keyValuePair)
 }
 
-func (pageHierarchy PageHierarchy) Get(key []byte) GetResult {
+func (pageHierarchy *PageHierarchy) Get(key []byte) GetResult {
 	return pageHierarchy.get(key, pageHierarchy.rootPage)
 }
 
@@ -34,7 +34,7 @@ func (pageHierarchy PageHierarchy) PageById(id int) *Page {
 	return pageHierarchy.pageById[id]
 }
 
-func (pageHierarchy PageHierarchy) get(key []byte, page *Page) GetResult {
+func (pageHierarchy *PageHierarchy) get(key []byte, page *Page) GetResult {
 	index, found := page.Get(key)
 	if page.isLeaf() {
 		if found {
@@ -45,7 +45,7 @@ func (pageHierarchy PageHierarchy) get(key []byte, page *Page) GetResult {
 		if found {
 			index = index + 1
 		}
-		child, err := pageHierarchy.fetchPage(page.childPageIds[index])
+		child, err := pageHierarchy.fetchOrCachePage(page.childPageIds[index])
 		if err != nil {
 			return NewFailedGetResult(err)
 		}
@@ -53,7 +53,7 @@ func (pageHierarchy PageHierarchy) get(key []byte, page *Page) GetResult {
 	}
 }
 
-func (pageHierarchy PageHierarchy) fetchPage(pageId int) (*Page, error) {
+func (pageHierarchy *PageHierarchy) fetchOrCachePage(pageId int) (*Page, error) {
 	page, found := pageHierarchy.pageById[pageId]
 	if found {
 		return page, nil
@@ -62,6 +62,6 @@ func (pageHierarchy PageHierarchy) fetchPage(pageId int) (*Page, error) {
 	if err != nil {
 		return nil, err
 	}
-	pageHierarchy.pageById[page.id] = page
+	pageHierarchy.pageById[pageId] = page
 	return page, nil
 }

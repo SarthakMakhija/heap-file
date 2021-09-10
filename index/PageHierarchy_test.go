@@ -307,3 +307,65 @@ func TestPutsAKeyValuePairInRootPage(t *testing.T) {
 		t.Fatalf("Expected Key value pairs to be %v, received %v", expected, pageKeyValuePairs)
 	}
 }
+
+func TestPutsAKeyValuePairInTheRightPage(t *testing.T) {
+	writeLeftPageToFile := func(fileName string, pageSize int) {
+		leftPage := Page{
+			id: 1,
+			keyValuePairs: []KeyValuePair{
+				{
+					key:   []byte("A"),
+					value: []byte("Database"),
+				},
+			},
+		}
+		writeToAATestFileAtOffset(fileName, leftPage.MarshalBinary(), int64(pageSize*leftPage.id))
+	}
+	writeRightPageToFile := func(fileName string, pageSize int) {
+		rightPage := Page{
+			id: 2,
+			keyValuePairs: []KeyValuePair{
+				{
+					key:   []byte("B"),
+					value: []byte("Storage"),
+				},
+				{
+					key:   []byte("C"),
+					value: []byte("Systems"),
+				},
+			},
+		}
+		writeToAATestFileAtOffset(fileName, rightPage.MarshalBinary(), int64(pageSize*rightPage.id))
+	}
+
+	options := Options{
+		PageSize:                 os.Getpagesize(),
+		FileName:                 "./test",
+		PreAllocatedPagePoolSize: 8,
+	}
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	pageHierarchy := NewPageHierarchy(pagePool)
+
+	defer deleteFile(pagePool.indexFile)
+
+	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
+		{
+			key:   []byte("B"),
+			value: []byte("Storage"),
+		},
+	}
+	writeLeftPageToFile(options.FileName, options.PageSize)
+	writeRightPageToFile(options.FileName, options.PageSize)
+	pageHierarchy.rootPage.childPageIds = []int{1, 2}
+
+	pageHierarchy.Put(KeyValuePair{key: []byte("D"), value: []byte("OS")})
+
+	getResult := pageHierarchy.Get([]byte("D"))
+	expected := KeyValuePair{key: []byte("D"), value: []byte("OS")}
+
+	if !expected.Equals(getResult.keyValuePair) {
+		t.Fatalf("Expected Key value pair to be %v, received %v", expected, getResult.keyValuePair)
+	}
+}
