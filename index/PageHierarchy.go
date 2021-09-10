@@ -17,26 +17,26 @@ func NewPageHierarchy(pagePool *PagePool) *PageHierarchy {
 }
 
 func (pageHierarchy PageHierarchy) Get(key []byte) (KeyValuePair, bool, error) {
-	var getInner func(*Page) (KeyValuePair, bool, error)
-	getInner = func(page *Page) (KeyValuePair, bool, error) {
-		index, found := page.Get(key)
-		if page.isLeaf() {
-			if found {
-				return page.GetKeyValuePairAt(index), found, nil
-			}
-			return KeyValuePair{}, false, nil
-		} else {
-			if found {
-				index = index + 1
-			}
-			child, err := pageHierarchy.fetchPage(page.childPageIds[index])
-			if err != nil {
-				return KeyValuePair{}, false, err
-			}
-			return getInner(child)
+	return pageHierarchy.get(key, pageHierarchy.rootPage)
+}
+
+func (pageHierarchy PageHierarchy) get(key []byte, page *Page) (KeyValuePair, bool, error) {
+	index, found := page.Get(key)
+	if page.isLeaf() {
+		if found {
+			return page.GetKeyValuePairAt(index), found, nil
 		}
+		return KeyValuePair{}, false, nil
+	} else {
+		if found {
+			index = index + 1
+		}
+		child, err := pageHierarchy.fetchPage(page.childPageIds[index])
+		if err != nil {
+			return KeyValuePair{}, false, err
+		}
+		return pageHierarchy.get(key, child)
 	}
-	return getInner(pageHierarchy.rootPage)
 }
 
 func (pageHierarchy PageHierarchy) fetchPage(pageId int) (*Page, error) {
