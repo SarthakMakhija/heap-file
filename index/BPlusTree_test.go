@@ -55,10 +55,10 @@ func TestDoesNotGetByKeyAsSearchedKeyDoesNotExist(t *testing.T) {
 		{key: []byte("B")},
 	}
 
-	_, found, err := tree.Get([]byte("C"))
+	getResult := tree.Get([]byte("C"))
 
-	if found != false && err != nil {
-		t.Fatalf("Expected found to be false received %v, and error to be nil, received err %v", found, err)
+	if getResult.found != false && getResult.err != nil {
+		t.Fatalf("Expected found to be false received %v, and error to be nil, received err %v", getResult.found, getResult.err)
 	}
 }
 
@@ -114,9 +114,9 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 		key:   []byte("B"),
 		value: []byte("Database"),
 	}
-	keyValuePair, _, _ := tree.Get([]byte("B"))
+	getResult := tree.Get([]byte("B"))
 
-	if !expectedKeyValuePair.Equals(keyValuePair) {
-		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, keyValuePair)
+	if !expectedKeyValuePair.Equals(getResult.keyValuePair) {
+		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, getResult.keyValuePair)
 	}
 }

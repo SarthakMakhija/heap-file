@@ -16,7 +16,7 @@ func NewPageHierarchy(pagePool *PagePool) *PageHierarchy {
 	return pageHierarchy
 }
 
-func (pageHierarchy PageHierarchy) Get(key []byte) (KeyValuePair, bool, error) {
+func (pageHierarchy PageHierarchy) Get(key []byte) GetResult {
 	return pageHierarchy.get(key, pageHierarchy.rootPage)
 }
 
@@ -28,20 +28,20 @@ func (pageHierarchy PageHierarchy) PageById(id int) *Page {
 	return pageHierarchy.pageById[id]
 }
 
-func (pageHierarchy PageHierarchy) get(key []byte, page *Page) (KeyValuePair, bool, error) {
+func (pageHierarchy PageHierarchy) get(key []byte, page *Page) GetResult {
 	index, found := page.Get(key)
 	if page.isLeaf() {
 		if found {
-			return page.GetKeyValuePairAt(index), found, nil
+			return NewKeyAvailableGetResult(page.GetKeyValuePairAt(index), index, page.id)
 		}
-		return KeyValuePair{}, false, nil
+		return NewKeyMissingGetResult(index, page.id)
 	} else {
 		if found {
 			index = index + 1
 		}
 		child, err := pageHierarchy.fetchPage(page.childPageIds[index])
 		if err != nil {
-			return KeyValuePair{}, false, err
+			return NewFailedGetResult(err)
 		}
 		return pageHierarchy.get(key, child)
 	}

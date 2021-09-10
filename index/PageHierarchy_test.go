@@ -50,10 +50,10 @@ func TestDoesNotGetByKey(t *testing.T) {
 		{key: []byte("B")},
 	}
 
-	_, found, err := pageHierarchy.Get([]byte("C"))
+	getResult := pageHierarchy.Get([]byte("C"))
 
-	if found != false && err != nil {
-		t.Fatalf("Expected found to be false received %v, and error to be nil, received err %v", found, err)
+	if getResult.found != false && getResult.err != nil {
+		t.Fatalf("Expected found to be false received %v, and error to be nil, received err %v", getResult.found, getResult.err)
 	}
 }
 
@@ -80,10 +80,10 @@ func TestGetsByKeyInRootLeafPage(t *testing.T) {
 		key:   []byte("B"),
 		value: []byte("Systems"),
 	}
-	keyValuePair, _, _ := pageHierarchy.Get([]byte("B"))
+	getResult := pageHierarchy.Get([]byte("B"))
 
-	if !expectedKeyValuePair.Equals(keyValuePair) {
-		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, keyValuePair)
+	if !expectedKeyValuePair.Equals(getResult.keyValuePair) {
+		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, getResult.keyValuePair)
 	}
 }
 
@@ -143,10 +143,10 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 		key:   []byte("A"),
 		value: []byte("Database"),
 	}
-	keyValuePair, _, _ := pageHierarchy.Get([]byte("A"))
+	getResult := pageHierarchy.Get([]byte("A"))
 
-	if !expectedKeyValuePair.Equals(keyValuePair) {
-		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, keyValuePair)
+	if !expectedKeyValuePair.Equals(getResult.keyValuePair) {
+		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, getResult.keyValuePair)
 	}
 }
 
@@ -206,10 +206,10 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 		key:   []byte("C"),
 		value: []byte("Systems"),
 	}
-	keyValuePair, _, _ := pageHierarchy.Get([]byte("C"))
+	getResult := pageHierarchy.Get([]byte("C"))
 
-	if !expectedKeyValuePair.Equals(keyValuePair) {
-		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, keyValuePair)
+	if !expectedKeyValuePair.Equals(getResult.keyValuePair) {
+		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, getResult.keyValuePair)
 	}
 }
 
@@ -269,9 +269,9 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 		key:   []byte("B"),
 		value: []byte("Storage"),
 	}
-	keyValuePair, _, _ := pageHierarchy.Get([]byte("B"))
+	getResult := pageHierarchy.Get([]byte("B"))
 
-	if !expectedKeyValuePair.Equals(keyValuePair) {
-		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, keyValuePair)
+	if !expectedKeyValuePair.Equals(getResult.keyValuePair) {
+		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, getResult.keyValuePair)
 	}
 }
