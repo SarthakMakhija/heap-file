@@ -6,4 +6,12 @@
 6. Handle free page list
 7. Make value as byte array - done
 8. Put key,value
-9. Validation Optionsk
+9. Validation Options
+10. Write to disk
+11. Close file
+12. Write page id to the file and also add a test to put and get with - root page - child1 - child2 - and then leaf..
+    to ensure marshal and unmarshal for internal nodes are covered and also page ids are retrieved and cached properly. Also confirm if this is really needed
+
+-----------------------------------------------------------------------------
+
+
