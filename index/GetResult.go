@@ -3,26 +3,26 @@ package index
 type GetResult struct {
 	keyValuePair KeyValuePair
 	index        int
-	pageId       int
+	page         *Page
 	found        bool
 	err          error
 }
 
-func NewKeyAvailableGetResult(pair KeyValuePair, index int, pageId int) GetResult {
+func NewKeyAvailableGetResult(pair KeyValuePair, index int, page *Page) GetResult {
 	return GetResult{
 		keyValuePair: pair,
 		index:        index,
-		pageId:       pageId,
+		page:         page,
 		found:        true,
 		err:          nil,
 	}
 }
 
-func NewKeyMissingGetResult(index int, pageId int) GetResult {
+func NewKeyMissingGetResult(index int, page *Page) GetResult {
 	return GetResult{
 		keyValuePair: KeyValuePair{},
 		index:        index,
-		pageId:       pageId,
+		page:         page,
 		found:        false,
 		err:          nil,
 	}

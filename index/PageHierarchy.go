@@ -32,9 +32,9 @@ func (pageHierarchy PageHierarchy) get(key []byte, page *Page) GetResult {
 	index, found := page.Get(key)
 	if page.isLeaf() {
 		if found {
-			return NewKeyAvailableGetResult(page.GetKeyValuePairAt(index), index, page.id)
+			return NewKeyAvailableGetResult(page.GetKeyValuePairAt(index), index, page)
 		}
-		return NewKeyMissingGetResult(index, page.id)
+		return NewKeyMissingGetResult(index, page)
 	} else {
 		if found {
 			index = index + 1
