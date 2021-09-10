@@ -14,14 +14,8 @@ func TestDoesNotGetByKey(t *testing.T) {
 	defer deleteFile(pagePool.indexFile)
 
 	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
-		{
-			key:   []byte("A"),
-			value: uint64(100),
-		},
-		{
-			key:   []byte("B"),
-			value: uint64(200),
-		},
+		{key: []byte("A")},
+		{key: []byte("B")},
 	}
 
 	_, found, err := pageHierarchy.Get([]byte("C"))
@@ -42,17 +36,17 @@ func TestGetsByKeyInRootLeafPage(t *testing.T) {
 	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
 		{
 			key:   []byte("A"),
-			value: uint64(100),
+			value: []byte("Database"),
 		},
 		{
 			key:   []byte("B"),
-			value: uint64(200),
+			value: []byte("Systems"),
 		},
 	}
 
 	expectedKeyValuePair := KeyValuePair{
 		key:   []byte("B"),
-		value: uint64(200),
+		value: []byte("Systems"),
 	}
 	keyValuePair, _, _ := pageHierarchy.Get([]byte("B"))
 
@@ -68,7 +62,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
-					value: uint64(100),
+					value: []byte("Database"),
 				},
 			},
 		}
@@ -80,11 +74,11 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
-					value: uint64(200),
+					value: []byte("Storage"),
 				},
 				{
 					key:   []byte("C"),
-					value: uint64(300),
+					value: []byte("Systems"),
 				},
 			},
 		}
@@ -106,7 +100,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
 		{
 			key:   []byte("B"),
-			value: uint64(200),
+			value: []byte("Storage"),
 		},
 	}
 	writeLeftPageToFile(options.FileName, options.PageSize)
@@ -115,7 +109,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 
 	expectedKeyValuePair := KeyValuePair{
 		key:   []byte("A"),
-		value: uint64(100),
+		value: []byte("Database"),
 	}
 	keyValuePair, _, _ := pageHierarchy.Get([]byte("A"))
 
@@ -131,7 +125,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
-					value: uint64(100),
+					value: []byte("Database"),
 				},
 			},
 		}
@@ -143,11 +137,11 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
-					value: uint64(200),
+					value: []byte("Storage"),
 				},
 				{
 					key:   []byte("C"),
-					value: uint64(300),
+					value: []byte("Systems"),
 				},
 			},
 		}
@@ -164,10 +158,12 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool)
 
+	defer deleteFile(pagePool.indexFile)
+
 	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
 		{
 			key:   []byte("B"),
-			value: uint64(200),
+			value: []byte("Storage"),
 		},
 	}
 	writeLeftPageToFile(options.FileName, options.PageSize)
@@ -176,7 +172,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 
 	expectedKeyValuePair := KeyValuePair{
 		key:   []byte("C"),
-		value: uint64(300),
+		value: []byte("Systems"),
 	}
 	keyValuePair, _, _ := pageHierarchy.Get([]byte("C"))
 
@@ -192,7 +188,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
-					value: uint64(100),
+					value: []byte("Database"),
 				},
 			},
 		}
@@ -204,11 +200,11 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
-					value: uint64(200),
+					value: []byte("Storage"),
 				},
 				{
 					key:   []byte("C"),
-					value: uint64(300),
+					value: []byte("Systems"),
 				},
 			},
 		}
@@ -224,12 +220,13 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool)
+
 	defer deleteFile(pagePool.indexFile)
 
 	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
 		{
 			key:   []byte("B"),
-			value: uint64(200),
+			value: []byte("Storage"),
 		},
 	}
 	writeLeftPageToFile(options.FileName, options.PageSize)
@@ -238,7 +235,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 
 	expectedKeyValuePair := KeyValuePair{
 		key:   []byte("B"),
-		value: uint64(200),
+		value: []byte("Storage"),
 	}
 	keyValuePair, _, _ := pageHierarchy.Get([]byte("B"))
 

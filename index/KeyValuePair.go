@@ -4,12 +4,16 @@ import "bytes"
 
 type KeyValuePair struct {
 	key   []byte
-	value uint64
+	value []byte
 }
 
 func (keyValuePair KeyValuePair) Equals(other KeyValuePair) bool {
-	if keyValuePair.value == other.value && bytes.Equal(keyValuePair.key, other.key) {
+	if bytes.Equal(keyValuePair.value, other.value) && bytes.Equal(keyValuePair.key, other.key) {
 		return true
 	}
 	return false
+}
+
+func (keyValuePair KeyValuePair) PrettyValue() string {
+	return string(keyValuePair.value)
 }

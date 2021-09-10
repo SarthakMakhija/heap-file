@@ -44,13 +44,17 @@ func (page Page) MarshalBinary() []byte {
 		littleEndian.PutUint16(buffer[offset:offset+2], uint16(len(page.keyValuePairs)))
 		offset += 2
 	}
-	writeValue := func(value uint64) {
-		littleEndian.PutUint64(buffer[offset:offset+8], value)
-		offset += 8
+	writeValueLength := func(length uint16) {
+		littleEndian.PutUint16(buffer[offset:offset+2], length)
+		offset += 2
 	}
 	writeKeyLength := func(length uint16) {
 		littleEndian.PutUint16(buffer[offset:offset+2], length)
 		offset += 2
+	}
+	writeValue := func(value []byte) {
+		copy(buffer[offset:offset+len(value)], value)
+		offset += len(value)
 	}
 	writeKey := func(key []byte) {
 		copy(buffer[offset:], key)
@@ -64,6 +68,7 @@ func (page Page) MarshalBinary() []byte {
 		for index := 0; index < len(page.keyValuePairs); index++ {
 			keyValuePair := page.keyValuePairs[index]
 
+			writeValueLength(uint16(len(keyValuePair.value)))
 			writeValue(keyValuePair.value)
 			writeKeyLength(uint16(len(keyValuePair.key)))
 			writeKey(keyValuePair.key)
@@ -80,9 +85,13 @@ func (page *Page) UnMarshalBinary(buffer []byte) {
 		offset += 2
 		return keyValuePairCount
 	}
-	readValue := func() uint64 {
-		value := littleEndian.Uint64(buffer[offset : offset+8])
-		offset += 8
+	readValue := func() []byte {
+		valueSize := int(littleEndian.Uint16(buffer[offset : offset+2]))
+		offset += 2
+
+		value := make([]byte, valueSize)
+		copy(value, buffer[offset:offset+valueSize])
+		offset += valueSize
 		return value
 	}
 	readKey := func() []byte {

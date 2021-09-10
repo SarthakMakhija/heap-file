@@ -7,18 +7,9 @@ import (
 func TestGetsTheIndexForAKey(t *testing.T) {
 	page := Page{
 		keyValuePairs: []KeyValuePair{
-			{
-				key:   []byte("A"),
-				value: uint64(100),
-			},
-			{
-				key:   []byte("B"),
-				value: uint64(200),
-			},
-			{
-				key:   []byte("C"),
-				value: uint64(300),
-			},
+			{key: []byte("A")},
+			{key: []byte("B")},
+			{key: []byte("C")},
 		},
 	}
 	expectedIndex := 0
@@ -32,18 +23,9 @@ func TestGetsTheIndexForAKey(t *testing.T) {
 func TestReturnsTrueIfKeyIsPresentInThePage(t *testing.T) {
 	page := Page{
 		keyValuePairs: []KeyValuePair{
-			{
-				key:   []byte("A"),
-				value: uint64(100),
-			},
-			{
-				key:   []byte("B"),
-				value: uint64(200),
-			},
-			{
-				key:   []byte("C"),
-				value: uint64(300),
-			},
+			{key: []byte("A")},
+			{key: []byte("B")},
+			{key: []byte("C")},
 		},
 	}
 	_, found := page.Get([]byte("B"))
@@ -56,10 +38,7 @@ func TestReturnsTrueIfKeyIsPresentInThePage(t *testing.T) {
 func TestReturnsFalseIfKeyIsNotPresentInThePage(t *testing.T) {
 	page := Page{
 		keyValuePairs: []KeyValuePair{
-			{
-				key:   []byte("C"),
-				value: uint64(300),
-			},
+			{key: []byte("C")},
 		},
 	}
 	_, found := page.Get([]byte("D"))
@@ -74,7 +53,7 @@ func TestUnMarshalsAPageWithKeyValuePairCountAs1(t *testing.T) {
 		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("C"),
-				value: uint64(300),
+				value: []byte("Storage"),
 			},
 		},
 	}
@@ -94,7 +73,7 @@ func TestUnMarshalsAPageWithKey(t *testing.T) {
 		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("C"),
-				value: uint64(300),
+				value: []byte("Storage"),
 			},
 		},
 	}
@@ -114,7 +93,7 @@ func TestUnMarshalsAPageWithValue(t *testing.T) {
 		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("C"),
-				value: uint64(300),
+				value: []byte("Storage"),
 			},
 		},
 	}
@@ -123,9 +102,9 @@ func TestUnMarshalsAPageWithValue(t *testing.T) {
 	newPage := &Page{}
 	newPage.UnMarshalBinary(bytes)
 
-	value := newPage.keyValuePairs[0].value
-	if value != 300 {
-		t.Fatalf("Expected value to be 300, received %v", value)
+	value := newPage.keyValuePairs[0].PrettyValue()
+	if value != "Storage" {
+		t.Fatalf("Expected value to be Storage, received %v", value)
 	}
 }
 
@@ -134,11 +113,11 @@ func TestUnMarshalsAPageWithMultipleKeyValuePairs(t *testing.T) {
 		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("A"),
-				value: uint64(100),
+				value: []byte("Database"),
 			},
 			{
 				key:   []byte("B"),
-				value: uint64(200),
+				value: []byte("Storage"),
 			},
 		},
 	}

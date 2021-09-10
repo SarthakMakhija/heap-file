@@ -51,14 +51,8 @@ func TestDoesNotGetByKeyAsSearchedKeyDoesNotExist(t *testing.T) {
 	defer deleteFile(tree.pagePool.indexFile)
 
 	tree.pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
-		{
-			key:   []byte("A"),
-			value: uint64(100),
-		},
-		{
-			key:   []byte("B"),
-			value: uint64(200),
-		},
+		{key: []byte("A")},
+		{key: []byte("B")},
 	}
 
 	_, found, err := tree.Get([]byte("C"))
@@ -75,7 +69,7 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
-					value: uint64(100),
+					value: []byte("Storage"),
 				},
 			},
 		}
@@ -87,11 +81,11 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
-					value: uint64(200),
+					value: []byte("Database"),
 				},
 				{
 					key:   []byte("C"),
-					value: uint64(300),
+					value: []byte("Systems"),
 				},
 			},
 		}
@@ -109,7 +103,7 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 	tree.pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
 		{
 			key:   []byte("B"),
-			value: uint64(200),
+			value: []byte("Database"),
 		},
 	}
 	writeLeftPageToFile(options.FileName, options.PageSize)
@@ -118,7 +112,7 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 
 	expectedKeyValuePair := KeyValuePair{
 		key:   []byte("B"),
-		value: uint64(200),
+		value: []byte("Database"),
 	}
 	keyValuePair, _, _ := tree.Get([]byte("B"))
 

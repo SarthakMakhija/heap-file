@@ -95,7 +95,7 @@ func TestReadsAPageIdentifiedByPageId0(t *testing.T) {
 		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("A"),
-				value: uint64(100),
+				value: []byte("Storage"),
 			},
 		},
 	}
@@ -125,7 +125,7 @@ func TestReadsAPageIdentifiedByPageId1(t *testing.T) {
 		keyValuePairs: []KeyValuePair{
 			{
 				key:   []byte("B"),
-				value: uint64(200),
+				value: []byte("Database Storage"),
 			},
 		},
 	}
