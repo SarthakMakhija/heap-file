@@ -7,9 +7,9 @@ import (
 
 func TestDoesNotGetByKey(t *testing.T) {
 	options := DefaultOptions()
-	indexFile, _ := Open(options)
-	pagePool := New(indexFile, options)
-	pageHierarchy := InstantiateHierarchy(pagePool)
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	pageHierarchy := NewPageHierarchy(pagePool)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -33,9 +33,9 @@ func TestDoesNotGetByKey(t *testing.T) {
 
 func TestGetsByKeyInRootLeafPage(t *testing.T) {
 	options := DefaultOptions()
-	indexFile, _ := Open(options)
-	pagePool := New(indexFile, options)
-	pageHierarchy := InstantiateHierarchy(pagePool)
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	pageHierarchy := NewPageHierarchy(pagePool)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -96,10 +96,10 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 		FileName:                 "./test",
 		PreAllocatedPagePoolSize: 8,
 	}
-	indexFile, _ := Open(options)
-	pagePool := New(indexFile, options)
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := InstantiateHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -159,10 +159,10 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 		FileName:                 "./test",
 		PreAllocatedPagePoolSize: 8,
 	}
-	indexFile, _ := Open(options)
-	pagePool := New(indexFile, options)
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := InstantiateHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool)
 
 	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
 		{
@@ -220,10 +220,10 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 		FileName:                 "./test",
 		PreAllocatedPagePoolSize: 8,
 	}
-	indexFile, _ := Open(options)
-	pagePool := New(indexFile, options)
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := InstantiateHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool)
 	defer deleteFile(pagePool.indexFile)
 
 	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{

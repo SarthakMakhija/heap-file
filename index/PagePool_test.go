@@ -7,8 +7,8 @@ import (
 
 func TestReturnsThePageCountInAnIndexFile(t *testing.T) {
 	options := DefaultOptions()
-	indexFile, _ := Open(options)
-	pagePool := New(indexFile, options)
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
 
 	defer deleteFile(indexFile)
 
@@ -22,8 +22,8 @@ func TestReturnsThePageCountInAnIndexFile(t *testing.T) {
 
 func TestReturnsTrueGivenIndexFileContainsZeroPages(t *testing.T) {
 	options := DefaultOptions()
-	indexFile, _ := Open(options)
-	pagePool := New(indexFile, options)
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
 
 	defer deleteFile(indexFile)
 
@@ -41,9 +41,9 @@ func TestReturnsFalseGivenIndexFileContainsMoreThanZeroPages(t *testing.T) {
 	}
 	writeToATestFileWithEmptyPage(options.FileName, options.PageSize)
 
-	indexFile, _ := Open(options)
+	indexFile, _ := OpenIndexFile(options)
 	defer deleteFile(indexFile)
-	pagePool := New(indexFile, options)
+	pagePool := NewPagePool(indexFile, options)
 
 	defer deleteFile(indexFile)
 
@@ -56,8 +56,8 @@ func TestReturnsFalseGivenIndexFileContainsMoreThanZeroPages(t *testing.T) {
 
 func TestAllocates5Pages(t *testing.T) {
 	options := DefaultOptions()
-	indexFile, _ := Open(options)
-	pagePool := New(indexFile, options)
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
 
 	defer deleteFile(indexFile)
 
@@ -72,8 +72,8 @@ func TestAllocates5Pages(t *testing.T) {
 
 func TestAllocationOf5PagesShouldIncreaseTheFileSize(t *testing.T) {
 	options := DefaultOptions()
-	indexFile, _ := Open(options)
-	pagePool := New(indexFile, options)
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
 
 	defer deleteFile(indexFile)
 
@@ -103,8 +103,8 @@ func TestReadsAPageIdentifiedByPageId0(t *testing.T) {
 	writeToATestFileWithEmptyPage(options.FileName, options.PageSize)
 	writeToAATestFileWith(options.FileName, page.MarshalBinary())
 
-	indexFile, _ := Open(options)
-	pagePool := New(indexFile, options)
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
 	defer deleteFile(indexFile)
 
 	pageId := 0
@@ -133,8 +133,8 @@ func TestReadsAPageIdentifiedByPageId1(t *testing.T) {
 	writeToATestFileWithEmptyPage(options.FileName, options.PageSize*2)
 	writeToAATestFileAtOffset(options.FileName, page.MarshalBinary(), pageOffset)
 
-	indexFile, _ := Open(options)
-	pagePool := New(indexFile, options)
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
 	defer deleteFile(indexFile)
 
 	pageId := 1

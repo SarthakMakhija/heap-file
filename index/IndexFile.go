@@ -12,7 +12,7 @@ type IndexFile struct {
 	memoryMap mmap.MMap
 }
 
-func Open(options Options) (*IndexFile, error) {
+func OpenIndexFile(options Options) (*IndexFile, error) {
 	fileMode := os.O_CREATE | os.O_RDWR
 	file, err := os.OpenFile(options.FileName, fileMode, 0644)
 

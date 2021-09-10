@@ -11,7 +11,7 @@ func deleteFile(indexFile *IndexFile) {
 
 func TestCreatesANewIndexFileWithFileSize(t *testing.T) {
 	options := DefaultOptions()
-	indexFile, _ := Open(options)
+	indexFile, _ := OpenIndexFile(options)
 	defer deleteFile(indexFile)
 
 	expectedFileSize := int64(0)
@@ -29,7 +29,7 @@ func TestOpensAnExistingFileWithFileSizeGreaterThanZero(t *testing.T) {
 	}
 	createATestFileWithSize(options.FileName, options.PageSize)
 
-	indexFile, _ := Open(options)
+	indexFile, _ := OpenIndexFile(options)
 	defer deleteFile(indexFile)
 
 	expectedFileSize := int64(options.PageSize)
@@ -42,7 +42,7 @@ func TestOpensAnExistingFileWithFileSizeGreaterThanZero(t *testing.T) {
 
 func TestResizesAnEmptyFileToAGivenSize(t *testing.T) {
 	options := DefaultOptions()
-	indexFile, _ := Open(options)
+	indexFile, _ := OpenIndexFile(options)
 	defer deleteFile(indexFile)
 
 	_ = indexFile.ResizeTo(100)

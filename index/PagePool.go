@@ -6,7 +6,7 @@ type PagePool struct {
 	pageCount int
 }
 
-func New(indexFile *IndexFile, options Options) *PagePool {
+func NewPagePool(indexFile *IndexFile, options Options) *PagePool {
 	pagePool := &PagePool{
 		indexFile: indexFile,
 	}

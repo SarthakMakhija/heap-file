@@ -6,7 +6,7 @@ type PageHierarchy struct {
 	pagePool *PagePool
 }
 
-func InstantiateHierarchy(pagePool *PagePool) *PageHierarchy {
+func NewPageHierarchy(pagePool *PagePool) *PageHierarchy {
 	pageHierarchy := &PageHierarchy{
 		rootPage: NewPage(0),
 		pagePool: pagePool,

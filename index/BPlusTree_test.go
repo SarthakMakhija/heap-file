@@ -11,7 +11,7 @@ func TestCreatesABPlusTreeByPreAllocatingPagesAlongWithMetaPageAndRootPage(t *te
 		FileName:                 "./test",
 		PreAllocatedPagePoolSize: 6,
 	}
-	tree, _ := Create(options)
+	tree, _ := CreateBPlusTree(options)
 	defer deleteFile(tree.pagePool.indexFile)
 
 	expectedPageCount := options.PreAllocatedPagePoolSize + metaPageCount + rootPageCount
@@ -24,7 +24,7 @@ func TestCreatesABPlusTreeByPreAllocatingPagesAlongWithMetaPageAndRootPage(t *te
 
 func TestCreatesABPlusTreeWithARootPage(t *testing.T) {
 	options := DefaultOptions()
-	tree, _ := Create(options)
+	tree, _ := CreateBPlusTree(options)
 	defer deleteFile(tree.pagePool.indexFile)
 
 	if tree.pageHierarchy.rootPage == nil {
@@ -34,7 +34,7 @@ func TestCreatesABPlusTreeWithARootPage(t *testing.T) {
 
 func TestCreatesABPlusTreeByCachingRootPage(t *testing.T) {
 	options := DefaultOptions()
-	tree, _ := Create(options)
+	tree, _ := CreateBPlusTree(options)
 	defer deleteFile(tree.pagePool.indexFile)
 
 	rootPageId := tree.pageHierarchy.rootPage.id
@@ -47,7 +47,7 @@ func TestCreatesABPlusTreeByCachingRootPage(t *testing.T) {
 
 func TestDoesNotGetByKeyAsSearchedKeyDoesNotExist(t *testing.T) {
 	options := DefaultOptions()
-	tree, _ := Create(options)
+	tree, _ := CreateBPlusTree(options)
 	defer deleteFile(tree.pagePool.indexFile)
 
 	tree.pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
@@ -103,7 +103,7 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 		FileName:                 "./test",
 		PreAllocatedPagePoolSize: 8,
 	}
-	tree, _ := Create(options)
+	tree, _ := CreateBPlusTree(options)
 	defer deleteFile(tree.pagePool.indexFile)
 
 	tree.pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{

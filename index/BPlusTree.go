@@ -9,9 +9,9 @@ type BPlusTree struct {
 const metaPageCount = 1
 const rootPageCount = 1
 
-func Create(options Options) (*BPlusTree, error) {
-	indexFile, err := Open(options)
-	pagePool := New(indexFile, options)
+func CreateBPlusTree(options Options) (*BPlusTree, error) {
+	indexFile, err := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
 
 	if err != nil {
 		return nil, err
@@ -19,7 +19,7 @@ func Create(options Options) (*BPlusTree, error) {
 	tree := &BPlusTree{
 		fileName:      options.FileName,
 		pagePool:      pagePool,
-		pageHierarchy: InstantiateHierarchy(pagePool),
+		pageHierarchy: NewPageHierarchy(pagePool),
 	}
 	if err := tree.create(options); err != nil {
 		return nil, err
