@@ -4,5 +4,5 @@
 4. Revisit error handling
 5. Handle meta pages
 6. Handle free page list
-7. Make value as byte array
+7. Make value as byte array - done
 8. Put key,value
