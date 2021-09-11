@@ -209,23 +209,24 @@ func (page *Page) insertChildAt(index int, childPage *Page) {
 
 func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 	if page.isLeaf() {
-
-		siblingPage.keyValuePairs = make([]KeyValuePair, len(page.keyValuePairs)/2+1)   //may change later - len(page.keyValuePairs)
-		copy(siblingPage.keyValuePairs, page.keyValuePairs[len(page.keyValuePairs)/2:]) //may change later
-		page.keyValuePairs = page.keyValuePairs[:len(page.keyValuePairs)/2]
+		pageKeyValuePairs := page.NonEmptyKeyValuePairs()
+		siblingPage.keyValuePairs = make([]KeyValuePair, len(pageKeyValuePairs)/2+1)   //may change later - len(page.keyValuePairs)
+		copy(siblingPage.keyValuePairs, page.keyValuePairs[len(pageKeyValuePairs)/2:]) //may change later
+		page.keyValuePairs = page.keyValuePairs[:len(pageKeyValuePairs)/2]
 
 		parentPage.insertChildAt(index+1, siblingPage)
 		parentPage.insertAt(index, siblingPage.keyValuePairs[0])
 	} else {
-		parentKey := page.keyValuePairs[len(page.keyValuePairs)/2]
+		pageKeyValuePairs := page.NonEmptyKeyValuePairs()
+		parentKey := page.keyValuePairs[len(pageKeyValuePairs)/2]
 
-		siblingPage.keyValuePairs = make([]KeyValuePair, len(page.keyValuePairs)/2+1)
-		copy(siblingPage.keyValuePairs, page.keyValuePairs[:len(page.keyValuePairs)/2])
-		page.keyValuePairs = page.keyValuePairs[len(page.keyValuePairs)/2:]
+		siblingPage.keyValuePairs = make([]KeyValuePair, len(pageKeyValuePairs)/2+1)
+		copy(siblingPage.keyValuePairs, page.keyValuePairs[:len(pageKeyValuePairs)/2])
+		page.keyValuePairs = page.keyValuePairs[len(pageKeyValuePairs)/2:]
 
-		siblingPage.childPageIds = make([]int, len(siblingPage.keyValuePairs)+1)
-		copy(siblingPage.childPageIds, page.childPageIds[:len(page.keyValuePairs)/2])
-		page.childPageIds = page.childPageIds[len(page.keyValuePairs)/2:]
+		siblingPage.childPageIds = make([]int, len(siblingPage.NonEmptyKeyValuePairs())+1)
+		copy(siblingPage.childPageIds, page.childPageIds[:len(pageKeyValuePairs)/2])
+		page.childPageIds = page.childPageIds[len(pageKeyValuePairs)/2:]
 
 		parentPage.insertChildAt(index, siblingPage)
 		parentPage.insertAt(index, parentKey)
