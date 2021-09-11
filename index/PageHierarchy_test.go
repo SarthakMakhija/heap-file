@@ -130,12 +130,8 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 
 	defer deleteFile(pagePool.indexFile)
 
-	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
-		{
-			key:   []byte("B"),
-			value: []byte("Storage"),
-		},
-	}
+	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{{key: []byte("B")}}
+
 	writeLeftPageToFile(options.FileName, options.PageSize)
 	writeRightPageToFile(options.FileName, options.PageSize)
 	pageHierarchy.rootPage.childPageIds = []int{1, 2}
@@ -193,12 +189,8 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 
 	defer deleteFile(pagePool.indexFile)
 
-	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
-		{
-			key:   []byte("B"),
-			value: []byte("Storage"),
-		},
-	}
+	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{{key: []byte("B")}}
+
 	writeLeftPageToFile(options.FileName, options.PageSize)
 	writeRightPageToFile(options.FileName, options.PageSize)
 	pageHierarchy.rootPage.childPageIds = []int{1, 2}
@@ -256,12 +248,8 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 
 	defer deleteFile(pagePool.indexFile)
 
-	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
-		{
-			key:   []byte("B"),
-			value: []byte("Storage"),
-		},
-	}
+	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{{key: []byte("B")}}
+
 	writeLeftPageToFile(options.FileName, options.PageSize)
 	writeRightPageToFile(options.FileName, options.PageSize)
 	pageHierarchy.rootPage.childPageIds = []int{1, 2}
@@ -277,7 +265,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 	}
 }
 
-func TestPutsAKeyValuePairInRootPage(t *testing.T) {
+func TestPutsAKeyValuePairInRootLeafPage(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
@@ -350,12 +338,8 @@ func TestPutsAKeyValuePairInTheRightPage(t *testing.T) {
 
 	defer deleteFile(pagePool.indexFile)
 
-	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
-		{
-			key:   []byte("B"),
-			value: []byte("Storage"),
-		},
-	}
+	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{{key: []byte("B")}}
+
 	writeLeftPageToFile(options.FileName, options.PageSize)
 	writeRightPageToFile(options.FileName, options.PageSize)
 	pageHierarchy.rootPage.childPageIds = []int{1, 2}

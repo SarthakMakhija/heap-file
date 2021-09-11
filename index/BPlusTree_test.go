@@ -101,12 +101,8 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 	tree, _ := CreateBPlusTree(options)
 	defer deleteFile(tree.pagePool.indexFile)
 
-	tree.pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
-		{
-			key:   []byte("B"),
-			value: []byte("Database"),
-		},
-	}
+	tree.pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{{key: []byte("B")}}
+
 	writeLeftPageToFile(options.FileName, options.PageSize)
 	writeRightPageToFile(options.FileName, options.PageSize)
 	tree.pageHierarchy.rootPage.childPageIds = []int{1, 2}
