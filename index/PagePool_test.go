@@ -2,6 +2,7 @@ package index
 
 import (
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -143,6 +144,66 @@ func TestReadsAPageIdentifiedByPageId1(t *testing.T) {
 
 	if !expectedKeyValuePair.Equals(readPage.keyValuePairs[0]) {
 		t.Fatalf("Expected key value pair to be %v, received %v", expectedKeyValuePair, readPage.keyValuePairs[0])
+	}
+}
+
+func TestReadsANonLeafPageWithChildPageIds(t *testing.T) {
+	options := Options{
+		PageSize: os.Getpagesize(),
+		FileName: "./test",
+	}
+	page := Page{
+		keyValuePairs: []KeyValuePair{
+			{key: []byte("A")},
+		},
+		childPageIds: []int{10, 20},
+	}
+
+	writeToATestFileWithEmptyPage(options.FileName, options.PageSize)
+	writeToAATestFileWith(options.FileName, page.MarshalBinary())
+
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	defer deleteFile(indexFile)
+
+	pageId := 0
+	readPage, _ := pagePool.Read(pageId)
+
+	expected := []int{10, 20}
+	childPageIds := readPage.childPageIds
+
+	if !reflect.DeepEqual(expected, childPageIds) {
+		t.Fatalf("Expected child page ids to be %v, received %v", expected, childPageIds)
+	}
+}
+
+func TestReadsANonLeafPageWithKeyValuePairs(t *testing.T) {
+	options := Options{
+		PageSize: os.Getpagesize(),
+		FileName: "./test",
+	}
+	page := Page{
+		keyValuePairs: []KeyValuePair{
+			{key: []byte("A")},
+		},
+		childPageIds: []int{10, 20},
+	}
+
+	writeToATestFileWithEmptyPage(options.FileName, options.PageSize)
+	writeToAATestFileWith(options.FileName, page.MarshalBinary())
+
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	defer deleteFile(indexFile)
+
+	pageId := 0
+	readPage, _ := pagePool.Read(pageId)
+
+	expected := []KeyValuePair{{key: []byte("A")}}
+	keyValuePairs := readPage.NonEmptyKeyValuePairs()
+
+	if !reflect.DeepEqual(expected, keyValuePairs) {
+		t.Fatalf("Expected keyValuePairs to be %v, received %v", expected, keyValuePairs)
 	}
 }
 
