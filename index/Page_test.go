@@ -214,7 +214,7 @@ func TestSplitsALeafPageWithKeyValuePairsInParent(t *testing.T) {
 	_ = page.split(parentPage, siblingPage, 0)
 
 	keyValuePairsAfterSplit := parentPage.keyValuePairs
-	expected := []KeyValuePair{{key: []byte("B"), value: []byte("Systems")}}
+	expected := []KeyValuePair{{key: []byte("B")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {
 		t.Fatalf("Expected key value pairs in the parent page after split to be %v, received %v", expected, keyValuePairsAfterSplit)

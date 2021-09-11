@@ -33,7 +33,7 @@ func (page Page) GetKeyValuePairAt(index int) KeyValuePair {
 }
 
 func (page Page) MarshalBinary() []byte {
-	buffer := make([]byte, 30) //will be replaced with page.Size()
+	buffer := make([]byte, 50) //will be replaced with page.Size()
 	offset := 0
 
 	writeLeafPageType := func() {
@@ -133,9 +133,15 @@ func (page Page) isLeaf() bool {
 }
 
 func (page *Page) insertAt(index int, keyValuePair KeyValuePair) {
-	page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{})
-	copy(page.keyValuePairs[index+1:], page.keyValuePairs[index:])
-	page.keyValuePairs[index] = keyValuePair
+	if page.isLeaf() {
+		page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{})
+		copy(page.keyValuePairs[index+1:], page.keyValuePairs[index:]) //handle the case where value should not be inserted if it is a leaf page
+		page.keyValuePairs[index] = keyValuePair
+	} else {
+		page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{})
+		copy(page.keyValuePairs[index+1:], page.keyValuePairs[index:]) //handle the case where value should not be inserted if it is a leaf page
+		page.keyValuePairs[index] = KeyValuePair{key: keyValuePair.key}
+	}
 }
 
 func (page *Page) insertChildAt(index int, childPage *Page) {
