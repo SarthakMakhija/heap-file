@@ -13,11 +13,9 @@ const (
 )
 
 type Page struct {
-	id             int
-	keyValuePairs  []KeyValuePair
-	childPageIds   []int
-	nextPageId     int
-	previousPageId int
+	id            int
+	keyValuePairs []KeyValuePair
+	childPageIds  []int
 }
 
 func NewPage(id int) *Page {
@@ -148,9 +146,6 @@ func (page *Page) insertChildAt(index int, childPage *Page) {
 
 func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 	if page.isLeaf() {
-		siblingPage.nextPageId = page.nextPageId
-		siblingPage.previousPageId = page.id
-		page.nextPageId = siblingPage.id
 
 		siblingPage.keyValuePairs = make([]KeyValuePair, len(page.keyValuePairs)/2+1)   //may change later - len(page.keyValuePairs)
 		copy(siblingPage.keyValuePairs, page.keyValuePairs[len(page.keyValuePairs)/2:]) //may change later
