@@ -17,3 +17,11 @@ func (keyValuePair KeyValuePair) Equals(other KeyValuePair) bool {
 func (keyValuePair KeyValuePair) PrettyValue() string {
 	return string(keyValuePair.value)
 }
+
+func (keyValuePair KeyValuePair) PrettyKey() string {
+	return string(keyValuePair.key)
+}
+
+func (keyValuePair KeyValuePair) String() string {
+	return " [" + keyValuePair.PrettyKey() + " - " + keyValuePair.PrettyValue() + "] "
+}
