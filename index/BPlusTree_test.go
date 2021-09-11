@@ -133,7 +133,7 @@ func TestPutsAKeyValuePair(t *testing.T) {
 			value: []byte("Database"),
 		},
 	}
-	tree.Put([]byte("C"), []byte("Storage"))
+	_ = tree.Put([]byte("C"), []byte("Storage"))
 	expected := []KeyValuePair{
 		{key: []byte("B"), value: []byte("Database")},
 		{key: []byte("C"), value: []byte("Storage")},

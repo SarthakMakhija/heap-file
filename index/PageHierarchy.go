@@ -16,10 +16,31 @@ func NewPageHierarchy(pagePool *PagePool) *PageHierarchy {
 	return pageHierarchy
 }
 
-func (pageHierarchy *PageHierarchy) Put(keyValuePair KeyValuePair) {
+func (pageHierarchy *PageHierarchy) Put(keyValuePair KeyValuePair) error {
+	splitRoot := func() error {
+		siblingPageCount := 1
+		newRootPageCount := 1
+
+		pages, err := pageHierarchy.allocatePages(siblingPageCount + newRootPageCount)
+		if err != nil {
+			return err
+		}
+		newRootPage, rightSiblingPage, oldRootPage := pages[0], pages[1], pageHierarchy.rootPage
+		newRootPage.childPageIds = append(newRootPage.childPageIds, oldRootPage.id)
+		pageHierarchy.rootPage = newRootPage
+
+		return oldRootPage.split(newRootPage, rightSiblingPage, 0)
+	}
+
+	if len(pageHierarchy.rootPage.keyValuePairs) >= 3 { //will be replaced with % occupancy later
+		if err := splitRoot(); err != nil {
+			return err
+		}
+	}
 	getResult := pageHierarchy.Get(keyValuePair.key)
 	//assume key does not exist and page is not full
 	getResult.page.insertAt(getResult.index, keyValuePair)
+	return nil
 }
 
 func (pageHierarchy *PageHierarchy) Get(key []byte) GetResult {
@@ -64,4 +85,16 @@ func (pageHierarchy *PageHierarchy) fetchOrCachePage(pageId int) (*Page, error) 
 	}
 	pageHierarchy.pageById[pageId] = page
 	return page, nil
+}
+
+func (pageHierarchy *PageHierarchy) allocatePages(pageCount int) ([]*Page, error) {
+	newPageId := 1 //will come from free list of pages
+	pages := make([]*Page, pageCount)
+	for index := 0; index < pageCount; index++ {
+		newPage := NewPage(newPageId)
+		pageHierarchy.pageById[newPageId] = newPage
+		pages[index] = newPage
+		newPageId = newPageId + 1
+	}
+	return pages, nil
 }

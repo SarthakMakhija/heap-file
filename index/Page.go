@@ -13,9 +13,11 @@ const (
 )
 
 type Page struct {
-	id            int
-	keyValuePairs []KeyValuePair
-	childPageIds  []int
+	id             int
+	keyValuePairs  []KeyValuePair
+	childPageIds   []int
+	nextPageId     int
+	previousPageId int
 }
 
 func NewPage(id int) *Page {
@@ -136,4 +138,26 @@ func (page *Page) insertAt(index int, keyValuePair KeyValuePair) {
 	page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{})
 	copy(page.keyValuePairs[index+1:], page.keyValuePairs[index:])
 	page.keyValuePairs[index] = keyValuePair
+}
+
+func (page *Page) insertChildAt(index int, childPage *Page) {
+	page.childPageIds = append(page.childPageIds, 0)
+	copy(page.childPageIds[index+1:], page.childPageIds[index:])
+	page.childPageIds[index] = childPage.id
+}
+
+func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
+	if page.isLeaf() {
+		siblingPage.nextPageId = page.nextPageId
+		siblingPage.previousPageId = page.id
+		page.nextPageId = siblingPage.id
+
+		siblingPage.keyValuePairs = make([]KeyValuePair, len(page.keyValuePairs)/2+1)   //may change later - len(page.keyValuePairs)
+		copy(siblingPage.keyValuePairs, page.keyValuePairs[len(page.keyValuePairs)/2:]) //may change later
+		page.keyValuePairs = page.keyValuePairs[:len(page.keyValuePairs)/2]
+
+		parentPage.insertChildAt(index+1, siblingPage)
+		parentPage.insertAt(index, siblingPage.keyValuePairs[0])
+	}
+	return nil
 }
