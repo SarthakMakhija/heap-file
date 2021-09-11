@@ -12,11 +12,15 @@ var (
 	keyValuePairCountSize = 2
 	keyLengthSize         = 2
 	valueLengthSize       = 2
+	childPageIdSize       = 4
+	childPageId0Size      = childPageIdSize
 	leafPageMetaSize      = pageTypeSize + keyValuePairCountSize
+	nonLeafPageMetaSize   = pageTypeSize + keyValuePairCountSize + childPageId0Size
 )
 
 const (
-	LeafPage = 0x00
+	LeafPage    = uint8(0x0)
+	NonLeafPage = uint8(0x01)
 )
 
 type Page struct {
@@ -43,8 +47,8 @@ func (page Page) MarshalBinary() []byte {
 	buffer := make([]byte, page.size())
 	offset := 0
 
-	writeLeafPageType := func() {
-		buffer[offset] = LeafPage
+	writePageType := func(pageType byte) {
+		buffer[offset] = pageType
 		offset++
 	}
 	writeKeyValuePairCount := func() {
@@ -67,9 +71,13 @@ func (page Page) MarshalBinary() []byte {
 		copy(buffer[offset:], key)
 		offset += len(key)
 	}
+	writeChildPageId := func(childPageId uint32) {
+		littleEndian.PutUint32(buffer[offset:offset+4], childPageId)
+		offset += 4
+	}
 
 	if page.isLeaf() {
-		writeLeafPageType()
+		writePageType(LeafPage)
 		writeKeyValuePairCount()
 
 		for index := 0; index < len(page.keyValuePairs); index++ {
@@ -80,8 +88,19 @@ func (page Page) MarshalBinary() []byte {
 			writeKeyLength(uint16(len(keyValuePair.key)))
 			writeKey(keyValuePair.key)
 		}
+	} else {
+		writePageType(NonLeafPage)
+		writeKeyValuePairCount()
+		writeChildPageId(uint32(page.childPageIds[0]))
+
+		for index := 0; index < len(page.keyValuePairs); index++ {
+			keyValuePair := page.keyValuePairs[index]
+
+			writeChildPageId(uint32(page.childPageIds[index+1]))
+			writeKeyLength(uint16(len(keyValuePair.key)))
+			writeKey(keyValuePair.key)
+		}
 	}
-	//handle non-leaf
 	return buffer
 }
 
@@ -111,8 +130,13 @@ func (page *Page) UnMarshalBinary(buffer []byte) {
 		offset += keySize
 		return key
 	}
+	readChildPageId := func() int {
+		pageId := int(littleEndian.Uint32(buffer[offset : offset+4]))
+		offset += 4
+		return pageId
+	}
 
-	if buffer[0]&LeafPage == 0 {
+	if buffer[0]&NonLeafPage == 0 {
 		keyValuePairCount := readKeyValuePairCount()
 		for index := 0; index < keyValuePairCount; index++ {
 			pair := KeyValuePair{}
@@ -120,7 +144,18 @@ func (page *Page) UnMarshalBinary(buffer []byte) {
 			pair.key = readKey()
 			page.keyValuePairs = append(page.keyValuePairs, pair)
 		}
-	} //handle non-leaf
+	} else {
+		keyValuePairCount := readKeyValuePairCount()
+		page.childPageIds = append(page.childPageIds, readChildPageId())
+
+		for index := 0; index < keyValuePairCount; index++ {
+			childPageId := readChildPageId()
+			key := readKey()
+
+			page.childPageIds = append(page.childPageIds, childPageId)
+			page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{key: key})
+		}
+	}
 }
 
 func (page Page) size() int {
@@ -130,7 +165,12 @@ func (page Page) size() int {
 		for _, keyValuePair := range page.keyValuePairs {
 			size = size + keyLengthSize + valueLengthSize + len(keyValuePair.key) + len(keyValuePair.value)
 		}
-	} //handle non-leaf
+	} else {
+		size = nonLeafPageMetaSize
+		for _, keyValuePair := range page.keyValuePairs {
+			size = size + keyLengthSize + len(keyValuePair.key) + childPageIdSize
+		}
+	}
 	return size
 }
 

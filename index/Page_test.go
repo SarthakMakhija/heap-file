@@ -109,6 +109,67 @@ func TestUnMarshalsAPageWithValue(t *testing.T) {
 	}
 }
 
+func TestUnMarshalsANonLeafPageWithKey(t *testing.T) {
+	page := Page{
+		keyValuePairs: []KeyValuePair{
+			{
+				key: []byte("C"),
+			},
+		},
+		childPageIds: []int{10, 0},
+	}
+	bytes := page.MarshalBinary()
+
+	newPage := &Page{}
+	newPage.UnMarshalBinary(bytes)
+
+	key := string(newPage.NonEmptyKeyValuePairs()[0].key)
+	if key != "C" {
+		t.Fatalf("Expected key to be C, received %v", key)
+	}
+}
+
+func TestUnMarshalsANonLeafPageWithChildPageId(t *testing.T) {
+	page := Page{
+		keyValuePairs: []KeyValuePair{
+			{
+				key: []byte("C"),
+			},
+		},
+		childPageIds: []int{10, 0},
+	}
+	bytes := page.MarshalBinary()
+
+	newPage := &Page{}
+	newPage.UnMarshalBinary(bytes)
+
+	childPageId0 := newPage.childPageIds[0]
+	if childPageId0 != 10 {
+		t.Fatalf("Expected zeroth child page id to be 10, received %v", childPageId0)
+	}
+}
+
+func TestUnMarshalsANonLeafPageWithMultipleChildPageIds(t *testing.T) {
+	page := Page{
+		keyValuePairs: []KeyValuePair{
+			{key: []byte("C")},
+			{key: []byte("D")},
+		},
+		childPageIds: []int{10, 15, 20},
+	}
+	bytes := page.MarshalBinary()
+
+	newPage := &Page{}
+	newPage.UnMarshalBinary(bytes)
+
+	expected := []int{10, 15, 20}
+	childPageIds := newPage.childPageIds
+
+	if !reflect.DeepEqual(childPageIds, expected) {
+		t.Fatalf("Expected child page ids to be %v, received %v", expected, childPageIds)
+	}
+}
+
 func TestUnMarshalsAPageWithMultipleKeyValuePairs(t *testing.T) {
 	page := Page{
 		keyValuePairs: []KeyValuePair{
@@ -335,5 +396,19 @@ func TestReturnsTheSizeOfALeafPage(t *testing.T) {
 
 	if expected != size {
 		t.Fatalf("Expected leaf page size to be %v, received %v", expected, size)
+	}
+}
+
+func TestReturnsTheSizeOfANonLeafPage(t *testing.T) {
+	page := &Page{
+		id:            0,
+		keyValuePairs: []KeyValuePair{{key: []byte("A")}},
+		childPageIds:  []int{10, 11},
+	}
+	size := page.size()
+	expected := len(page.keyValuePairs[0].key) + pageTypeSize + keyValuePairCountSize + keyLengthSize + 2*childPageIdSize
+
+	if expected != size {
+		t.Fatalf("Expected non-leaf page size to be %v, received %v", expected, size)
 	}
 }
