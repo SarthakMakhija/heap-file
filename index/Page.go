@@ -157,11 +157,24 @@ func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 
 		parentPage.insertChildAt(index+1, siblingPage)
 		parentPage.insertAt(index, siblingPage.keyValuePairs[0])
+	} else {
+		parentKey := page.keyValuePairs[len(page.keyValuePairs)/2]
+
+		siblingPage.keyValuePairs = make([]KeyValuePair, len(page.keyValuePairs)/2+1)
+		copy(siblingPage.keyValuePairs, page.keyValuePairs[:len(page.keyValuePairs)/2])
+		page.keyValuePairs = page.keyValuePairs[len(page.keyValuePairs)/2:]
+
+		siblingPage.childPageIds = make([]int, len(siblingPage.keyValuePairs)+1)
+		copy(siblingPage.childPageIds, page.childPageIds[:len(page.keyValuePairs)/2])
+		page.childPageIds = page.childPageIds[len(page.keyValuePairs)/2:]
+
+		parentPage.insertChildAt(index, siblingPage)
+		parentPage.insertAt(index, parentKey)
 	}
 	return nil
 }
 
-func (page Page) NonEmptyKeyValuePairs() []KeyValuePair {
+func (page *Page) NonEmptyKeyValuePairs() []KeyValuePair {
 	var pairs []KeyValuePair
 	for _, keyValuePair := range page.keyValuePairs {
 		if !keyValuePair.isEmpty() {
