@@ -28,7 +28,12 @@ func CreateBPlusTree(options Options) (*BPlusTree, error) {
 }
 
 func (tree BPlusTree) Put(key, value []byte) {
-	tree.pageHierarchy.Put(KeyValuePair{key: key, value: value})
+	tree.pageHierarchy.Put(
+		KeyValuePair{
+			key:   append([]byte(nil), key...),
+			value: append([]byte(nil), value...),
+		},
+	)
 }
 
 func (tree BPlusTree) Get(key []byte) GetResult {
