@@ -119,11 +119,7 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 }
 
 func TestPutsAKeyValuePair(t *testing.T) {
-	options := Options{
-		PageSize:                 os.Getpagesize(),
-		FileName:                 "./test",
-		PreAllocatedPagePoolSize: 8,
-	}
+	options := DefaultOptions()
 	tree, _ := CreateBPlusTree(options)
 	defer deleteFile(tree.pagePool.indexFile)
 

@@ -10,7 +10,7 @@ func TestReturnsPageById(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 	pageHierarchy.pageById[0] = &Page{
 		id: 0,
 	}
@@ -27,7 +27,7 @@ func TestReturnsTheRootPageId(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 	pageHierarchy.rootPage = &Page{id: 100}
 
 	defer deleteFile(pagePool.indexFile)
@@ -38,11 +38,61 @@ func TestReturnsTheRootPageId(t *testing.T) {
 	}
 }
 
+func TestReturnsTrueGivenPageIsEligibleForSplit(t *testing.T) {
+	options := Options{
+		PageSize:                       100,
+		AllowedPageOccupancyPercentage: 1,
+		FileName:                       "./test",
+		PreAllocatedPagePoolSize:       8,
+	}
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	page := &Page{
+		keyValuePairs: []KeyValuePair{
+			{key: []byte("A")},
+			{key: []byte("B")},
+		},
+	}
+
+	defer deleteFile(pagePool.indexFile)
+
+	isEligibleForSplit := pageHierarchy.isPageEligibleForSplit(page)
+	if isEligibleForSplit != true {
+		t.Fatalf("Expected page to be eligible for split but received false")
+	}
+}
+
+func TestReturnsFalseGivenPageIsNotEligibleForSplit(t *testing.T) {
+	options := Options{
+		PageSize:                       4096,
+		AllowedPageOccupancyPercentage: 90,
+		FileName:                       "./test",
+		PreAllocatedPagePoolSize:       8,
+	}
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	page := &Page{
+		keyValuePairs: []KeyValuePair{
+			{key: []byte("A")},
+			{key: []byte("B")},
+		},
+	}
+
+	defer deleteFile(pagePool.indexFile)
+
+	isEligibleForSplit := pageHierarchy.isPageEligibleForSplit(page)
+	if isEligibleForSplit != false {
+		t.Fatalf("Expected page to be non eligible for split but received true")
+	}
+}
+
 func TestDoesNotGetByKey(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -62,7 +112,7 @@ func TestGetsByKeyInRootLeafPage(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -126,7 +176,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -185,7 +235,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -244,7 +294,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -269,7 +319,7 @@ func TestPutsAKeyValuePairInRootLeafPage(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -334,7 +384,7 @@ func TestPutsAKeyValuePairInTheRightPage(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -359,7 +409,7 @@ func TestPutsAKeyValuePairAfterSplittingTheRootPage(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
@@ -388,11 +438,15 @@ func TestPutsAKeyValuePairAfterSplittingTheRootPage(t *testing.T) {
 }
 
 func TestSplitsTheRootPageAndCreatesANewRootWithKeyValuePairs(t *testing.T) {
-	options := DefaultOptions()
+	options := Options{
+		PageSize:                 300,
+		FileName:                 "./test",
+		PreAllocatedPagePoolSize: 8,
+	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
@@ -421,11 +475,15 @@ func TestSplitsTheRootPageAndCreatesANewRootWithKeyValuePairs(t *testing.T) {
 }
 
 func TestSplitsTheRootPageAndWithKeyValuePairsInOldRoot(t *testing.T) {
-	options := DefaultOptions()
+	options := Options{
+		PageSize:                 100,
+		FileName:                 "./test",
+		PreAllocatedPagePoolSize: 8,
+	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 	existingRootPage := pageHierarchy.rootPage
@@ -455,11 +513,15 @@ func TestSplitsTheRootPageAndWithKeyValuePairsInOldRoot(t *testing.T) {
 }
 
 func TestSplitsTheRootPageAndWithKeyValuePairsInRightSiblingPage(t *testing.T) {
-	options := DefaultOptions()
+	options := Options{
+		PageSize:                 300,
+		FileName:                 "./test",
+		PreAllocatedPagePoolSize: 8,
+	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 	existingRootPage := pageHierarchy.rootPage
@@ -526,14 +588,14 @@ func TestSplitsLeafPageAndAddsAKeyToTheRootPage(t *testing.T) {
 	}
 
 	options := Options{
-		PageSize:                 os.Getpagesize(),
+		PageSize:                 200,
 		FileName:                 "./test",
 		PreAllocatedPagePoolSize: 8,
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -592,14 +654,14 @@ func TestSplitsLeafPageAndPutsTheValueInTheRightSibling(t *testing.T) {
 	}
 
 	options := Options{
-		PageSize:                 os.Getpagesize(),
+		PageSize:                 200,
 		FileName:                 "./test",
 		PreAllocatedPagePoolSize: 8,
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -673,14 +735,14 @@ func TestSplitsLeafPageAndAddsTheNewPageAsTheRightmostChildOfTheRootPage(t *test
 	}
 
 	options := Options{
-		PageSize:                 os.Getpagesize(),
+		PageSize:                 200,
 		FileName:                 "./test",
 		PreAllocatedPagePoolSize: 8,
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool)
+	pageHierarchy := NewPageHierarchy(pagePool, 10)
 
 	defer deleteFile(pagePool.indexFile)
 

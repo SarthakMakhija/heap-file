@@ -1,18 +1,22 @@
 package index
 
-import "bytes"
+import (
+	"bytes"
+)
 
 type PageHierarchy struct {
-	rootPage *Page
-	pageById map[int]*Page
-	pagePool *PagePool
+	rootPage                       *Page
+	pageById                       map[int]*Page
+	pagePool                       *PagePool
+	allowedPageOccupancyPercentage int
 }
 
-func NewPageHierarchy(pagePool *PagePool) *PageHierarchy {
+func NewPageHierarchy(pagePool *PagePool, allowedPageOccupancyPercentage int) *PageHierarchy {
 	pageHierarchy := &PageHierarchy{
-		rootPage: NewPage(0),
-		pagePool: pagePool,
-		pageById: map[int]*Page{},
+		rootPage:                       NewPage(0),
+		pagePool:                       pagePool,
+		pageById:                       map[int]*Page{},
+		allowedPageOccupancyPercentage: allowedPageOccupancyPercentage,
 	}
 	pageHierarchy.pageById[pageHierarchy.rootPage.id] = pageHierarchy.rootPage
 	return pageHierarchy
@@ -34,7 +38,7 @@ func (pageHierarchy *PageHierarchy) Put(keyValuePair KeyValuePair) error {
 		return oldRootPage.split(newRootPage, rightSiblingPage, 0)
 	}
 
-	if len(pageHierarchy.rootPage.keyValuePairs) >= 3 { //will be replaced with % occupancy later
+	if pageHierarchy.isPageEligibleForSplit(pageHierarchy.rootPage) {
 		if err := splitRoot(); err != nil {
 			return err
 		}
@@ -74,8 +78,7 @@ func (pageHierarchy *PageHierarchy) insertOrSplit(keyValuePair KeyValuePair, pag
 	if err != nil {
 		return err
 	}
-
-	if len(childPage.keyValuePairs) >= 3 { //will be replaced with % occupancy later
+	if pageHierarchy.isPageEligibleForSplit(childPage) {
 		sibling, err := pageHierarchy.allocateSinglePage()
 		if err != nil {
 			return err
@@ -123,6 +126,10 @@ func (pageHierarchy *PageHierarchy) fetchOrCachePage(pageId int) (*Page, error) 
 	}
 	pageHierarchy.pageById[pageId] = page
 	return page, nil
+}
+
+func (pageHierarchy PageHierarchy) isPageEligibleForSplit(page *Page) bool {
+	return page.size() >= (pageHierarchy.allowedPageOccupancyPercentage * (pageHierarchy.pagePool.pageSize) / 100)
 }
 
 func (pageHierarchy *PageHierarchy) allocateSinglePage() (*Page, error) {
