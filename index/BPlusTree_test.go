@@ -139,7 +139,7 @@ func TestPutsAKeyValuePair(t *testing.T) {
 		{key: []byte("C"), value: []byte("Storage")},
 	}
 
-	pageKeyValuePairs := tree.pageHierarchy.rootPage.keyValuePairs
+	pageKeyValuePairs := tree.pageHierarchy.rootPage.NonEmptyKeyValuePairs()
 	if !reflect.DeepEqual(expected, pageKeyValuePairs) {
 		t.Fatalf("Expected Key value pairs to be %v, received %v", expected, pageKeyValuePairs)
 	}

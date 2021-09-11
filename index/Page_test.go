@@ -241,8 +241,6 @@ func TestSplitsALeafPageWithKeyValuePairsInParent(t *testing.T) {
 }
 
 func TestSplitsALeafPageWithKeyValuePairsInSibling(t *testing.T) {
-	t.Skip()
-
 	page := &Page{
 		id:            0,
 		keyValuePairs: []KeyValuePair{{key: []byte("A"), value: []byte("Database")}, {key: []byte("B"), value: []byte("Systems")}},
@@ -253,7 +251,7 @@ func TestSplitsALeafPageWithKeyValuePairsInSibling(t *testing.T) {
 
 	_ = page.split(parentPage, siblingPage, 0)
 
-	keyValuePairsAfterSplit := siblingPage.keyValuePairs
+	keyValuePairsAfterSplit := siblingPage.NonEmptyKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("B"), value: []byte("Systems")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {

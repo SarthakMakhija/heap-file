@@ -25,3 +25,10 @@ func (keyValuePair KeyValuePair) PrettyKey() string {
 func (keyValuePair KeyValuePair) String() string {
 	return " [" + keyValuePair.PrettyKey() + " - " + keyValuePair.PrettyValue() + "] "
 }
+
+func (keyValuePair KeyValuePair) isEmpty() bool {
+	if len(keyValuePair.key) == 0 && len(keyValuePair.value) == 0 {
+		return true
+	}
+	return false
+}

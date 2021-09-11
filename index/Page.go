@@ -160,3 +160,13 @@ func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 	}
 	return nil
 }
+
+func (page Page) NonEmptyKeyValuePairs() []KeyValuePair {
+	var pairs []KeyValuePair
+	for _, keyValuePair := range page.keyValuePairs {
+		if !keyValuePair.isEmpty() {
+			pairs = append(pairs, keyValuePair)
+		}
+	}
+	return pairs
+}
