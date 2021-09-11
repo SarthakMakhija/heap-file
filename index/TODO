@@ -6,12 +6,16 @@
 6. Handle free page list
 7. Make value as byte array - done
 8. Put key,value
-9. Validation Options
+9. Validation of Options
 10. Write to disk
 11. Close file
 12. Write page id to the file and also add a test to put and get with - root page - child1 - child2 - and then leaf..
     to ensure marshal and unmarshal for internal nodes are covered and also page ids are retrieved and cached properly. Also confirm if this is really needed
-
+13. Ensure non-leaf pages do not contain value in tests - done
+14. Handle allocation of pages
+15. Build occupancy percentage
+16. Add test for split in page with an assertion on child position so that insertChildAt gets tested
+17. Split the root page - done
+18. Fix the skipped test
+19. Split the internal page
 -----------------------------------------------------------------------------
-
-
