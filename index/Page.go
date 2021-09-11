@@ -7,6 +7,13 @@ import (
 )
 
 var littleEndian = binary.LittleEndian
+var (
+	pageTypeSize          = 1
+	keyValuePairCountSize = 2
+	keyLengthSize         = 2
+	valueLengthSize       = 2
+	leafPageMetaSize      = pageTypeSize + keyValuePairCountSize
+)
 
 const (
 	LeafPage = 0x00
@@ -33,7 +40,7 @@ func (page Page) GetKeyValuePairAt(index int) KeyValuePair {
 }
 
 func (page Page) MarshalBinary() []byte {
-	buffer := make([]byte, 50) //will be replaced with page.Size()
+	buffer := make([]byte, page.size())
 	offset := 0
 
 	writeLeafPageType := func() {
@@ -74,6 +81,7 @@ func (page Page) MarshalBinary() []byte {
 			writeKey(keyValuePair.key)
 		}
 	}
+	//handle non-leaf
 	return buffer
 }
 
@@ -112,7 +120,18 @@ func (page *Page) UnMarshalBinary(buffer []byte) {
 			pair.key = readKey()
 			page.keyValuePairs = append(page.keyValuePairs, pair)
 		}
-	}
+	} //handle non-leaf
+}
+
+func (page Page) size() int {
+	size := 0
+	if page.isLeaf() {
+		size = leafPageMetaSize
+		for _, keyValuePair := range page.keyValuePairs {
+			size = size + keyLengthSize + valueLengthSize + len(keyValuePair.key) + len(keyValuePair.value)
+		}
+	} //handle non-leaf
+	return size
 }
 
 func (page Page) binarySearch(key []byte) (int, bool) {

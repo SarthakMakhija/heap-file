@@ -324,3 +324,16 @@ func TestSplitsANonLeafPageWithKeyValuePairsInSibling(t *testing.T) {
 		t.Fatalf("Expected key value pairs in the sibling page after split to be %v, received %v", expected, keyValuePairsAfterSplit)
 	}
 }
+
+func TestReturnsTheSizeOfALeafPage(t *testing.T) {
+	page := &Page{
+		id:            0,
+		keyValuePairs: []KeyValuePair{{key: []byte("A"), value: []byte("Database")}},
+	}
+	size := page.size()
+	expected := len(page.keyValuePairs[0].key) + len(page.keyValuePairs[0].value) + pageTypeSize + keyValuePairCountSize + keyLengthSize + valueLengthSize
+
+	if expected != size {
+		t.Fatalf("Expected leaf page size to be %v, received %v", expected, size)
+	}
+}
