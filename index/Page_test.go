@@ -147,7 +147,7 @@ func TestUnMarshalsAPageWithMultipleKeyValuePairs(t *testing.T) {
 	}
 }
 
-func TestInsertsAtAnIndexInAPage(t *testing.T) {
+func TestInsertsAtAnIndexInAPageWhichIsLeaf(t *testing.T) {
 	page := &Page{
 		keyValuePairs: []KeyValuePair{
 			{key: []byte("A"), value: []byte("Database")},
@@ -161,6 +161,25 @@ func TestInsertsAtAnIndexInAPage(t *testing.T) {
 		{key: []byte("C"), value: []byte("Storage")},
 		{key: []byte("D"), value: []byte("Operating")},
 		{key: []byte("F"), value: []byte("Systems")},
+	}
+
+	pageKeyValuePairs := page.keyValuePairs
+	if !reflect.DeepEqual(expected, pageKeyValuePairs) {
+		t.Fatalf("Expected Key value pairs to be %v, received %v", expected, pageKeyValuePairs)
+	}
+}
+
+func TestInsertsAtAnIndexInAPageWhichIsNonLeaf(t *testing.T) {
+	page := &Page{
+		keyValuePairs: []KeyValuePair{
+			{key: []byte("A")},
+		},
+		childPageIds: []int{1},
+	}
+	page.insertAt(1, KeyValuePair{key: []byte("D"), value: []byte("Operating")})
+	expected := []KeyValuePair{
+		{key: []byte("A")},
+		{key: []byte("D")},
 	}
 
 	pageKeyValuePairs := page.keyValuePairs

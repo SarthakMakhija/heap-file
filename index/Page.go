@@ -133,13 +133,11 @@ func (page Page) isLeaf() bool {
 }
 
 func (page *Page) insertAt(index int, keyValuePair KeyValuePair) {
+	page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{})
+	copy(page.keyValuePairs[index+1:], page.keyValuePairs[index:])
 	if page.isLeaf() {
-		page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{})
-		copy(page.keyValuePairs[index+1:], page.keyValuePairs[index:]) //handle the case where value should not be inserted if it is a leaf page
 		page.keyValuePairs[index] = keyValuePair
 	} else {
-		page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{})
-		copy(page.keyValuePairs[index+1:], page.keyValuePairs[index:]) //handle the case where value should not be inserted if it is a leaf page
 		page.keyValuePairs[index] = KeyValuePair{key: keyValuePair.key}
 	}
 }
