@@ -43,6 +43,18 @@ func (indexFile *IndexFile) ResizeTo(sizeInBytes int64) error {
 	return indexFile.mMap()
 }
 
+func (indexFile *IndexFile) Close() error {
+	err := indexFile.unMap()
+	if err != nil {
+		return err
+	}
+	err = indexFile.file.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (indexFile *IndexFile) readFrom(offset int64, size int) ([]byte, error) {
 	buf := make([]byte, size)
 	elementsCopied := copy(buf, indexFile.memoryMap[offset:])

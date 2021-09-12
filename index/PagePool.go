@@ -39,10 +39,14 @@ func (pagePool PagePool) Read(pageId int) (*Page, error) {
 	return page, nil
 }
 
-func (pagePool PagePool) numberOfPages() int {
-	return int(pagePool.indexFile.size) / pagePool.pageSize
-}
-
 func (pagePool PagePool) ContainsZeroPages() bool {
 	return pagePool.pageCount == 0
+}
+
+func (pagePool *PagePool) Close() error {
+	return pagePool.indexFile.Close()
+}
+
+func (pagePool PagePool) numberOfPages() int {
+	return int(pagePool.indexFile.size) / pagePool.pageSize
 }

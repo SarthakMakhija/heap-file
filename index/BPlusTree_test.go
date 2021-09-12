@@ -157,3 +157,18 @@ func TestPutsAKeyValuePair(t *testing.T) {
 		t.Fatalf("Expected Key value pairs to be %v, received %v", expected, pageKeyValuePairs)
 	}
 }
+
+func TestClosesBPlusTree(t *testing.T) {
+	options := Options{
+		PageSize:                 os.Getpagesize(),
+		FileName:                 "./test",
+		PreAllocatedPagePoolSize: 6,
+	}
+	tree, _ := CreateBPlusTree(options)
+	defer deleteFile(tree.pagePool.indexFile)
+
+	err := tree.Close()
+	if err != nil {
+		t.Fatalf("Expected no error while closing the BPlusTree file, but received %v", err)
+	}
+}

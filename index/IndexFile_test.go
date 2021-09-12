@@ -55,6 +55,19 @@ func TestResizesAnEmptyFileToAGivenSize(t *testing.T) {
 	}
 }
 
+func TestClosesTheIndexFile(t *testing.T) {
+	options := DefaultOptions()
+	indexFile, _ := OpenIndexFile(options)
+	defer deleteFile(indexFile)
+
+	_ = indexFile.ResizeTo(100)
+
+	err := indexFile.Close()
+	if err != nil {
+		t.Fatalf("Expected no error while closing the index file, but received %v", err)
+	}
+}
+
 func createATestFileWithSize(fileName string, sizeBytes int) {
 	file, _ := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR, 0644)
 	_, _ = file.Write(make([]byte, sizeBytes))

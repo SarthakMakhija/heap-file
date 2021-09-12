@@ -39,6 +39,11 @@ func (tree BPlusTree) Get(key []byte) GetResult {
 	return tree.pageHierarchy.Get(key)
 }
 
+func (tree *BPlusTree) Close() error {
+	//ensure the content is written to the disk
+	return tree.pagePool.Close()
+}
+
 func (tree *BPlusTree) create(options Options) error {
 	if tree.pagePool.ContainsZeroPages() {
 		return tree.initialize(options)
