@@ -386,6 +386,32 @@ func TestSplitsANonLeafPageWithKeyValuePairsInSibling(t *testing.T) {
 	}
 }
 
+func TestReturnsTheNonLeadPageAfterSplitWithChildPageIdsAsOneGreaterThanNumberOfKeyValuePairs(t *testing.T) {
+	page := &Page{
+		id:            5,
+		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}, {key: []byte("Q")}},
+		childPageIds:  []int{10, 11, 12, 13},
+	}
+	parentPage := NewPage(100)
+	parentPage.childPageIds = []int{5}
+	parentPage.keyValuePairs = []KeyValuePair{{key: []byte("S")}}
+
+	siblingPage := NewPage(200)
+
+	_ = page.split(parentPage, siblingPage, 1)
+	pageKeyValuePairLength := len(page.keyValuePairs)
+
+	if pageKeyValuePairLength != 2 {
+		t.Fatalf("Expected number of key value pairs in page to be %v, received %v", 2, pageKeyValuePairLength)
+	}
+
+	childPageIdLength := len(page.childPageIds)
+
+	if childPageIdLength != 3 {
+		t.Fatalf("Expected number of child page ids in page to be %v, received %v", 3, childPageIdLength)
+	}
+}
+
 func TestReturnsTheSizeOfALeafPage(t *testing.T) {
 	page := &Page{
 		id:            0,

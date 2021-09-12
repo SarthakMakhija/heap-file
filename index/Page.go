@@ -226,16 +226,17 @@ func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 		parentPage.insertChildAt(index+1, siblingPage)
 		parentPage.insertAt(index, siblingPage.keyValuePairs[0])
 	} else {
-		pageKeyValuePairs := page.NonEmptyKeyValuePairs()
-		parentKey := page.keyValuePairs[len(pageKeyValuePairs)/2]
+		parentKey := page.keyValuePairs[len(page.NonEmptyKeyValuePairs())/2]
 
-		siblingPage.keyValuePairs = make([]KeyValuePair, len(pageKeyValuePairs)/2+1)
-		copy(siblingPage.keyValuePairs, page.keyValuePairs[:len(pageKeyValuePairs)/2])
-		page.keyValuePairs = page.keyValuePairs[len(pageKeyValuePairs)/2:]
+		siblingPage.keyValuePairs = make([]KeyValuePair, len(page.NonEmptyKeyValuePairs())/2+1)
+		copy(siblingPage.keyValuePairs, page.keyValuePairs[:len(page.NonEmptyKeyValuePairs())/2])
+		page.keyValuePairs = page.keyValuePairs[len(page.NonEmptyKeyValuePairs())/2:]
 
 		siblingPage.childPageIds = make([]int, len(siblingPage.NonEmptyKeyValuePairs())+1)
-		copy(siblingPage.childPageIds, page.childPageIds[:len(pageKeyValuePairs)/2])
-		page.childPageIds = page.childPageIds[len(pageKeyValuePairs)/2:]
+		copy(siblingPage.childPageIds, page.childPageIds[:len(page.NonEmptyKeyValuePairs())/2])
+
+		page.childPageIds = make([]int, len(page.NonEmptyKeyValuePairs())+1)
+		copy(page.childPageIds, page.childPageIds[len(page.NonEmptyKeyValuePairs())/2:])
 
 		parentPage.insertChildAt(index, siblingPage)
 		parentPage.insertAt(index, parentKey)
