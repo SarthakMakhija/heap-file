@@ -62,12 +62,43 @@ func TestAllocates5Pages(t *testing.T) {
 
 	defer deleteFile(indexFile)
 
-	_ = pagePool.Allocate(5)
+	_, _ = pagePool.Allocate(5)
 	expectedPageCount := 5
 	actualPageCount := pagePool.pageCount
 
 	if actualPageCount != expectedPageCount {
 		t.Fatalf("Expected page count to be %v, received %v", expectedPageCount, actualPageCount)
+	}
+}
+
+func TestReturnsTheCurrentPageIdAndAllocates5Pages(t *testing.T) {
+	options := DefaultOptions()
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+
+	defer deleteFile(indexFile)
+
+	pageId, _ := pagePool.Allocate(5)
+	expectedPageId := 0
+
+	if pageId != expectedPageId {
+		t.Fatalf("Expected page id to be %v, received %v", expectedPageId, pageId)
+	}
+}
+
+func TestReturnsTheNextPageIdAfterAllocating5Pages(t *testing.T) {
+	options := DefaultOptions()
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+
+	defer deleteFile(indexFile)
+
+	_, _ = pagePool.Allocate(5)
+	expectedPageId := 5
+	pageId := pagePool.pageCount
+
+	if pageId != expectedPageId {
+		t.Fatalf("Expected page id to be %v, received %v", expectedPageId, pageId)
 	}
 }
 
@@ -78,7 +109,7 @@ func TestAllocationOf5PagesShouldIncreaseTheFileSize(t *testing.T) {
 
 	defer deleteFile(indexFile)
 
-	_ = pagePool.Allocate(5)
+	_, _ = pagePool.Allocate(5)
 	expectedFileSize := int64(5 * os.Getpagesize())
 	actualFileSize := pagePool.indexFile.size
 

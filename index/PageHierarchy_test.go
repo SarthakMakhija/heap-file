@@ -183,7 +183,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
@@ -242,7 +242,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
@@ -301,7 +301,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
@@ -391,7 +391,7 @@ func TestPutsAKeyValuePairInTheRightPage(t *testing.T) {
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
@@ -416,7 +416,7 @@ func TestPutsAKeyValuePairAfterSplittingTheRootPage(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
@@ -453,7 +453,7 @@ func TestSplitsTheRootPageAndCreatesANewRootWithKeyValuePairs(t *testing.T) {
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
@@ -490,7 +490,7 @@ func TestSplitsTheRootPageAndWithKeyValuePairsInOldRoot(t *testing.T) {
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
@@ -528,7 +528,7 @@ func TestSplitsTheRootPageAndWithKeyValuePairsInRightSiblingPage(t *testing.T) {
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
@@ -602,7 +602,7 @@ func TestSplitsLeafPageAndAddsAKeyToTheRootPage(t *testing.T) {
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageListWithStartingPgeId(4, options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
@@ -668,7 +668,7 @@ func TestSplitsLeafPageAndPutsTheValueInTheRightSibling(t *testing.T) {
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageListWithStartingPgeId(4, options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
@@ -749,7 +749,7 @@ func TestSplitsLeafPageAndAddsTheNewPageAsTheRightmostChildOfTheRootPage(t *test
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageListWithStartingPgeId(4, options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
@@ -784,5 +784,30 @@ func TestSplitsLeafPageAndAddsTheNewPageAsTheRightmostChildOfTheRootPage(t *test
 
 	if !reflect.DeepEqual(expected, resultantPageKeyValuePairs) {
 		t.Fatalf("Expected Key value pair in the sibling page to be %v, received %v", expected, resultantPageKeyValuePairs)
+	}
+}
+
+func TestAllocatesPagesFromPagePoolGivenFreePageListIsEmpty(t *testing.T) {
+	options := Options{
+		FileName:                 "./test",
+		PreAllocatedPagePoolSize: 5,
+		PageSize:                 100,
+	}
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	emptyFreePageList := &FreePageList{}
+	pageHierarchy := NewPageHierarchy(pagePool, 10, emptyFreePageList)
+
+	defer deleteFile(pagePool.indexFile)
+
+	pages, _ := pageHierarchy.allocatePages(2)
+	expectedPageIds := []int{5, 6}
+
+	if pages[0].id != expectedPageIds[0] {
+		t.Fatalf("Expected first page id to be %v, received %v", expectedPageIds[0], pages[0].id)
+	}
+	if pages[1].id != expectedPageIds[1] {
+		t.Fatalf("Expected second page id to be %v, received %v", expectedPageIds[1], pages[1].id)
 	}
 }

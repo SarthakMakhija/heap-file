@@ -47,7 +47,7 @@ func (tree *BPlusTree) create(options Options) error {
 }
 
 func (tree *BPlusTree) initialize(options Options) error {
-	err := tree.pagePool.Allocate(metaPageCount + rootPageCount + options.PreAllocatedPagePoolSize)
+	_, err := tree.pagePool.Allocate(metaPageCount + rootPageCount + options.PreAllocatedPagePoolSize)
 	if err != nil {
 		return err
 	}

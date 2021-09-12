@@ -16,13 +16,14 @@ func NewPagePool(indexFile *IndexFile, options Options) *PagePool {
 	return pagePool
 }
 
-func (pagePool *PagePool) Allocate(pageCount int) error {
-	targetSize := pagePool.indexFile.size + int64(pageCount*pagePool.pageSize)
+func (pagePool *PagePool) Allocate(pages int) (int, error) {
+	nextPageId := pagePool.pageCount
+	targetSize := pagePool.indexFile.size + int64(pages*pagePool.pageSize)
 	if err := pagePool.indexFile.ResizeTo(targetSize); err != nil {
-		return err
+		return 0, err
 	}
 	pagePool.pageCount = pagePool.numberOfPages()
-	return nil
+	return nextPageId, nil
 }
 
 func (pagePool PagePool) Read(pageId int) (*Page, error) {

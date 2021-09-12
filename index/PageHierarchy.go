@@ -144,8 +144,13 @@ func (pageHierarchy *PageHierarchy) allocateSinglePage() (*Page, error) {
 
 func (pageHierarchy *PageHierarchy) allocatePages(pageCount int) ([]*Page, error) {
 	newPageId := pageHierarchy.freePageList.allocateAndUpdate(pageCount)
-	//handle newPageId < 1
-
+	if newPageId < 1 {
+		var err error
+		newPageId, err = pageHierarchy.pagePool.Allocate(pageCount)
+		if err != nil {
+			return nil, err
+		}
+	}
 	pages := make([]*Page, pageCount)
 	for index := 0; index < pageCount; index++ {
 		newPage := NewPage(newPageId)
