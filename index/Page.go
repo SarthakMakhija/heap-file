@@ -230,11 +230,8 @@ func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 		siblingPage.keyValuePairs = append(siblingPage.keyValuePairs, page.keyValuePairs[0:len(page.AllKeyValuePairs())/2]...)
 		page.keyValuePairs = page.keyValuePairs[len(page.AllKeyValuePairs())/2:]
 
-		siblingPage.childPageIds = make([]int, len(siblingPage.AllKeyValuePairs())+1)
-		copy(siblingPage.childPageIds, page.childPageIds[:len(page.AllKeyValuePairs())/2])
-
-		page.childPageIds = make([]int, len(page.AllKeyValuePairs())+1)
-		copy(page.childPageIds, page.childPageIds[len(page.AllKeyValuePairs())/2:])
+		siblingPage.childPageIds = append(siblingPage.childPageIds, page.childPageIds[:len(page.AllKeyValuePairs())/2]...)
+		page.childPageIds = page.childPageIds[len(page.AllKeyValuePairs())/2:]
 
 		parentPage.insertChildAt(index, siblingPage)
 		parentPage.insertAt(index, parentKey)
