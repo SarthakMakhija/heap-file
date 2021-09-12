@@ -257,6 +257,10 @@ func (page *Page) MarkDirty() {
 	page.dirty = true
 }
 
+func (page *Page) ClearDirty() {
+	page.dirty = false
+}
+
 func (page *Page) IsDirty() bool {
 	return page.dirty
 }

@@ -60,6 +60,7 @@ func (pageHierarchy *PageHierarchy) Write() {
 	for _, page := range pageHierarchy.pageById {
 		if page.IsDirty() {
 			pageHierarchy.pagePool.Write(page)
+			page.ClearDirty()
 		}
 	}
 }
