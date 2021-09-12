@@ -64,6 +64,10 @@ func (indexFile *IndexFile) readFrom(offset int64, size int) ([]byte, error) {
 	return buf, nil
 }
 
+func (indexFile *IndexFile) writeAt(offset int64, buffer []byte) {
+	copy(indexFile.memoryMap[offset:], buffer)
+}
+
 func (indexFile *IndexFile) fileSize() (int64, error) {
 	stat, err := indexFile.file.Stat()
 	if err != nil {

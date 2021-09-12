@@ -27,6 +27,7 @@ type Page struct {
 	id            int
 	keyValuePairs []KeyValuePair
 	childPageIds  []int
+	dirty         bool
 }
 
 func NewPage(id int) *Page {
@@ -192,7 +193,9 @@ func (page Page) isLeaf() bool {
 }
 
 func (page *Page) insertAt(index int, keyValuePair KeyValuePair) {
+	page.MarkDirty()
 	page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{})
+
 	copy(page.keyValuePairs[index+1:], page.keyValuePairs[index:])
 	if page.isLeaf() {
 		page.keyValuePairs[index] = keyValuePair
@@ -202,12 +205,18 @@ func (page *Page) insertAt(index int, keyValuePair KeyValuePair) {
 }
 
 func (page *Page) insertChildAt(index int, childPage *Page) {
+	page.MarkDirty()
+
 	page.childPageIds = append(page.childPageIds, 0)
 	copy(page.childPageIds[index+1:], page.childPageIds[index:])
 	page.childPageIds[index] = childPage.id
 }
 
 func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
+	page.MarkDirty()
+	parentPage.MarkDirty()
+	siblingPage.MarkDirty()
+
 	if page.isLeaf() {
 		pageKeyValuePairs := page.NonEmptyKeyValuePairs()
 		siblingPage.keyValuePairs = make([]KeyValuePair, len(pageKeyValuePairs)/2+1)   //may change later - len(page.keyValuePairs)
@@ -242,4 +251,12 @@ func (page *Page) NonEmptyKeyValuePairs() []KeyValuePair {
 		}
 	}
 	return pairs
+}
+
+func (page *Page) MarkDirty() {
+	page.dirty = true
+}
+
+func (page *Page) IsDirty() bool {
+	return page.dirty
 }

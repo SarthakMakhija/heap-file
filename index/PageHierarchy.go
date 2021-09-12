@@ -45,11 +45,23 @@ func (pageHierarchy *PageHierarchy) Put(keyValuePair KeyValuePair) error {
 			return err
 		}
 	}
-	return pageHierarchy.put(keyValuePair, pageHierarchy.rootPage)
+	if err := pageHierarchy.put(keyValuePair, pageHierarchy.rootPage); err != nil {
+		return err
+	}
+	pageHierarchy.Write()
+	return nil
 }
 
 func (pageHierarchy *PageHierarchy) Get(key []byte) GetResult {
 	return pageHierarchy.get(key, pageHierarchy.rootPage)
+}
+
+func (pageHierarchy *PageHierarchy) Write() {
+	for _, page := range pageHierarchy.pageById {
+		if page.IsDirty() {
+			pageHierarchy.pagePool.Write(page)
+		}
+	}
 }
 
 func (pageHierarchy PageHierarchy) RootPageId() int {

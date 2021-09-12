@@ -178,6 +178,37 @@ func TestReadsAPageIdentifiedByPageId1(t *testing.T) {
 	}
 }
 
+func TestWritesAPage(t *testing.T) {
+	options := Options{
+		PageSize: os.Getpagesize(),
+		FileName: "./test",
+	}
+	page := &Page{
+		id: 0,
+		keyValuePairs: []KeyValuePair{
+			{
+				key:   []byte("A"),
+				value: []byte("Storage"),
+			},
+		},
+	}
+
+	writeToATestFileWithEmptyPage(options.FileName, options.PageSize)
+
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	defer deleteFile(indexFile)
+
+	pagePool.Write(page)
+
+	readPage, _ := pagePool.Read(page.id)
+	expectedKeyValuePair := page.keyValuePairs[0]
+
+	if !expectedKeyValuePair.Equals(readPage.keyValuePairs[0]) {
+		t.Fatalf("Expected key value pair to be %v, received %v", expectedKeyValuePair, readPage.keyValuePairs[0])
+	}
+}
+
 func TestReadsANonLeafPageWithChildPageIds(t *testing.T) {
 	options := Options{
 		PageSize: os.Getpagesize(),

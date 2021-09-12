@@ -27,16 +27,21 @@ func (pagePool *PagePool) Allocate(pages int) (int, error) {
 }
 
 func (pagePool PagePool) Read(pageId int) (*Page, error) {
-	offset := func() int64 {
-		return int64(pagePool.pageSize * pageId)
-	}
-	bytes, err := pagePool.indexFile.readFrom(offset(), pagePool.pageSize)
+	bytes, err := pagePool.indexFile.readFrom(pagePool.offsetOf(pageId), pagePool.pageSize)
 	if err != nil {
 		return nil, err
 	}
 	page := &Page{}
 	page.UnMarshalBinary(bytes)
 	return page, nil
+}
+
+func (pagePool *PagePool) Write(page *Page) {
+	pagePool.indexFile.writeAt(pagePool.offsetOf(page.id), page.MarshalBinary())
+}
+
+func (pagePool PagePool) offsetOf(pageId int) int64 {
+	return int64(pagePool.pageSize * pageId)
 }
 
 func (pagePool PagePool) ContainsZeroPages() bool {

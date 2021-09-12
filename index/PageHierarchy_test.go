@@ -811,3 +811,41 @@ func TestAllocatesPagesFromPagePoolGivenFreePageListIsEmpty(t *testing.T) {
 		t.Fatalf("Expected second page id to be %v, received %v", expectedPageIds[1], pages[1].id)
 	}
 }
+
+func TestWritesDirtyPagesToStorage(t *testing.T) {
+	pageA := func() *Page {
+		return &Page{
+			dirty: true,
+			id:    0,
+			keyValuePairs: []KeyValuePair{
+				{
+					key:   []byte("A"),
+					value: []byte("Database"),
+				},
+			},
+		}
+	}
+
+	options := Options{
+		PageSize:                 os.Getpagesize(),
+		FileName:                 "./test",
+		PreAllocatedPagePoolSize: 8,
+	}
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
+
+	pageHierarchy.pageById[0] = pageA()
+
+	defer deleteFile(pagePool.indexFile)
+
+	pageHierarchy.Write()
+
+	readPage, _ := pagePool.Read(pageA().id)
+	expectedKeyValuePair := pageA().keyValuePairs[0]
+
+	if !expectedKeyValuePair.Equals(readPage.keyValuePairs[0]) {
+		t.Fatalf("Expected key value pair to be %v, received %v", expectedKeyValuePair, readPage.keyValuePairs[0])
+	}
+}
