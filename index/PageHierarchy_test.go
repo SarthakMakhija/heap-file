@@ -328,6 +328,7 @@ func TestPutsAKeyValuePairInRootLeafPage(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -342,6 +343,7 @@ func TestPutsAKeyValuePairInRootLeafPage(t *testing.T) {
 		},
 	}
 	_ = pageHierarchy.Put(KeyValuePair{key: []byte("B"), value: []byte("Storage")})
+
 	expected := []KeyValuePair{
 		{key: []byte("A"), value: []byte("Database")},
 		{key: []byte("B"), value: []byte("Storage")},

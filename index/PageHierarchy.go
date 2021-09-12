@@ -14,7 +14,7 @@ type PageHierarchy struct {
 
 func NewPageHierarchy(pagePool *PagePool, allowedPageOccupancyPercentage int, freePageList *FreePageList) *PageHierarchy {
 	pageHierarchy := &PageHierarchy{
-		rootPage:                       NewPage(0),
+		rootPage:                       NewPage(1),
 		pagePool:                       pagePool,
 		pageById:                       map[int]*Page{},
 		allowedPageOccupancyPercentage: allowedPageOccupancyPercentage,
