@@ -23,6 +23,23 @@ func TestCreatesABPlusTreeByPreAllocatingPagesAlongWithMetaPageAndRootPage(t *te
 	}
 }
 
+func TestCreatesABPlusTreeWithFreePageList(t *testing.T) {
+	options := Options{
+		PageSize:                 os.Getpagesize(),
+		FileName:                 "./test",
+		PreAllocatedPagePoolSize: 6,
+	}
+	tree, _ := CreateBPlusTree(options)
+	defer deleteFile(tree.pagePool.indexFile)
+
+	expected := []int{2, 3, 4, 5, 6, 7} //first 2 pages for meta and root
+	freePageIds := tree.freePageList.pageIds
+
+	if !reflect.DeepEqual(expected, freePageIds) {
+		t.Fatalf("Expected free pageIds to be %v, received %v", expected, freePageIds)
+	}
+}
+
 func TestCreatesABPlusTreeWithARootPage(t *testing.T) {
 	options := DefaultOptions()
 	tree, _ := CreateBPlusTree(options)

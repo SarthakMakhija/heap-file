@@ -4,6 +4,7 @@ type BPlusTree struct {
 	fileName      string
 	pagePool      *PagePool
 	pageHierarchy *PageHierarchy
+	freePageList  *FreePageList
 }
 
 const metaPageCount = 1
@@ -50,5 +51,6 @@ func (tree *BPlusTree) initialize(options Options) error {
 	if err != nil {
 		return err
 	}
+	tree.freePageList = InitializeFreePageList(metaPageCount+rootPageCount, options.PreAllocatedPagePoolSize)
 	return nil
 }
