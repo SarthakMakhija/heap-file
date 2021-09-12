@@ -219,8 +219,7 @@ func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 
 	if page.isLeaf() {
 		pageKeyValuePairs := page.NonEmptyKeyValuePairs()
-		siblingPage.keyValuePairs = make([]KeyValuePair, len(pageKeyValuePairs)/2+1)   //may change later - len(page.keyValuePairs)
-		copy(siblingPage.keyValuePairs, page.keyValuePairs[len(pageKeyValuePairs)/2:]) //may change later
+		siblingPage.keyValuePairs = append(siblingPage.keyValuePairs, page.keyValuePairs[len(pageKeyValuePairs)/2:]...)
 		page.keyValuePairs = page.keyValuePairs[:len(pageKeyValuePairs)/2]
 
 		parentPage.insertChildAt(index+1, siblingPage)
@@ -228,8 +227,7 @@ func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 	} else {
 		parentKey := page.keyValuePairs[len(page.NonEmptyKeyValuePairs())/2]
 
-		siblingPage.keyValuePairs = make([]KeyValuePair, len(page.NonEmptyKeyValuePairs())/2+1)
-		copy(siblingPage.keyValuePairs, page.keyValuePairs[:len(page.NonEmptyKeyValuePairs())/2])
+		siblingPage.keyValuePairs = append(siblingPage.keyValuePairs, page.keyValuePairs[0:len(page.NonEmptyKeyValuePairs())/2]...)
 		page.keyValuePairs = page.keyValuePairs[len(page.NonEmptyKeyValuePairs())/2:]
 
 		siblingPage.childPageIds = make([]int, len(siblingPage.NonEmptyKeyValuePairs())+1)
@@ -245,13 +243,7 @@ func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 }
 
 func (page *Page) NonEmptyKeyValuePairs() []KeyValuePair {
-	var pairs []KeyValuePair
-	for _, keyValuePair := range page.keyValuePairs {
-		if !keyValuePair.isEmpty() {
-			pairs = append(pairs, keyValuePair)
-		}
-	}
-	return pairs
+	return page.keyValuePairs
 }
 
 func (page *Page) MarkDirty() {
