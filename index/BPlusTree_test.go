@@ -83,7 +83,7 @@ func TestDoesNotGetByKeyAsSearchedKeyDoesNotExist(t *testing.T) {
 func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 	writeLeftPageToFile := func(fileName string, pageSize int) {
 		leftPage := Page{
-			id: 1,
+			id: 2,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
@@ -95,7 +95,7 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 	}
 	writeRightPageToFile := func(fileName string, pageSize int) {
 		rightPage := Page{
-			id: 2,
+			id: 3,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
@@ -122,7 +122,7 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 
 	writeLeftPageToFile(options.FileName, options.PageSize)
 	writeRightPageToFile(options.FileName, options.PageSize)
-	tree.pageHierarchy.rootPage.childPageIds = []int{1, 2}
+	tree.pageHierarchy.rootPage.childPageIds = []int{2, 3}
 
 	expectedKeyValuePair := KeyValuePair{
 		key:   []byte("B"),

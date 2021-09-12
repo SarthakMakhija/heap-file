@@ -6,11 +6,19 @@ import (
 	"testing"
 )
 
+func DefaultFreePageList(pageCount int) *FreePageList {
+	return DefaultFreePageListWithStartingPgeId(2, pageCount)
+}
+
+func DefaultFreePageListWithStartingPgeId(startingPageId, pageCount int) *FreePageList {
+	return InitializeFreePageList(startingPageId, pageCount)
+}
+
 func TestReturnsPageById(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 	pageHierarchy.pageById[0] = &Page{
 		id: 0,
 	}
@@ -27,7 +35,7 @@ func TestReturnsTheRootPageId(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 	pageHierarchy.rootPage = &Page{id: 100}
 
 	defer deleteFile(pagePool.indexFile)
@@ -47,7 +55,7 @@ func TestReturnsTrueGivenPageIsEligibleForSplit(t *testing.T) {
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 	page := &Page{
 		keyValuePairs: []KeyValuePair{
 			{key: []byte("A")},
@@ -72,7 +80,7 @@ func TestReturnsFalseGivenPageIsNotEligibleForSplit(t *testing.T) {
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 	page := &Page{
 		keyValuePairs: []KeyValuePair{
 			{key: []byte("A")},
@@ -92,7 +100,7 @@ func TestDoesNotGetByKey(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -112,7 +120,7 @@ func TestGetsByKeyInRootLeafPage(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -141,7 +149,7 @@ func TestGetsByKeyInRootLeafPage(t *testing.T) {
 func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 	writeLeftPageToFile := func(fileName string, pageSize int) {
 		leftPage := Page{
-			id: 1,
+			id: 2,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
@@ -153,7 +161,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 	}
 	writeRightPageToFile := func(fileName string, pageSize int) {
 		rightPage := Page{
-			id: 2,
+			id: 3,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
@@ -176,7 +184,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -184,7 +192,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 
 	writeLeftPageToFile(options.FileName, options.PageSize)
 	writeRightPageToFile(options.FileName, options.PageSize)
-	pageHierarchy.rootPage.childPageIds = []int{1, 2}
+	pageHierarchy.rootPage.childPageIds = []int{2, 3}
 
 	expectedKeyValuePair := KeyValuePair{
 		key:   []byte("A"),
@@ -200,7 +208,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheLeftChildOfRootPage(t *testing.T) {
 func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 	writeLeftPageToFile := func(fileName string, pageSize int) {
 		leftPage := Page{
-			id: 1,
+			id: 2,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
@@ -212,7 +220,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 	}
 	writeRightPageToFile := func(fileName string, pageSize int) {
 		rightPage := Page{
-			id: 2,
+			id: 3,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
@@ -235,7 +243,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -243,7 +251,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 
 	writeLeftPageToFile(options.FileName, options.PageSize)
 	writeRightPageToFile(options.FileName, options.PageSize)
-	pageHierarchy.rootPage.childPageIds = []int{1, 2}
+	pageHierarchy.rootPage.childPageIds = []int{2, 3}
 
 	expectedKeyValuePair := KeyValuePair{
 		key:   []byte("C"),
@@ -259,7 +267,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPage(t *testing.T) {
 func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 	writeLeftPageToFile := func(fileName string, pageSize int) {
 		leftPage := Page{
-			id: 1,
+			id: 2,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
@@ -271,7 +279,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 	}
 	writeRightPageToFile := func(fileName string, pageSize int) {
 		rightPage := Page{
-			id: 2,
+			id: 3,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
@@ -294,7 +302,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -302,7 +310,7 @@ func TestGetsByKeyInTheLeafPageWhichIsTheRightChildOfRootPageGivenKeyIsFoundInTh
 
 	writeLeftPageToFile(options.FileName, options.PageSize)
 	writeRightPageToFile(options.FileName, options.PageSize)
-	pageHierarchy.rootPage.childPageIds = []int{1, 2}
+	pageHierarchy.rootPage.childPageIds = []int{2, 3}
 
 	expectedKeyValuePair := KeyValuePair{
 		key:   []byte("B"),
@@ -319,7 +327,7 @@ func TestPutsAKeyValuePairInRootLeafPage(t *testing.T) {
 	options := DefaultOptions()
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -349,7 +357,7 @@ func TestPutsAKeyValuePairInRootLeafPage(t *testing.T) {
 func TestPutsAKeyValuePairInTheRightPage(t *testing.T) {
 	writeLeftPageToFile := func(fileName string, pageSize int) {
 		leftPage := Page{
-			id: 1,
+			id: 2,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
@@ -361,7 +369,7 @@ func TestPutsAKeyValuePairInTheRightPage(t *testing.T) {
 	}
 	writeRightPageToFile := func(fileName string, pageSize int) {
 		rightPage := Page{
-			id: 2,
+			id: 3,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
@@ -384,7 +392,7 @@ func TestPutsAKeyValuePairInTheRightPage(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -392,7 +400,7 @@ func TestPutsAKeyValuePairInTheRightPage(t *testing.T) {
 
 	writeLeftPageToFile(options.FileName, options.PageSize)
 	writeRightPageToFile(options.FileName, options.PageSize)
-	pageHierarchy.rootPage.childPageIds = []int{1, 2}
+	pageHierarchy.rootPage.childPageIds = []int{2, 3}
 
 	_ = pageHierarchy.Put(KeyValuePair{key: []byte("D"), value: []byte("OS")})
 
@@ -409,7 +417,7 @@ func TestPutsAKeyValuePairAfterSplittingTheRootPage(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
@@ -446,7 +454,7 @@ func TestSplitsTheRootPageAndCreatesANewRootWithKeyValuePairs(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
@@ -483,7 +491,7 @@ func TestSplitsTheRootPageAndWithKeyValuePairsInOldRoot(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 	existingRootPage := pageHierarchy.rootPage
@@ -521,7 +529,7 @@ func TestSplitsTheRootPageAndWithKeyValuePairsInRightSiblingPage(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 	existingRootPage := pageHierarchy.rootPage
@@ -554,7 +562,7 @@ func TestSplitsTheRootPageAndWithKeyValuePairsInRightSiblingPage(t *testing.T) {
 func TestSplitsLeafPageAndAddsAKeyToTheRootPage(t *testing.T) {
 	writeLeftPageToFile := func(fileName string, pageSize int) *Page {
 		leftPage := &Page{
-			id: 1,
+			id: 2,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
@@ -567,7 +575,7 @@ func TestSplitsLeafPageAndAddsAKeyToTheRootPage(t *testing.T) {
 	}
 	writeRightPageToFile := func(fileName string, pageSize int) *Page {
 		rightPage := &Page{
-			id: 2,
+			id: 3,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
@@ -595,7 +603,7 @@ func TestSplitsLeafPageAndAddsAKeyToTheRootPage(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageListWithStartingPgeId(4, options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -603,9 +611,9 @@ func TestSplitsLeafPageAndAddsAKeyToTheRootPage(t *testing.T) {
 
 	leftPage := writeLeftPageToFile(options.FileName, options.PageSize)
 	rightPage := writeRightPageToFile(options.FileName, options.PageSize)
-	pageHierarchy.rootPage.childPageIds = []int{1, 2}
-	pageHierarchy.pageById[1] = leftPage
-	pageHierarchy.pageById[2] = rightPage
+	pageHierarchy.rootPage.childPageIds = []int{2, 3}
+	pageHierarchy.pageById[2] = leftPage
+	pageHierarchy.pageById[3] = rightPage
 
 	_ = pageHierarchy.Put(KeyValuePair{key: []byte("E"), value: []byte("NFS")})
 
@@ -620,7 +628,7 @@ func TestSplitsLeafPageAndAddsAKeyToTheRootPage(t *testing.T) {
 func TestSplitsLeafPageAndPutsTheValueInTheRightSibling(t *testing.T) {
 	writeLeftPageToFile := func(fileName string, pageSize int) *Page {
 		leftPage := &Page{
-			id: 1,
+			id: 2,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
@@ -633,7 +641,7 @@ func TestSplitsLeafPageAndPutsTheValueInTheRightSibling(t *testing.T) {
 	}
 	writeRightPageToFile := func(fileName string, pageSize int) *Page {
 		rightPage := &Page{
-			id: 2,
+			id: 3,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
@@ -661,7 +669,7 @@ func TestSplitsLeafPageAndPutsTheValueInTheRightSibling(t *testing.T) {
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageListWithStartingPgeId(4, options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -669,9 +677,9 @@ func TestSplitsLeafPageAndPutsTheValueInTheRightSibling(t *testing.T) {
 
 	leftPage := writeLeftPageToFile(options.FileName, options.PageSize)
 	rightPage := writeRightPageToFile(options.FileName, options.PageSize)
-	pageHierarchy.rootPage.childPageIds = []int{1, 2}
-	pageHierarchy.pageById[1] = leftPage
-	pageHierarchy.pageById[2] = rightPage
+	pageHierarchy.rootPage.childPageIds = []int{2, 3}
+	pageHierarchy.pageById[2] = leftPage
+	pageHierarchy.pageById[3] = rightPage
 
 	_ = pageHierarchy.Put(KeyValuePair{key: []byte("E"), value: []byte("NFS")})
 	getResult := pageHierarchy.Get([]byte("E"))
@@ -701,7 +709,7 @@ func TestSplitsLeafPageAndPutsTheValueInTheRightSibling(t *testing.T) {
 func TestSplitsLeafPageAndAddsTheNewPageAsTheRightmostChildOfTheRootPage(t *testing.T) {
 	writeLeftPageToFile := func(fileName string, pageSize int) *Page {
 		leftPage := &Page{
-			id: 1,
+			id: 2,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
@@ -714,7 +722,7 @@ func TestSplitsLeafPageAndAddsTheNewPageAsTheRightmostChildOfTheRootPage(t *test
 	}
 	writeRightPageToFile := func(fileName string, pageSize int) *Page {
 		rightPage := &Page{
-			id: 2,
+			id: 3,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("B"),
@@ -742,7 +750,7 @@ func TestSplitsLeafPageAndAddsTheNewPageAsTheRightmostChildOfTheRootPage(t *test
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
 	_ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageListWithStartingPgeId(4, options.PreAllocatedPagePoolSize))
 
 	defer deleteFile(pagePool.indexFile)
 
@@ -750,9 +758,9 @@ func TestSplitsLeafPageAndAddsTheNewPageAsTheRightmostChildOfTheRootPage(t *test
 
 	leftPage := writeLeftPageToFile(options.FileName, options.PageSize)
 	rightPage := writeRightPageToFile(options.FileName, options.PageSize)
-	pageHierarchy.rootPage.childPageIds = []int{1, 2}
-	pageHierarchy.pageById[1] = leftPage
-	pageHierarchy.pageById[2] = rightPage
+	pageHierarchy.rootPage.childPageIds = []int{2, 3}
+	pageHierarchy.pageById[2] = leftPage
+	pageHierarchy.pageById[3] = rightPage
 
 	_ = pageHierarchy.Put(KeyValuePair{key: []byte("E"), value: []byte("NFS")})
 	resultantPageId := pageHierarchy.rootPage.childPageIds[len(pageHierarchy.rootPage.childPageIds)-1]

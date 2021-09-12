@@ -9,14 +9,16 @@ type PageHierarchy struct {
 	pageById                       map[int]*Page
 	pagePool                       *PagePool
 	allowedPageOccupancyPercentage int
+	freePageList                   *FreePageList
 }
 
-func NewPageHierarchy(pagePool *PagePool, allowedPageOccupancyPercentage int) *PageHierarchy {
+func NewPageHierarchy(pagePool *PagePool, allowedPageOccupancyPercentage int, freePageList *FreePageList) *PageHierarchy {
 	pageHierarchy := &PageHierarchy{
 		rootPage:                       NewPage(0),
 		pagePool:                       pagePool,
 		pageById:                       map[int]*Page{},
 		allowedPageOccupancyPercentage: allowedPageOccupancyPercentage,
+		freePageList:                   freePageList,
 	}
 	pageHierarchy.pageById[pageHierarchy.rootPage.id] = pageHierarchy.rootPage
 	return pageHierarchy
@@ -141,7 +143,9 @@ func (pageHierarchy *PageHierarchy) allocateSinglePage() (*Page, error) {
 }
 
 func (pageHierarchy *PageHierarchy) allocatePages(pageCount int) ([]*Page, error) {
-	newPageId := 3 //will come from free list of pages
+	newPageId := pageHierarchy.freePageList.allocateAndUpdate(pageCount)
+	//handle newPageId < 1
+
 	pages := make([]*Page, pageCount)
 	for index := 0; index < pageCount; index++ {
 		newPage := NewPage(newPageId)

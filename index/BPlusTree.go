@@ -18,13 +18,13 @@ func CreateBPlusTree(options Options) (*BPlusTree, error) {
 		return nil, err
 	}
 	tree := &BPlusTree{
-		fileName:      options.FileName,
-		pagePool:      pagePool,
-		pageHierarchy: NewPageHierarchy(pagePool, options.AllowedPageOccupancyPercentage),
+		fileName: options.FileName,
+		pagePool: pagePool,
 	}
 	if err := tree.create(options); err != nil {
 		return nil, err
 	}
+	tree.pageHierarchy = NewPageHierarchy(pagePool, options.AllowedPageOccupancyPercentage, tree.freePageList)
 	return tree, nil
 }
 
