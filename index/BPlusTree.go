@@ -40,7 +40,7 @@ func (tree BPlusTree) Get(key []byte) GetResult {
 }
 
 func (tree *BPlusTree) Close() error {
-	//ensure the content is written to the disk
+	tree.pageHierarchy.Write()
 	return tree.pagePool.Close()
 }
 
