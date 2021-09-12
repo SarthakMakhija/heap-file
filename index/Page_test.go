@@ -123,7 +123,7 @@ func TestUnMarshalsANonLeafPageWithKey(t *testing.T) {
 	newPage := &Page{}
 	newPage.UnMarshalBinary(bytes)
 
-	key := string(newPage.NonEmptyKeyValuePairs()[0].key)
+	key := string(newPage.AllKeyValuePairs()[0].key)
 	if key != "C" {
 		t.Fatalf("Expected key to be C, received %v", key)
 	}
@@ -274,7 +274,7 @@ func TestSplitsALeafPageWithKeyValuePairs(t *testing.T) {
 
 	_ = page.split(parentPage, siblingPage, 0)
 
-	keyValuePairsAfterSplit := page.NonEmptyKeyValuePairs()
+	keyValuePairsAfterSplit := page.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("A"), value: []byte("Database")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {
@@ -293,7 +293,7 @@ func TestSplitsALeafPageWithKeyValuePairsInParent(t *testing.T) {
 
 	_ = page.split(parentPage, siblingPage, 0)
 
-	keyValuePairsAfterSplit := parentPage.NonEmptyKeyValuePairs()
+	keyValuePairsAfterSplit := parentPage.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("B")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {
@@ -312,7 +312,7 @@ func TestSplitsALeafPageWithKeyValuePairsInSibling(t *testing.T) {
 
 	_ = page.split(parentPage, siblingPage, 0)
 
-	keyValuePairsAfterSplit := siblingPage.NonEmptyKeyValuePairs()
+	keyValuePairsAfterSplit := siblingPage.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("B"), value: []byte("Systems")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {
@@ -334,7 +334,7 @@ func TestSplitsANonLeafPageWithKeyValuePairs(t *testing.T) {
 
 	_ = page.split(parentPage, siblingPage, 1)
 
-	keyValuePairsAfterSplit := page.NonEmptyKeyValuePairs()
+	keyValuePairsAfterSplit := page.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("O")}, {key: []byte("Q")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {
@@ -356,7 +356,7 @@ func TestSplitsANonLeafPageWithKeyValuePairsInParent(t *testing.T) {
 
 	_ = page.split(parentPage, siblingPage, 1)
 
-	keyValuePairsAfterSplit := parentPage.NonEmptyKeyValuePairs()
+	keyValuePairsAfterSplit := parentPage.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("S")}, {key: []byte("O")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {
@@ -378,7 +378,7 @@ func TestSplitsANonLeafPageWithKeyValuePairsInSibling(t *testing.T) {
 
 	_ = page.split(parentPage, siblingPage, 1)
 
-	keyValuePairsAfterSplit := siblingPage.NonEmptyKeyValuePairs()
+	keyValuePairsAfterSplit := siblingPage.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {

@@ -350,7 +350,7 @@ func TestPutsAKeyValuePairInRootLeafPage(t *testing.T) {
 		{key: []byte("C"), value: []byte("Systems")},
 	}
 
-	pageKeyValuePairs := pageHierarchy.rootPage.NonEmptyKeyValuePairs()
+	pageKeyValuePairs := pageHierarchy.rootPage.AllKeyValuePairs()
 	if !reflect.DeepEqual(expected, pageKeyValuePairs) {
 		t.Fatalf("Expected Key value pairs to be %v, received %v", expected, pageKeyValuePairs)
 	}
@@ -476,7 +476,7 @@ func TestSplitsTheRootPageAndCreatesANewRootWithKeyValuePairs(t *testing.T) {
 
 	_ = pageHierarchy.Put(KeyValuePair{key: []byte("D"), value: []byte("File System")})
 
-	keyValuePairsOfNewRootPage := pageHierarchy.rootPage.NonEmptyKeyValuePairs()
+	keyValuePairsOfNewRootPage := pageHierarchy.rootPage.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("C")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairsOfNewRootPage) {
@@ -514,7 +514,7 @@ func TestSplitsTheRootPageAndWithKeyValuePairsInOldRoot(t *testing.T) {
 
 	_ = pageHierarchy.Put(KeyValuePair{key: []byte("D"), value: []byte("File System")})
 
-	keyValuePairs := existingRootPage.NonEmptyKeyValuePairs()
+	keyValuePairs := existingRootPage.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("A"), value: []byte("Database")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairs) {
@@ -553,7 +553,7 @@ func TestSplitsTheRootPageAndWithKeyValuePairsInRightSiblingPage(t *testing.T) {
 	_ = pageHierarchy.Put(KeyValuePair{key: []byte("D"), value: []byte("File System")})
 	rightSibling := pageHierarchy.PageById(pageHierarchy.rootPage.childPageIds[1])
 
-	keyValuePairs := rightSibling.NonEmptyKeyValuePairs()
+	keyValuePairs := rightSibling.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("C"), value: []byte("Systems")}, {key: []byte("D"), value: []byte("File System")}, {key: []byte("E"), value: []byte("OS")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairs) {
@@ -620,7 +620,7 @@ func TestSplitsLeafPageAndAddsAKeyToTheRootPage(t *testing.T) {
 	_ = pageHierarchy.Put(KeyValuePair{key: []byte("E"), value: []byte("NFS")})
 
 	expected := []KeyValuePair{{key: []byte("B")}, {key: []byte("C")}}
-	rootPageKeyValuePairs := pageHierarchy.rootPage.NonEmptyKeyValuePairs()
+	rootPageKeyValuePairs := pageHierarchy.rootPage.AllKeyValuePairs()
 
 	if !reflect.DeepEqual(expected, rootPageKeyValuePairs) {
 		t.Fatalf("Expected Key value pair in the root page to be %v, received %v", expected, rootPageKeyValuePairs)
@@ -701,7 +701,7 @@ func TestSplitsLeafPageAndPutsTheValueInTheRightSibling(t *testing.T) {
 			value: []byte("NFS"),
 		},
 	}
-	resultantPageKeyValuePairs := resultantPage.NonEmptyKeyValuePairs()
+	resultantPageKeyValuePairs := resultantPage.AllKeyValuePairs()
 
 	if !reflect.DeepEqual(expected, resultantPageKeyValuePairs) {
 		t.Fatalf("Expected Key value pair in the sibling page to be %v, received %v", expected, resultantPageKeyValuePairs)
@@ -782,7 +782,7 @@ func TestSplitsLeafPageAndAddsTheNewPageAsTheRightmostChildOfTheRootPage(t *test
 			value: []byte("NFS"),
 		},
 	}
-	resultantPageKeyValuePairs := resultantPage.NonEmptyKeyValuePairs()
+	resultantPageKeyValuePairs := resultantPage.AllKeyValuePairs()
 
 	if !reflect.DeepEqual(expected, resultantPageKeyValuePairs) {
 		t.Fatalf("Expected Key value pair in the sibling page to be %v, received %v", expected, resultantPageKeyValuePairs)

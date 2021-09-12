@@ -262,7 +262,7 @@ func TestReadsANonLeafPageWithKeyValuePairs(t *testing.T) {
 	readPage, _ := pagePool.Read(pageId)
 
 	expected := []KeyValuePair{{key: []byte("A")}}
-	keyValuePairs := readPage.NonEmptyKeyValuePairs()
+	keyValuePairs := readPage.AllKeyValuePairs()
 
 	if !reflect.DeepEqual(expected, keyValuePairs) {
 		t.Fatalf("Expected keyValuePairs to be %v, received %v", expected, keyValuePairs)

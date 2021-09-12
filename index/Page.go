@@ -218,23 +218,23 @@ func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 	siblingPage.MarkDirty()
 
 	if page.isLeaf() {
-		pageKeyValuePairs := page.NonEmptyKeyValuePairs()
+		pageKeyValuePairs := page.AllKeyValuePairs()
 		siblingPage.keyValuePairs = append(siblingPage.keyValuePairs, page.keyValuePairs[len(pageKeyValuePairs)/2:]...)
 		page.keyValuePairs = page.keyValuePairs[:len(pageKeyValuePairs)/2]
 
 		parentPage.insertChildAt(index+1, siblingPage)
 		parentPage.insertAt(index, siblingPage.keyValuePairs[0])
 	} else {
-		parentKey := page.keyValuePairs[len(page.NonEmptyKeyValuePairs())/2]
+		parentKey := page.keyValuePairs[len(page.AllKeyValuePairs())/2]
 
-		siblingPage.keyValuePairs = append(siblingPage.keyValuePairs, page.keyValuePairs[0:len(page.NonEmptyKeyValuePairs())/2]...)
-		page.keyValuePairs = page.keyValuePairs[len(page.NonEmptyKeyValuePairs())/2:]
+		siblingPage.keyValuePairs = append(siblingPage.keyValuePairs, page.keyValuePairs[0:len(page.AllKeyValuePairs())/2]...)
+		page.keyValuePairs = page.keyValuePairs[len(page.AllKeyValuePairs())/2:]
 
-		siblingPage.childPageIds = make([]int, len(siblingPage.NonEmptyKeyValuePairs())+1)
-		copy(siblingPage.childPageIds, page.childPageIds[:len(page.NonEmptyKeyValuePairs())/2])
+		siblingPage.childPageIds = make([]int, len(siblingPage.AllKeyValuePairs())+1)
+		copy(siblingPage.childPageIds, page.childPageIds[:len(page.AllKeyValuePairs())/2])
 
-		page.childPageIds = make([]int, len(page.NonEmptyKeyValuePairs())+1)
-		copy(page.childPageIds, page.childPageIds[len(page.NonEmptyKeyValuePairs())/2:])
+		page.childPageIds = make([]int, len(page.AllKeyValuePairs())+1)
+		copy(page.childPageIds, page.childPageIds[len(page.AllKeyValuePairs())/2:])
 
 		parentPage.insertChildAt(index, siblingPage)
 		parentPage.insertAt(index, parentKey)
@@ -242,7 +242,7 @@ func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 	return nil
 }
 
-func (page *Page) NonEmptyKeyValuePairs() []KeyValuePair {
+func (page *Page) AllKeyValuePairs() []KeyValuePair {
 	return page.keyValuePairs
 }
 
