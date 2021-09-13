@@ -7,7 +7,7 @@ B+ tree disk implementation for storing key value pairs
 - Put : puts a KeyValuePair
 
 # Open
-- Meta pages are not implemented
+- No support for meta pages which means index file does not get read again
 - No support for concurrency
 
 # Implementation details
