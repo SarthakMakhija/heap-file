@@ -386,7 +386,7 @@ func TestSplitsANonLeafPageWithKeyValuePairsInSibling(t *testing.T) {
 	}
 }
 
-func TestReturnsTheNonLeadPageAfterSplitWithChildPageIdsAsOneGreaterThanNumberOfKeyValuePairs(t *testing.T) {
+func TestReturnsTheNonLeafPageAfterSplitWithChildPageIdsAsOneGreaterThanNumberOfKeyValuePairs(t *testing.T) {
 	page := &Page{
 		id:            5,
 		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}, {key: []byte("Q")}},
