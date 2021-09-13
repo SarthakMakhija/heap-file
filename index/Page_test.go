@@ -320,14 +320,14 @@ func TestSplitsALeafPageWithKeyValuePairsInSibling(t *testing.T) {
 	}
 }
 
-func TestSplitsANonLeafPageWithKeyValuePairs(t *testing.T) {
+func TestSplitsANonLeafPageWithKeyValuePairsWithEvenNumberOfKeyValuePairs(t *testing.T) {
 	page := &Page{
 		id:            5,
 		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}, {key: []byte("Q")}},
-		childPageIds:  []int{10, 11, 12, 13},
+		childPageIds:  []int{10, 11, 12, 13, 14},
 	}
 	parentPage := NewPage(100)
-	parentPage.childPageIds = []int{5}
+	parentPage.childPageIds = []int{5, 6}
 	parentPage.keyValuePairs = []KeyValuePair{{key: []byte("S")}}
 
 	siblingPage := NewPage(200)
@@ -335,10 +335,186 @@ func TestSplitsANonLeafPageWithKeyValuePairs(t *testing.T) {
 	_ = page.split(parentPage, siblingPage, 1)
 
 	keyValuePairsAfterSplit := page.AllKeyValuePairs()
-	expected := []KeyValuePair{{key: []byte("O")}, {key: []byte("Q")}}
+	expected := []KeyValuePair{{key: []byte("Q")}}
 
 	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {
 		t.Fatalf("Expected key value pairs in the page after split to be %v, received %v", expected, keyValuePairsAfterSplit)
+	}
+}
+
+func TestSplitsANonLeafPageWithKeyValuePairsWithOddNumberOfKeyValuePairs(t *testing.T) {
+	page := &Page{
+		id:            5,
+		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}},
+		childPageIds:  []int{10, 11, 12, 13},
+	}
+	parentPage := NewPage(100)
+	parentPage.childPageIds = []int{5, 6}
+	parentPage.keyValuePairs = []KeyValuePair{{key: []byte("S")}}
+
+	siblingPage := NewPage(200)
+
+	_ = page.split(parentPage, siblingPage, 1)
+
+	keyValuePairsAfterSplit := page.AllKeyValuePairs()
+	expected := []KeyValuePair{{key: []byte("O")}}
+
+	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {
+		t.Fatalf("Expected key value pairs in the page after split to be %v, received %v", expected, keyValuePairsAfterSplit)
+	}
+}
+
+func TestSplitsANonLeafPageWithKeyValuePairsInSiblingWithEvenNumberOfKeyValuePairs(t *testing.T) {
+	page := &Page{
+		id:            5,
+		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}, {key: []byte("Q")}},
+		childPageIds:  []int{10, 11, 12, 13, 14},
+	}
+	parentPage := NewPage(100)
+	parentPage.childPageIds = []int{5, 6}
+	parentPage.keyValuePairs = []KeyValuePair{{key: []byte("S")}}
+
+	siblingPage := NewPage(200)
+
+	_ = page.split(parentPage, siblingPage, 1)
+
+	keyValuePairsAfterSplit := siblingPage.AllKeyValuePairs()
+	expected := []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}}
+
+	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {
+		t.Fatalf("Expected key value pairs in the sibling page after split to be %v, received %v", expected, keyValuePairsAfterSplit)
+	}
+}
+
+func TestSplitsANonLeafPageWithKeyValuePairsInSiblingWithOddNumberOfKeyValuePairs(t *testing.T) {
+	page := &Page{
+		id:            5,
+		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}},
+		childPageIds:  []int{10, 11, 12, 13},
+	}
+	parentPage := NewPage(100)
+	parentPage.childPageIds = []int{5, 6}
+	parentPage.keyValuePairs = []KeyValuePair{{key: []byte("S")}}
+
+	siblingPage := NewPage(200)
+
+	_ = page.split(parentPage, siblingPage, 1)
+
+	keyValuePairsAfterSplit := siblingPage.AllKeyValuePairs()
+	expected := []KeyValuePair{{key: []byte("J")}}
+
+	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {
+		t.Fatalf("Expected key value pairs in the sibling page after split to be %v, received %v", expected, keyValuePairsAfterSplit)
+	}
+}
+
+func TestSplitsANonLeafPageWithChildPageIdsWithEvenNumberOfChildPageIds(t *testing.T) {
+	page := &Page{
+		id:            5,
+		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}},
+		childPageIds:  []int{10, 11, 12, 13},
+	}
+	parentPage := NewPage(100)
+	parentPage.childPageIds = []int{5, 6}
+	parentPage.keyValuePairs = []KeyValuePair{{key: []byte("S")}}
+
+	siblingPage := NewPage(200)
+
+	_ = page.split(parentPage, siblingPage, 1)
+
+	childPageIdsAfterSplit := page.childPageIds
+	expected := []int{12, 13}
+
+	if !reflect.DeepEqual(expected, childPageIdsAfterSplit) {
+		t.Fatalf("Expected child page ids in the page after split to be %v, received %v", expected, childPageIdsAfterSplit)
+	}
+}
+
+func TestSplitsANonLeafPageWithChildPageIdsInSiblingPageWithEvenNumberOfChildPageIds(t *testing.T) {
+	page := &Page{
+		id:            5,
+		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}},
+		childPageIds:  []int{10, 11, 12, 13},
+	}
+	parentPage := NewPage(100)
+	parentPage.childPageIds = []int{5, 6}
+	parentPage.keyValuePairs = []KeyValuePair{{key: []byte("S")}}
+
+	siblingPage := NewPage(200)
+
+	_ = page.split(parentPage, siblingPage, 1)
+
+	childPageIdsAfterSplit := siblingPage.childPageIds
+	expected := []int{10, 11}
+
+	if !reflect.DeepEqual(expected, childPageIdsAfterSplit) {
+		t.Fatalf("Expected child page ids in the sibling page after split to be %v, received %v", expected, childPageIdsAfterSplit)
+	}
+}
+
+func TestSplitsANonLeafPageWithChildPageIdsWithOddNumberOfChildPageIds(t *testing.T) {
+	page := &Page{
+		id:            5,
+		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}, {key: []byte("Q")}},
+		childPageIds:  []int{10, 11, 12, 13, 14},
+	}
+	parentPage := NewPage(100)
+	parentPage.childPageIds = []int{5, 6}
+	parentPage.keyValuePairs = []KeyValuePair{{key: []byte("S")}}
+
+	siblingPage := NewPage(200)
+
+	_ = page.split(parentPage, siblingPage, 1)
+
+	childPageIdsAfterSplit := page.childPageIds
+	expected := []int{13, 14}
+
+	if !reflect.DeepEqual(expected, childPageIdsAfterSplit) {
+		t.Fatalf("Expected child page ids in the page after split to be %v, received %v", expected, childPageIdsAfterSplit)
+	}
+}
+
+func TestSplitsANonLeafPageWithChildPageIdsInSiblingPageWithOddNumberOfChildPageIds(t *testing.T) {
+	page := &Page{
+		id:            5,
+		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}, {key: []byte("Q")}},
+		childPageIds:  []int{10, 11, 12, 13, 14},
+	}
+	parentPage := NewPage(100)
+	parentPage.childPageIds = []int{5, 6}
+	parentPage.keyValuePairs = []KeyValuePair{{key: []byte("S")}}
+
+	siblingPage := NewPage(200)
+
+	_ = page.split(parentPage, siblingPage, 1)
+
+	childPageIdsAfterSplit := siblingPage.childPageIds
+	expected := []int{10, 11, 12}
+
+	if !reflect.DeepEqual(expected, childPageIdsAfterSplit) {
+		t.Fatalf("Expected child page ids in the sibling page after split to be %v, received %v", expected, childPageIdsAfterSplit)
+	}
+}
+
+func TestSplitsANonLeafPageWithAKeyValuePairAddedToParent(t *testing.T) {
+	page := &Page{
+		id:            5,
+		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}, {key: []byte("Q")}},
+		childPageIds:  []int{10, 11, 12, 13, 14},
+	}
+	parentPage := NewPage(100)
+	parentPage.childPageIds = []int{5, 6}
+	parentPage.keyValuePairs = []KeyValuePair{{key: []byte("S")}}
+
+	siblingPage := NewPage(200)
+
+	_ = page.split(parentPage, siblingPage, 1)
+
+	parentPageKeyValuePairs := parentPage.keyValuePairs
+	expected := []KeyValuePair{{key: []byte("S")}, {key: []byte("O")}}
+
+	if !reflect.DeepEqual(expected, parentPageKeyValuePairs) {
+		t.Fatalf("Expected parent page to contain key value pairs after split to be %v, received %v", expected, parentPageKeyValuePairs)
 	}
 }
 
@@ -364,7 +540,7 @@ func TestSplitsANonLeafPageWithKeyValuePairsInParent(t *testing.T) {
 	}
 }
 
-func TestSplitsANonLeafPageWithKeyValuePairsInSibling(t *testing.T) {
+func TestSplitsANonLeafPageWithChildPageIdAdddedToParent(t *testing.T) {
 	page := &Page{
 		id:            5,
 		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}, {key: []byte("Q")}},
@@ -378,37 +554,11 @@ func TestSplitsANonLeafPageWithKeyValuePairsInSibling(t *testing.T) {
 
 	_ = page.split(parentPage, siblingPage, 1)
 
-	keyValuePairsAfterSplit := siblingPage.AllKeyValuePairs()
-	expected := []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}}
+	childPageIdsOfParent := parentPage.childPageIds
+	expected := []int{5, 200}
 
-	if !reflect.DeepEqual(expected, keyValuePairsAfterSplit) {
-		t.Fatalf("Expected key value pairs in the sibling page after split to be %v, received %v", expected, keyValuePairsAfterSplit)
-	}
-}
-
-func TestReturnsTheNonLeafPageAfterSplitWithChildPageIdsAsOneGreaterThanNumberOfKeyValuePairs(t *testing.T) {
-	page := &Page{
-		id:            5,
-		keyValuePairs: []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}, {key: []byte("O")}, {key: []byte("Q")}},
-		childPageIds:  []int{10, 11, 12, 13},
-	}
-	parentPage := NewPage(100)
-	parentPage.childPageIds = []int{5}
-	parentPage.keyValuePairs = []KeyValuePair{{key: []byte("S")}}
-
-	siblingPage := NewPage(200)
-
-	_ = page.split(parentPage, siblingPage, 1)
-	pageKeyValuePairLength := len(page.keyValuePairs)
-
-	if pageKeyValuePairLength != 2 {
-		t.Fatalf("Expected number of key value pairs in page to be %v, received %v", 2, pageKeyValuePairLength)
-	}
-
-	childPageIdLength := len(page.childPageIds)
-
-	if childPageIdLength != 3 {
-		t.Fatalf("Expected number of child page ids in page to be %v, received %v", 3, childPageIdLength)
+	if !reflect.DeepEqual(expected, childPageIdsOfParent) {
+		t.Fatalf("Expected parent page to contain child page ids after split to be %v, received %v", expected, childPageIdsOfParent)
 	}
 }
 

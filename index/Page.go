@@ -3,6 +3,7 @@ package index
 import (
 	"bytes"
 	"encoding/binary"
+	"math"
 	"sort"
 )
 
@@ -227,11 +228,16 @@ func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 	} else {
 		parentKey := page.keyValuePairs[len(page.AllKeyValuePairs())/2]
 
-		siblingPage.keyValuePairs = append(siblingPage.keyValuePairs, page.keyValuePairs[0:len(page.AllKeyValuePairs())/2]...)
-		page.keyValuePairs = page.keyValuePairs[len(page.AllKeyValuePairs())/2:]
+		siblingPage.keyValuePairs = append(siblingPage.keyValuePairs, page.keyValuePairs[:len(page.AllKeyValuePairs())/2]...)
+		page.keyValuePairs = page.keyValuePairs[len(page.AllKeyValuePairs())/2+1:]
 
-		siblingPage.childPageIds = append(siblingPage.childPageIds, page.childPageIds[:len(page.AllKeyValuePairs())/2]...)
-		page.childPageIds = page.childPageIds[len(page.AllKeyValuePairs())/2:]
+		if math.Mod(float64(len(page.childPageIds)), 2) != 0 {
+			siblingPage.childPageIds = append(siblingPage.childPageIds, page.childPageIds[:len(page.childPageIds)/2+1]...)
+			page.childPageIds = page.childPageIds[len(page.childPageIds)/2+1:]
+		} else {
+			siblingPage.childPageIds = append(siblingPage.childPageIds, page.childPageIds[:len(page.childPageIds)/2]...)
+			page.childPageIds = page.childPageIds[len(page.childPageIds)/2:]
+		}
 
 		parentPage.insertChildAt(index, siblingPage)
 		parentPage.insertAt(index, parentKey)
