@@ -28,11 +28,11 @@ var options = index.Options{
 }
 var bPlusTree, _ = index.CreateBPlusTree(options)
 
-func BenchmarkBucket_Put(b *testing.B) {
+func Benchmark_Put(b *testing.B) {
 	benchmarkPutKeys(b, bPlusTree)
 }
 
-func BenchmarkBucket_GetFixedKey(b *testing.B) {
+func Benchmark_GetFixedKey(b *testing.B) {
 	if b.N == 1 {
 		initializeBPlusTree := func(count int) {
 			for iterator := 1; iterator <= count; iterator++ {
@@ -49,7 +49,7 @@ func BenchmarkBucket_GetFixedKey(b *testing.B) {
 	benchmarkGetFixedKey(b, bPlusTree, searchKey)
 }
 
-func BenchmarkBucket_GetKeys(b *testing.B) {
+func Benchmark_GetKeys(b *testing.B) {
 	if b.N == 1 {
 		initializeBPlusTree := func(count int) {
 			for iterator := 1; iterator <= count; iterator++ {
