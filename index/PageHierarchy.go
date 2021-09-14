@@ -75,8 +75,11 @@ func (pageHierarchy PageHierarchy) PageById(id int) *Page {
 
 func (pageHierarchy *PageHierarchy) put(keyValuePair KeyValuePair, page *Page) error {
 	if page.isLeaf() {
-		index, _ := page.Get(keyValuePair.key)
-		//assume not found
+		index, found := page.Get(keyValuePair.key)
+		if found {
+			page.updateAt(index, keyValuePair)
+			return nil
+		}
 		page.insertAt(index, keyValuePair)
 		return nil
 	}

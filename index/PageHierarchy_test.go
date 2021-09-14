@@ -356,6 +356,38 @@ func TestPutsAKeyValuePairInRootLeafPage(t *testing.T) {
 	}
 }
 
+func TestUpdatesAKeyValuePairInRootLeafPage(t *testing.T) {
+	options := DefaultOptions()
+	indexFile, _ := OpenIndexFile(options)
+	pagePool := NewPagePool(indexFile, options)
+	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
+	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
+
+	defer deleteFile(pagePool.indexFile)
+
+	pageHierarchy.rootPage.keyValuePairs = []KeyValuePair{
+		{
+			key:   []byte("A"),
+			value: []byte("Database"),
+		},
+		{
+			key:   []byte("C"),
+			value: []byte("Systems"),
+		},
+	}
+	_ = pageHierarchy.Put(KeyValuePair{key: []byte("C"), value: []byte("OS")})
+
+	expected := []KeyValuePair{
+		{key: []byte("A"), value: []byte("Database")},
+		{key: []byte("C"), value: []byte("OS")},
+	}
+
+	pageKeyValuePairs := pageHierarchy.rootPage.AllKeyValuePairs()
+	if !reflect.DeepEqual(expected, pageKeyValuePairs) {
+		t.Fatalf("Expected Key value pairs to be %v, received %v", expected, pageKeyValuePairs)
+	}
+}
+
 func TestPutsAKeyValuePairInTheRightPage(t *testing.T) {
 	writeLeftPageToFile := func(fileName string, pageSize int) {
 		leftPage := Page{

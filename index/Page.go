@@ -205,6 +205,11 @@ func (page *Page) insertAt(index int, keyValuePair KeyValuePair) {
 	}
 }
 
+func (page Page) updateAt(index int, keyValuePair KeyValuePair) {
+	page.MarkDirty()
+	page.keyValuePairs[index] = keyValuePair
+}
+
 func (page *Page) insertChildAt(index int, childPage *Page) {
 	page.MarkDirty()
 
