@@ -5,7 +5,7 @@ type GetResult struct {
 	index        int
 	page         *Page
 	found        bool
-	err          error
+	Err          error
 }
 
 func NewKeyAvailableGetResult(pair KeyValuePair, index int, page *Page) GetResult {
@@ -14,7 +14,7 @@ func NewKeyAvailableGetResult(pair KeyValuePair, index int, page *Page) GetResul
 		index:        index,
 		page:         page,
 		found:        true,
-		err:          nil,
+		Err:          nil,
 	}
 }
 
@@ -24,13 +24,13 @@ func NewKeyMissingGetResult(index int, page *Page) GetResult {
 		index:        index,
 		page:         page,
 		found:        false,
-		err:          nil,
+		Err:          nil,
 	}
 }
 
 func NewFailedGetResult(err error) GetResult {
 	return GetResult{
 		found: false,
-		err:   err,
+		Err:   err,
 	}
 }

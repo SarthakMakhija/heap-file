@@ -111,8 +111,8 @@ func TestDoesNotGetByKey(t *testing.T) {
 
 	getResult := pageHierarchy.Get([]byte("C"))
 
-	if getResult.found != false && getResult.err != nil {
-		t.Fatalf("Expected found to be false received %v, and error to be nil, received err %v", getResult.found, getResult.err)
+	if getResult.found != false && getResult.Err != nil {
+		t.Fatalf("Expected found to be false received %v, and error to be nil, received Err %v", getResult.found, getResult.Err)
 	}
 }
 
