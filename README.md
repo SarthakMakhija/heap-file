@@ -9,6 +9,7 @@ B+ tree disk implementation for storing key value pairs
 # Open
 - No support for meta pages which means index file does not get read again
 - No support for concurrency
+- Optimization for Put, currently the entire page get marshalled and written to memory mapped file after each put
 
 # Implementation details
 B+Tree is modelled as a collection of pages which is represented in an abstraction called ```PageHierarchy```. 
