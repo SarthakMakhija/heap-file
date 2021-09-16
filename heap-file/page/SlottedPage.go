@@ -63,6 +63,14 @@ func (slottedPage SlottedPage) SizeAvailable() uint16 {
 	return uint16(pageSize) - size
 }
 
+func (slottedPage SlottedPage) PageId() uint32 {
+	return slottedPage.id
+}
+
+func (slottedPage SlottedPage) Buffer() []byte {
+	return slottedPage.buffer
+}
+
 func (slottedPage *SlottedPage) put(tuple *heapFile.Tuple) Slot {
 	buffer, tupleSize := tuple.MarshalBinary()
 	latestOccupiedSlot := slottedPage.getSlot(slottedPage.slotCount)
