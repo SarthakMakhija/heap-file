@@ -1,7 +1,8 @@
-package heap_file
+package page
 
 import (
 	"encoding/binary"
+	"github.com/SarthakMakhija/b-plus-tree/heap-file"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
 	"os"
 	"unsafe"
@@ -10,7 +11,6 @@ import (
 var pageSize = os.Getpagesize()
 var littleEndian = binary.LittleEndian
 var pageIdSize = unsafe.Sizeof(SlottedPage{}.id)
-var slotSize = unsafe.Sizeof(Slot{})
 
 type SlottedPage struct {
 	id        uint32
@@ -19,11 +19,6 @@ type SlottedPage struct {
 }
 
 //revisit data types of SlottedPage
-
-type Slot struct {
-	tupleOffset uint16
-	tupleSize   uint16
-}
 
 func NewSlottedPage(id uint32) *SlottedPage {
 	slottedPage := &SlottedPage{
@@ -35,34 +30,32 @@ func NewSlottedPage(id uint32) *SlottedPage {
 	return slottedPage
 }
 
-func (slottedPage *SlottedPage) Put(tuple *Tuple) TupleId {
+func (slottedPage *SlottedPage) Put(tuple *heap_file.Tuple) heap_file.TupleId {
 	slot := slottedPage.put(tuple)
 	slottedPage.addSlot(slot)
 	slottedPage.increaseSlotCount()
 
-	return TupleId{
-		pageId: slottedPage.id,
-		slotNo: slottedPage.slotCount,
+	return heap_file.TupleId{
+		PageId: slottedPage.id,
+		SlotNo: slottedPage.slotCount,
 	}
 }
 
-func (slottedPage *SlottedPage) Get(slotNo int) *Tuple {
-	//assume slotNo > 0
+func (slottedPage *SlottedPage) Get(slotNo int) *heap_file.Tuple {
 	slotStartingOffset := int(pageIdSize) + (slotNo-1)*int(slotSize)
-	tupleSizeOffset := slotStartingOffset + 2
 
-	tupleOffset := littleEndian.Uint16(slottedPage.buffer[slotStartingOffset:])
-	tupleSize := littleEndian.Uint16(slottedPage.buffer[tupleSizeOffset:])
+	slot := &Slot{}
+	slot.UnMarshalBinary(slottedPage.buffer, slotStartingOffset)
 
-	tuple := NewTuple()
+	tuple := heap_file.NewTuple()
 	tuple.UnMarshalBinary(
-		slottedPage.buffer[tupleOffset:tupleOffset+tupleSize],
+		slottedPage.buffer[slot.tupleOffset:slot.tupleOffset+slot.tupleSize],
 		[]field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
 	)
 	return tuple
 }
 
-func (slottedPage *SlottedPage) put(tuple *Tuple) Slot {
+func (slottedPage *SlottedPage) put(tuple *heap_file.Tuple) Slot {
 	buffer, size := tuple.MarshalBinary()
 	startingOffset := pageSize - size
 	copy(slottedPage.buffer[startingOffset:], buffer)
@@ -72,9 +65,7 @@ func (slottedPage *SlottedPage) put(tuple *Tuple) Slot {
 
 func (slottedPage *SlottedPage) addSlot(slot Slot) {
 	offset := pageIdSize
-	littleEndian.PutUint16(slottedPage.buffer[offset:], slot.tupleOffset)
-	offset = offset + 2
-	littleEndian.PutUint16(slottedPage.buffer[offset:], slot.tupleSize)
+	copy(slottedPage.buffer[offset:], slot.MarshalBinary())
 }
 
 func (slottedPage *SlottedPage) increaseSlotCount() {

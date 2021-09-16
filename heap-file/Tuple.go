@@ -33,3 +33,7 @@ func (tuple *Tuple) UnMarshalBinary(buffer []byte, fieldTypes []field.FieldType)
 		tuple.fields = append(tuple.fields, aField)
 	}
 }
+
+func (tuple Tuple) AllFields() []field.Field {
+	return tuple.fields
+}
