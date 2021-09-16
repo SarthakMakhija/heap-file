@@ -60,3 +60,20 @@ func TestPutsATupleInASlottedPageAndReadsItBack(t *testing.T) {
 		t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
 	}
 }
+
+func TestReturnsTheSizeAvailableInAPage(t *testing.T) {
+	slottedPage := NewSlottedPage(100)
+
+	tuple := heap_file.NewTuple()
+	tuple.AddField(field.NewStringField("Database Systems"))
+	tuple.AddField(field.NewUint16Field(3000))
+
+	slottedPage.Put(tuple)
+
+	availableSize := slottedPage.SizeAvailable()
+	expectedSize := uint16(4096) - uint16(pageIdSize) - uint16(slotSize) - uint16(tuple.Size())
+
+	if availableSize != expectedSize {
+		t.Fatalf("Expected page available size to be %v, recevied %v", availableSize, expectedSize)
+	}
+}

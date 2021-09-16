@@ -25,6 +25,11 @@ func (tuple Tuple) MarshalBinary() ([]byte, int) {
 	return buffer, len(buffer)
 }
 
+func (tuple Tuple) Size() int {
+	_, size := tuple.MarshalBinary()
+	return size
+}
+
 func (tuple *Tuple) UnMarshalBinary(buffer []byte, fieldTypes []field.FieldType) {
 	offset := 0
 	for _, fieldType := range fieldTypes {
