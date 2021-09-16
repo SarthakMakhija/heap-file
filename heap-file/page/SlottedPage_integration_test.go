@@ -47,7 +47,7 @@ func readTuples(tupleIds []tuple.TupleId, slottedPage *SlottedPage) []*tuple.Tup
 
 	for index := 0; index < 5; index++ {
 		tupleId := tupleIds[index]
-		tuples[index] = slottedPage.Get(tupleId.SlotNo)
+		tuples[index] = slottedPage.GetAt(tupleId.SlotNo)
 	}
 	return tuples
 }

@@ -44,7 +44,7 @@ func TestPutsATupleInASlottedPageAndReadsItBack(t *testing.T) {
 	aTuple.AddField(field.NewUint16Field(3000))
 
 	slottedPage.Put(aTuple)
-	readTuple := slottedPage.Get(1)
+	readTuple := slottedPage.GetAt(1)
 
 	stringFieldValue := readTuple.AllFields()[0].Value()
 	expectedStringFieldValue := "Database Systems"

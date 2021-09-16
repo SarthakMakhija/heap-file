@@ -49,7 +49,7 @@ func (slottedPage *SlottedPage) Put(aTuple *tuple.Tuple) tuple.TupleId {
 	}
 }
 
-func (slottedPage *SlottedPage) Get(slotNo int) *tuple.Tuple {
+func (slottedPage *SlottedPage) GetAt(slotNo int) *tuple.Tuple {
 	aTuple := tuple.NewTuple()
 	slot := slottedPage.getSlot(slotNo)
 	if slot == nil {

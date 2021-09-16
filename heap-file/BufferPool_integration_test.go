@@ -17,7 +17,7 @@ func TestWritesAndReadsSlottedPage(t *testing.T) {
 	_ = bufferPool.Write(slottedPage)
 	readSlottedPage, _ := bufferPool.Read(slottedPage.PageId())
 
-	aTuple := readSlottedPage.Get(1)
+	aTuple := readSlottedPage.GetAt(1)
 
 	stringFieldValue := aTuple.AllFields()[0].Value()
 	expectedStringFieldValue := "Database Systems"
