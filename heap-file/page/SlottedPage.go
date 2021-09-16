@@ -42,10 +42,11 @@ func (slottedPage *SlottedPage) Put(tuple *heapFile.Tuple) heapFile.TupleId {
 }
 
 func (slottedPage *SlottedPage) Get(slotNo int) *heapFile.Tuple {
-	slot := &Slot{}
-	slot.UnMarshalBinary(slottedPage.buffer, slottedPage.slotOffset(slotNo))
-
 	tuple := heapFile.NewTuple()
+	slot := slottedPage.getSlot(slotNo)
+	if slot == nil {
+		return tuple
+	}
 	tuple.UnMarshalBinary(
 		slottedPage.buffer[slot.tupleOffset:slot.tupleOffset+slot.tupleSize],
 		[]field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
@@ -53,20 +54,36 @@ func (slottedPage *SlottedPage) Get(slotNo int) *heapFile.Tuple {
 	return tuple
 }
 
-func (slottedPage *SlottedPage) slotOffset(slotNo int) int {
+func (slottedPage *SlottedPage) getSlot(slotNo int) *Slot {
+	if slotNo <= 0 {
+		return nil
+	}
+	slot := &Slot{}
+	slot.UnMarshalBinary(slottedPage.buffer, slottedPage.slotOffset(slotNo))
+	return slot
+}
+
+func (slottedPage SlottedPage) slotOffset(slotNo int) int {
 	return int(pageIdSize) + (slotNo-1)*int(slotSize)
 }
 
 func (slottedPage *SlottedPage) put(tuple *heapFile.Tuple) Slot {
-	buffer, size := tuple.MarshalBinary()
-	startingOffset := pageSize - size
-	copy(slottedPage.buffer[startingOffset:], buffer)
+	buffer, tupleSize := tuple.MarshalBinary()
+	latestOccupiedSlot := slottedPage.getSlot(slottedPage.slotCount)
 
-	return Slot{tupleOffset: uint16(startingOffset), tupleSize: uint16(size)}
+	tupleStartingOffset := uint16(pageSize)
+	if latestOccupiedSlot == nil {
+		tupleStartingOffset = tupleStartingOffset - uint16(tupleSize)
+	} else {
+		tupleStartingOffset = latestOccupiedSlot.tupleOffset - uint16(tupleSize)
+	}
+
+	copy(slottedPage.buffer[tupleStartingOffset:], buffer)
+	return Slot{tupleOffset: tupleStartingOffset, tupleSize: uint16(tupleSize)}
 }
 
 func (slottedPage *SlottedPage) addSlot(slot Slot) {
-	offset := pageIdSize
+	offset := slottedPage.slotCount*int(slotSize) + int(pageIdSize)
 	copy(slottedPage.buffer[offset:], slot.MarshalBinary())
 }
 
