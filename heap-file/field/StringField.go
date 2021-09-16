@@ -16,7 +16,7 @@ func NewStringField(value string) StringField {
 	}
 }
 
-func (stringField StringField) Value() string {
+func (stringField StringField) Value() interface{} {
 	return string(stringField.value)
 }
 

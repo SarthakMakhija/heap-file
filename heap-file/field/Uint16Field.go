@@ -14,7 +14,7 @@ func NewUint16Field(value uint16) Uint16Field {
 	}
 }
 
-func (uint16Field Uint16Field) Value() uint16 {
+func (uint16Field Uint16Field) Value() interface{} {
 	return uint16Field.value
 }
 
