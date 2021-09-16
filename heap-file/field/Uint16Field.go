@@ -19,8 +19,12 @@ func (uint16Field Uint16Field) Value() interface{} {
 }
 
 func (uint16Field Uint16Field) MarshalBinary() []byte {
-	buffer := make([]byte, intSize)
+	buffer := make([]byte, uint16Field.MarshalSize())
 
 	littleEndian.PutUint16(buffer, uint16Field.value)
 	return buffer
+}
+
+func (uint16Field Uint16Field) MarshalSize() int {
+	return int(intSize)
 }

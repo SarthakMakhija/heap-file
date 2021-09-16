@@ -22,13 +22,17 @@ func (stringField StringField) Value() interface{} {
 
 func (stringField StringField) MarshalBinary() []byte {
 	offset := 0
-	buffer := make([]byte, len(stringField.value)+stringValueLengthSize)
+	buffer := make([]byte, stringField.MarshalSize())
 
 	stringField.writeValueLength(buffer)
 	offset = offset + stringValueLengthSize
 	stringField.writeValueAt(buffer, offset)
 
 	return buffer
+}
+
+func (stringField StringField) MarshalSize() int {
+	return len(stringField.value) + stringValueLengthSize
 }
 
 func (stringField StringField) writeValueLength(buffer []byte) {

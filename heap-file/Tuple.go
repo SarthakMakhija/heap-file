@@ -26,8 +26,10 @@ func (tuple Tuple) MarshalBinary() ([]byte, int) {
 }
 
 func (tuple *Tuple) UnMarshalBinary(buffer []byte, fieldTypes []field.FieldType) {
+	offset := 0
 	for _, fieldType := range fieldTypes {
-		aField := fieldType.UnMarshalBinary(buffer)
+		aField := fieldType.UnMarshalBinary(buffer[offset:])
+		offset = offset + aField.MarshalSize()
 		tuple.fields = append(tuple.fields, aField)
 	}
 }

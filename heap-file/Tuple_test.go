@@ -29,15 +29,17 @@ func TestMarshalsAndUnMarshalsATupleWithStringAndUint16Field(t *testing.T) {
 	buffer, _ := tuple.MarshalBinary()
 	fieldTypes := []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}}
 
-	tuple.UnMarshalBinary(buffer, fieldTypes)
-	stringFieldValue := tuple.fields[0].Value()
+	unmarshalledTuple := NewTuple()
+	unmarshalledTuple.UnMarshalBinary(buffer, fieldTypes)
+
+	stringFieldValue := unmarshalledTuple.fields[0].Value()
 	expectedStringFieldValue := "Database Systems"
 
 	if stringFieldValue != expectedStringFieldValue {
 		t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 	}
 
-	uint16FieldValue := tuple.fields[1].Value()
+	uint16FieldValue := unmarshalledTuple.fields[1].Value()
 	expectedUint16FieldValue := uint16(3000)
 
 	if uint16FieldValue != expectedUint16FieldValue {
