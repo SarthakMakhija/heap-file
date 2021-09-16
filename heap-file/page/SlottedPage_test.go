@@ -1,19 +1,19 @@
 package page
 
 import (
-	"github.com/SarthakMakhija/b-plus-tree/heap-file"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
+	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
 	"testing"
 )
 
 func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingPageId(t *testing.T) {
 	slottedPage := NewSlottedPage(100)
 
-	tuple := heap_file.NewTuple()
-	tuple.AddField(field.NewStringField("Database Systems"))
-	tuple.AddField(field.NewUint16Field(3000))
+	aTuple := tuple.NewTuple()
+	aTuple.AddField(field.NewStringField("Database Systems"))
+	aTuple.AddField(field.NewUint16Field(3000))
 
-	tupleId := slottedPage.Put(tuple)
+	tupleId := slottedPage.Put(aTuple)
 	expectedPageId := uint32(100)
 
 	if expectedPageId != tupleId.PageId {
@@ -24,11 +24,11 @@ func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingPageId(t *testing.T)
 func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingSlotNo(t *testing.T) {
 	slottedPage := NewSlottedPage(100)
 
-	tuple := heap_file.NewTuple()
-	tuple.AddField(field.NewStringField("Database Systems"))
-	tuple.AddField(field.NewUint16Field(3000))
+	aTuple := tuple.NewTuple()
+	aTuple.AddField(field.NewStringField("Database Systems"))
+	aTuple.AddField(field.NewUint16Field(3000))
 
-	tupleId := slottedPage.Put(tuple)
+	tupleId := slottedPage.Put(aTuple)
 	expectedSlotNo := 1
 
 	if expectedSlotNo != tupleId.SlotNo {
@@ -39,11 +39,11 @@ func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingSlotNo(t *testing.T)
 func TestPutsATupleInASlottedPageAndReadsItBack(t *testing.T) {
 	slottedPage := NewSlottedPage(100)
 
-	tuple := heap_file.NewTuple()
-	tuple.AddField(field.NewStringField("Database Systems"))
-	tuple.AddField(field.NewUint16Field(3000))
+	aTuple := tuple.NewTuple()
+	aTuple.AddField(field.NewStringField("Database Systems"))
+	aTuple.AddField(field.NewUint16Field(3000))
 
-	slottedPage.Put(tuple)
+	slottedPage.Put(aTuple)
 	readTuple := slottedPage.Get(1)
 
 	stringFieldValue := readTuple.AllFields()[0].Value()
@@ -64,14 +64,14 @@ func TestPutsATupleInASlottedPageAndReadsItBack(t *testing.T) {
 func TestReturnsTheSizeAvailableInAPage(t *testing.T) {
 	slottedPage := NewSlottedPage(100)
 
-	tuple := heap_file.NewTuple()
-	tuple.AddField(field.NewStringField("Database Systems"))
-	tuple.AddField(field.NewUint16Field(3000))
+	aTuple := tuple.NewTuple()
+	aTuple.AddField(field.NewStringField("Database Systems"))
+	aTuple.AddField(field.NewUint16Field(3000))
 
-	slottedPage.Put(tuple)
+	slottedPage.Put(aTuple)
 
 	availableSize := slottedPage.SizeAvailable()
-	expectedSize := uint16(4096) - uint16(pageIdSize) - uint16(slotSize) - uint16(tuple.Size())
+	expectedSize := uint16(4096) - uint16(pageIdSize) - uint16(slotSize) - uint16(aTuple.Size())
 
 	if availableSize != expectedSize {
 		t.Fatalf("Expected page available size to be %v, recevied %v", availableSize, expectedSize)

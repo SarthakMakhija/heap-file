@@ -1,8 +1,8 @@
 package page
 
 import (
-	heap_file "github.com/SarthakMakhija/b-plus-tree/heap-file"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
+	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
 	"strconv"
 	"testing"
 )
@@ -13,14 +13,14 @@ func TestPutsMultipleTuplesInASlottedPageAndReadsThemBack(t *testing.T) {
 	tupleIds := add5Tuples(slottedPage)
 	tuples := readTuples(tupleIds, slottedPage)
 
-	for index, tuple := range tuples {
-		stringFieldValue := tuple.AllFields()[0].Value()
+	for index, aTuple := range tuples {
+		stringFieldValue := aTuple.AllFields()[0].Value()
 		expectedStringFieldValue := "Database Systems" + strconv.Itoa(index)
 
 		if stringFieldValue != expectedStringFieldValue {
 			t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 		}
-		uint16FieldValue := tuple.AllFields()[1].Value()
+		uint16FieldValue := aTuple.AllFields()[1].Value()
 		expectedUint16FieldValue := uint16(index)
 
 		if uint16FieldValue != expectedUint16FieldValue {
@@ -29,21 +29,21 @@ func TestPutsMultipleTuplesInASlottedPageAndReadsThemBack(t *testing.T) {
 	}
 }
 
-func add5Tuples(slottedPage *SlottedPage) []heap_file.TupleId {
-	tupleIds := make([]heap_file.TupleId, 5)
+func add5Tuples(slottedPage *SlottedPage) []tuple.TupleId {
+	tupleIds := make([]tuple.TupleId, 5)
 
 	for index := 0; index < 5; index++ {
-		tuple := heap_file.NewTuple()
-		tuple.AddField(field.NewStringField("Database Systems" + strconv.Itoa(index)))
-		tuple.AddField(field.NewUint16Field(uint16(index)))
+		aTuple := tuple.NewTuple()
+		aTuple.AddField(field.NewStringField("Database Systems" + strconv.Itoa(index)))
+		aTuple.AddField(field.NewUint16Field(uint16(index)))
 
-		tupleIds[index] = slottedPage.Put(tuple)
+		tupleIds[index] = slottedPage.Put(aTuple)
 	}
 	return tupleIds
 }
 
-func readTuples(tupleIds []heap_file.TupleId, slottedPage *SlottedPage) []*heap_file.Tuple {
-	tuples := make([]*heap_file.Tuple, len(tupleIds))
+func readTuples(tupleIds []tuple.TupleId, slottedPage *SlottedPage) []*tuple.Tuple {
+	tuples := make([]*tuple.Tuple, len(tupleIds))
 
 	for index := 0; index < 5; index++ {
 		tupleId := tupleIds[index]

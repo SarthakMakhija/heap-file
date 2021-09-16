@@ -2,8 +2,8 @@ package page
 
 import (
 	"encoding/binary"
-	heapFile "github.com/SarthakMakhija/b-plus-tree/heap-file"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
+	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
 	"os"
 	"unsafe"
 )
@@ -30,28 +30,36 @@ func NewSlottedPage(id uint32) *SlottedPage {
 	return slottedPage
 }
 
-func (slottedPage *SlottedPage) Put(tuple *heapFile.Tuple) heapFile.TupleId {
-	slot := slottedPage.put(tuple)
+func NewReadonlySlottedPageFrom(buffer []byte) *SlottedPage {
+	slottedPage := &SlottedPage{
+		buffer: buffer,
+		id:     littleEndian.Uint32(buffer),
+	}
+	return slottedPage
+}
+
+func (slottedPage *SlottedPage) Put(aTuple *tuple.Tuple) tuple.TupleId {
+	slot := slottedPage.put(aTuple)
 	slottedPage.addSlot(slot)
 	slottedPage.increaseSlotCount()
 
-	return heapFile.TupleId{
+	return tuple.TupleId{
 		PageId: slottedPage.id,
 		SlotNo: slottedPage.slotCount,
 	}
 }
 
-func (slottedPage *SlottedPage) Get(slotNo int) *heapFile.Tuple {
-	tuple := heapFile.NewTuple()
+func (slottedPage *SlottedPage) Get(slotNo int) *tuple.Tuple {
+	aTuple := tuple.NewTuple()
 	slot := slottedPage.getSlot(slotNo)
 	if slot == nil {
-		return tuple
+		return aTuple
 	}
-	tuple.UnMarshalBinary(
+	aTuple.UnMarshalBinary(
 		slottedPage.buffer[slot.tupleOffset:slot.tupleOffset+slot.tupleSize],
 		[]field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
 	)
-	return tuple
+	return aTuple
 }
 
 func (slottedPage SlottedPage) SizeAvailable() uint16 {
@@ -71,7 +79,7 @@ func (slottedPage SlottedPage) Buffer() []byte {
 	return slottedPage.buffer
 }
 
-func (slottedPage *SlottedPage) put(tuple *heapFile.Tuple) Slot {
+func (slottedPage *SlottedPage) put(tuple *tuple.Tuple) Slot {
 	buffer, tupleSize := tuple.MarshalBinary()
 	latestOccupiedSlot := slottedPage.getSlot(slottedPage.slotCount)
 

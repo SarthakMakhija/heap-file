@@ -1,4 +1,4 @@
-package heap_file
+package tuple
 
 type TupleId struct {
 	PageId uint32

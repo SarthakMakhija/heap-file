@@ -1,4 +1,4 @@
-package heap_file
+package tuple
 
 import (
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
