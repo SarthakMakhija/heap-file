@@ -1,6 +1,5 @@
-package heap_file
+package field
 
 type Field interface {
 	MarshalBinary() []byte
-	UnMarshalBinary([]byte)
 }

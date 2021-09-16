@@ -1,4 +1,4 @@
-package heap_file
+package field
 
 import "unsafe"
 
@@ -23,8 +23,4 @@ func (uint16Field Uint16Field) MarshalBinary() []byte {
 
 	littleEndian.PutUint16(buffer, uint16Field.value)
 	return buffer
-}
-
-func (uint16Field *Uint16Field) UnMarshalBinary(buffer []byte) {
-	uint16Field.value = littleEndian.Uint16(buffer)
 }
