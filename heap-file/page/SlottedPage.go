@@ -4,15 +4,14 @@ import (
 	"encoding/binary"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
-	"os"
 	"unsafe"
 )
 
-var pageSize = os.Getpagesize()
 var littleEndian = binary.LittleEndian
 var pageIdSize = unsafe.Sizeof(SlottedPage{}.id)
 
 type SlottedPage struct {
+	pageSize  int
 	id        uint32
 	buffer    []byte
 	slotCount int
@@ -20,8 +19,9 @@ type SlottedPage struct {
 
 //revisit data types of SlottedPage
 
-func NewSlottedPage(id uint32) *SlottedPage {
+func NewSlottedPage(id uint32, pageSize int) *SlottedPage {
 	slottedPage := &SlottedPage{
+		pageSize:  pageSize,
 		buffer:    make([]byte, pageSize),
 		id:        id,
 		slotCount: 0,
@@ -68,7 +68,7 @@ func (slottedPage SlottedPage) SizeAvailable() uint16 {
 		slot := slottedPage.getSlot(slotNo)
 		size = size + slot.tupleSize + uint16(slotSize)
 	}
-	return uint16(pageSize) - size
+	return uint16(slottedPage.pageSize) - size
 }
 
 func (slottedPage SlottedPage) PageId() uint32 {
@@ -83,7 +83,7 @@ func (slottedPage *SlottedPage) put(tuple *tuple.Tuple) Slot {
 	marshalledTuple := tuple.MarshalBinary()
 	latestOccupiedSlot := slottedPage.getSlot(slottedPage.slotCount)
 
-	tupleStartingOffset := uint16(pageSize)
+	tupleStartingOffset := uint16(slottedPage.pageSize)
 	if latestOccupiedSlot == nil {
 		tupleStartingOffset = tupleStartingOffset - uint16(marshalledTuple.Size())
 	} else {

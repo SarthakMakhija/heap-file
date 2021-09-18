@@ -4,6 +4,7 @@ import (
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/page"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
+	"os"
 	"testing"
 )
 
@@ -38,7 +39,7 @@ func fillASlottedPage() *page.SlottedPage {
 	aTuple.AddField(field.NewStringField("Database Systems"))
 	aTuple.AddField(field.NewUint16Field(uint16(100)))
 
-	slottedPage := page.NewSlottedPage(0)
+	slottedPage := page.NewSlottedPage(0, os.Getpagesize())
 	slottedPage.Put(aTuple)
 
 	return slottedPage

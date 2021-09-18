@@ -3,12 +3,13 @@ package page
 import (
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
+	"os"
 	"strconv"
 	"testing"
 )
 
 func TestPutsMultipleTuplesInASlottedPageAndReadsThemBack(t *testing.T) {
-	slottedPage := NewSlottedPage(100)
+	slottedPage := NewSlottedPage(100, os.Getpagesize())
 
 	tupleIds := add5Tuples(slottedPage)
 	tuples := readTuples(tupleIds, slottedPage)
