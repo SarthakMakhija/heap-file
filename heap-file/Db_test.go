@@ -3,6 +3,7 @@ package heap_file
 import (
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
+	"github.com/SarthakMakhija/b-plus-tree/index"
 	"os"
 	"reflect"
 	"testing"
@@ -18,15 +19,39 @@ func TestCreatesADbByPreAllocatingPages(t *testing.T) {
 				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
 			},
 		},
+		IndexOptions: index.DefaultOptions(),
 	}
 	db, _ := Open(options)
 	defer deleteFile(db.bufferPool.file)
+	defer deleteFileByName(options.IndexOptions.FileName)
 
 	expectedPageCount := options.PreAllocatedPagePoolSize()
 	actualPageCount := db.bufferPool.pageCount
 
 	if actualPageCount != expectedPageCount {
 		t.Fatalf("Expected %v page count, received %v page count", expectedPageCount, actualPageCount)
+	}
+}
+
+func TestCreatesABPlusTreeWhenOpened(t *testing.T) {
+	options := DbOptions{
+		HeapFileOptions: HeapFileOptions{
+			PageSize:                 os.Getpagesize(),
+			FileName:                 "./heap.db",
+			PreAllocatedPagePoolSize: 6,
+			TupleDescriptor: tuple.TupleDescriptor{
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+			},
+		},
+		IndexOptions: index.DefaultOptions(),
+	}
+	db, _ := Open(options)
+	defer deleteFile(db.bufferPool.file)
+	defer deleteFileByName(options.IndexOptions.FileName)
+
+	tree := db.bPlusTree
+	if tree == nil {
+		t.Fatalf("Expected bPlusTree to be initialized when db is opened")
 	}
 }
 
@@ -37,9 +62,11 @@ func TestCreatesADbWithFreePageListAndUsesTheFirstPageForHeapFile(t *testing.T) 
 			FileName:                 "./heap.db",
 			PreAllocatedPagePoolSize: 6,
 		},
+		IndexOptions: index.DefaultOptions(),
 	}
 	db, _ := Open(options)
 	defer deleteFile(db.bufferPool.file)
+	defer deleteFileByName(options.IndexOptions.FileName)
 
 	expected := []uint32{1, 2, 3, 4, 5}
 	freePageIds := db.freePageList.pageIds
@@ -59,9 +86,11 @@ func TestPutsAndGetsATuple(t *testing.T) {
 				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
 			},
 		},
+		IndexOptions: index.DefaultOptions(),
 	}
 	db, _ := Open(options)
 	defer deleteFile(db.bufferPool.file)
+	defer deleteFileByName(options.IndexOptions.FileName)
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))

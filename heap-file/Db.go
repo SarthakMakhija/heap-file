@@ -2,6 +2,7 @@ package heap_file
 
 import (
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
+	"github.com/SarthakMakhija/b-plus-tree/index"
 	"os"
 )
 
@@ -9,6 +10,7 @@ type Db struct {
 	bufferPool   *BufferPool
 	freePageList *FreePageList
 	heapFile     *HeapFile
+	bPlusTree    *index.BPlusTree
 }
 
 func Open(options DbOptions) (*Db, error) {
@@ -52,7 +54,13 @@ func (db *Db) initialize(options DbOptions) error {
 	if err != nil {
 		return err
 	}
+	bPlusTree, err := index.CreateBPlusTree(options.IndexOptions)
+	if err != nil {
+		return err
+	}
+
 	db.freePageList = InitializeFreePageList(0, options.PreAllocatedPagePoolSize())
 	db.heapFile = NewHeapFile(db.bufferPool, db.freePageList, options)
+	db.bPlusTree = bPlusTree
 	return nil
 }

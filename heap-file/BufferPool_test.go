@@ -109,6 +109,10 @@ func deleteFile(file *os.File) {
 	_ = os.Remove(file.Name())
 }
 
+func deleteFileByName(fileName string) {
+	_ = os.Remove(fileName)
+}
+
 func writeToATestFileWithEmptyPage(fileName string, pageSize int) {
 	writeToAATestFileAtOffset(fileName, make([]byte, pageSize), 0)
 }
