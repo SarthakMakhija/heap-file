@@ -98,7 +98,7 @@ func TestRequiresANewPageForPuttingATuple(t *testing.T) {
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
 	aTuple.AddField(field.NewUint16Field(3000))
-	heapFile.currentPage.Put(aTuple) //needs 20 bytes of space
+	heapFile.currentPage.Put(aTuple.MarshalBinary()) //needs 20 bytes of space
 
 	copiedTuple := tuple.NewTuple()
 	copiedTuple.AddField(field.NewStringField("Database Systems"))
@@ -129,7 +129,7 @@ func TestPutsAndGetsATupleInAPageAfterRequiringANewPage(t *testing.T) {
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
 	aTuple.AddField(field.NewUint16Field(3000))
-	heapFile.currentPage.Put(aTuple) //needs 20 bytes of space
+	heapFile.currentPage.Put(aTuple.MarshalBinary()) //needs 20 bytes of space
 
 	copiedTuple := tuple.NewTuple()
 	copiedTuple.AddField(field.NewStringField("Database Systems"))

@@ -40,7 +40,7 @@ func fillASlottedPage() *page.SlottedPage {
 	aTuple.AddField(field.NewUint16Field(uint16(100)))
 
 	slottedPage := page.NewSlottedPage(0, os.Getpagesize())
-	slottedPage.Put(aTuple)
+	slottedPage.Put(aTuple.MarshalBinary())
 
 	return slottedPage
 }

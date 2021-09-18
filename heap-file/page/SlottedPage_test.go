@@ -14,7 +14,7 @@ func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingPageId(t *testing.T)
 	aTuple.AddField(field.NewStringField("Database Systems"))
 	aTuple.AddField(field.NewUint16Field(3000))
 
-	tupleId := slottedPage.Put(aTuple)
+	tupleId := slottedPage.Put(aTuple.MarshalBinary())
 	expectedPageId := uint32(100)
 
 	if expectedPageId != tupleId.PageId {
@@ -29,7 +29,7 @@ func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingSlotNo(t *testing.T)
 	aTuple.AddField(field.NewStringField("Database Systems"))
 	aTuple.AddField(field.NewUint16Field(3000))
 
-	tupleId := slottedPage.Put(aTuple)
+	tupleId := slottedPage.Put(aTuple.MarshalBinary())
 	expectedSlotNo := 1
 
 	if expectedSlotNo != tupleId.SlotNo {
@@ -44,7 +44,7 @@ func TestPutsATupleInASlottedPageAndReadsItBack(t *testing.T) {
 	aTuple.AddField(field.NewStringField("Database Systems"))
 	aTuple.AddField(field.NewUint16Field(3000))
 
-	slottedPage.Put(aTuple)
+	slottedPage.Put(aTuple.MarshalBinary())
 	readTuple := slottedPage.GetAt(1)
 
 	stringFieldValue := readTuple.AllFields()[0].Value()
@@ -69,7 +69,7 @@ func TestReturnsTheSizeAvailableInAPage(t *testing.T) {
 	aTuple.AddField(field.NewStringField("Database Systems"))
 	aTuple.AddField(field.NewUint16Field(3000))
 
-	slottedPage.Put(aTuple)
+	slottedPage.Put(aTuple.MarshalBinary())
 
 	availableSize := slottedPage.SizeAvailable()
 	expectedSize := uint16(4096) - uint16(pageIdSize) - uint16(slotSize) - uint16(aTuple.Size())

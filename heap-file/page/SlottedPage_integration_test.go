@@ -38,7 +38,7 @@ func add5Tuples(slottedPage *SlottedPage) []tuple.TupleId {
 		aTuple.AddField(field.NewStringField("Database Systems" + strconv.Itoa(index)))
 		aTuple.AddField(field.NewUint16Field(uint16(index)))
 
-		tupleIds[index] = slottedPage.Put(aTuple)
+		tupleIds[index] = slottedPage.Put(aTuple.MarshalBinary())
 	}
 	return tupleIds
 }

@@ -31,7 +31,7 @@ func (heapFile *HeapFile) Put(tuple *tuple.Tuple) (tuple.TupleId, error) {
 	if !heapFile.isCurrentSlottedPageLargeEnoughToHold(marshalledTuple) {
 		heapFile.currentPage = heapFile.newCurrentPage()
 	}
-	tupleId := heapFile.currentPage.Put(tuple)
+	tupleId := heapFile.currentPage.Put(marshalledTuple)
 	err := heapFile.bufferPool.Write(heapFile.currentPage)
 	return tupleId, err
 }

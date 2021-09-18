@@ -38,7 +38,7 @@ func NewReadonlySlottedPageFrom(buffer []byte) *SlottedPage {
 	return slottedPage
 }
 
-func (slottedPage *SlottedPage) Put(aTuple *tuple.Tuple) tuple.TupleId {
+func (slottedPage *SlottedPage) Put(aTuple tuple.MarshalledTuple) tuple.TupleId {
 	slot := slottedPage.put(aTuple)
 	slottedPage.addSlot(slot)
 	slottedPage.increaseSlotCount()
@@ -79,8 +79,7 @@ func (slottedPage SlottedPage) Buffer() []byte {
 	return slottedPage.buffer
 }
 
-func (slottedPage *SlottedPage) put(tuple *tuple.Tuple) Slot {
-	marshalledTuple := tuple.MarshalBinary()
+func (slottedPage *SlottedPage) put(marshalledTuple tuple.MarshalledTuple) Slot {
 	latestOccupiedSlot := slottedPage.getSlot(slottedPage.slotCount)
 
 	tupleStartingOffset := uint16(slottedPage.pageSize)
