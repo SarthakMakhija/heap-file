@@ -63,7 +63,7 @@ func TestPutsAndGetsATuple(t *testing.T) {
 
 	tupleId, _ := db.Put(aTuple)
 
-	readTuple := db.GetAt(tupleId.SlotNo)
+	readTuple := db.GetBy(tupleId)
 
 	stringFieldValue := readTuple.AllFields()[0].Value()
 	expectedStringFieldValue := "Database Systems"

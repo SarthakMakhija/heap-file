@@ -34,7 +34,7 @@ func TestPutsAndGetsATupleInAPage(t *testing.T) {
 	aTuple.AddField(field.NewUint16Field(3000))
 
 	tupleId, _ := heapFile.Put(aTuple)
-	readTuple := heapFile.GetAt(tupleId.SlotNo)
+	readTuple := heapFile.GetBy(tupleId)
 
 	stringFieldValue := readTuple.AllFields()[0].Value()
 	expectedStringFieldValue := "Database Systems"
@@ -142,7 +142,7 @@ func TestPutsAndGetsATupleInAPageAfterRequiringANewPage(t *testing.T) {
 	copiedTuple.AddField(field.NewUint16Field(3000))
 
 	tupleId, _ := heapFile.Put(copiedTuple)
-	readTuple := heapFile.GetAt(tupleId.SlotNo)
+	readTuple := heapFile.GetBy(tupleId)
 
 	stringFieldValue := readTuple.AllFields()[0].Value()
 	expectedStringFieldValue := "Database Systems"

@@ -31,8 +31,8 @@ func (db *Db) Put(tuple *tuple.Tuple) (tuple.TupleId, error) {
 	return db.heapFile.Put(tuple)
 }
 
-func (db *Db) GetAt(slotNo int) *tuple.Tuple {
-	return db.heapFile.GetAt(slotNo)
+func (db *Db) GetBy(tupleId tuple.TupleId) *tuple.Tuple {
+	return db.heapFile.GetBy(tupleId)
 }
 
 func openFile(fileName string) (*os.File, error) {

@@ -38,8 +38,12 @@ func (heapFile *HeapFile) Put(tuple *tuple.Tuple) (tuple.TupleId, error) {
 	return tupleId, err
 }
 
-func (heapFile *HeapFile) GetAt(slotNo int) *tuple.Tuple {
-	return heapFile.currentPage.GetAt(slotNo)
+func (heapFile *HeapFile) GetBy(tupleId tuple.TupleId) *tuple.Tuple {
+	slottedPage, err := heapFile.bufferPool.Read(tupleId.PageId)
+	if err != nil {
+		return nil
+	}
+	return slottedPage.GetAt(tupleId.SlotNo)
 }
 
 func (heapFile *HeapFile) isCurrentSlottedPageLargeEnoughToHold(marshalledTuple tuple.MarshalledTuple) bool {
