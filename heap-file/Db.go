@@ -1,10 +1,14 @@
 package heap_file
 
-import "os"
+import (
+	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
+	"os"
+)
 
 type Db struct {
 	bufferPool   *BufferPool
 	freePageList *FreePageList
+	heapFile     *HeapFile
 }
 
 func Open(options Options) (*Db, error) {
@@ -21,6 +25,14 @@ func Open(options Options) (*Db, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func (db *Db) Put(tuple *tuple.Tuple) (tuple.TupleId, error) {
+	return db.heapFile.Put(tuple)
+}
+
+func (db *Db) GetAt(slotNo int) *tuple.Tuple {
+	return db.heapFile.GetAt(slotNo)
 }
 
 func openFile(fileName string) (*os.File, error) {
@@ -41,5 +53,6 @@ func (db *Db) initialize(options Options) error {
 		return err
 	}
 	db.freePageList = InitializeFreePageList(0, options.PreAllocatedPagePoolSize)
+	db.heapFile = NewHeapFile(db.bufferPool, db.freePageList, options)
 	return nil
 }
