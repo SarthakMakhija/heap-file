@@ -1,4 +1,4 @@
-module github.com/SarthakMakhija/b-plus-tree
+module github.com/SarthakMakhija/heap-file
 
 go 1.16
 
