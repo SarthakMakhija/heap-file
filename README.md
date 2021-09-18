@@ -1,4 +1,30 @@
 
+# heap-ille
+Unordered collection of records
+
+# Operations supported
+- Get : gets a Tuple by a key
+- Put : puts a Tuple
+
+# Open
+- No support for meta pages which means heap file does not get read again
+- No support for concurrency
+- No support for handling large values which are bigger than the page size  
+
+
+# Implementation details
+A Tuple is a collection of fields. Currently, only string and unsigned-16 bit integer fields are supported. Heap file is organized into a collection of ```Slotted``` pages of fixed size. 
+
+A ```Slotted``` page contains
+- a page id
+- slots, each slot contains a tuple offset into the page and the tuple size
+- tuples
+
+```Put(Tuple)``` into the heap file returns a ```TupleId``` which contains ```PageNo``` and ```SlotNo```. After the ```Put(Tuple)``` operation is done, the content of the page is written to the underlying file using standard IO.
+
+Given this is a learning implementation, ```Tuple``` returns a ```Key``` which is the last field in the tuple. After the ```Put(Tuple)``` into the heap file, ```Key``` and ```TupleId``` are inserted into B+Tree.
+
+
 # b-plus-tree
 B+ tree disk implementation for storing key value pairs
 
