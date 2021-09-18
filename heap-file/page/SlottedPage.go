@@ -80,18 +80,18 @@ func (slottedPage SlottedPage) Buffer() []byte {
 }
 
 func (slottedPage *SlottedPage) put(tuple *tuple.Tuple) Slot {
-	buffer, tupleSize := tuple.MarshalBinary()
+	marshalledTuple := tuple.MarshalBinary()
 	latestOccupiedSlot := slottedPage.getSlot(slottedPage.slotCount)
 
 	tupleStartingOffset := uint16(pageSize)
 	if latestOccupiedSlot == nil {
-		tupleStartingOffset = tupleStartingOffset - uint16(tupleSize)
+		tupleStartingOffset = tupleStartingOffset - uint16(marshalledTuple.Size())
 	} else {
-		tupleStartingOffset = latestOccupiedSlot.tupleOffset - uint16(tupleSize)
+		tupleStartingOffset = latestOccupiedSlot.tupleOffset - uint16(marshalledTuple.Size())
 	}
 
-	copy(slottedPage.buffer[tupleStartingOffset:], buffer)
-	return Slot{tupleOffset: tupleStartingOffset, tupleSize: uint16(tupleSize)}
+	copy(slottedPage.buffer[tupleStartingOffset:], marshalledTuple.Buffer())
+	return Slot{tupleOffset: tupleStartingOffset, tupleSize: uint16(marshalledTuple.Size())}
 }
 
 func (slottedPage *SlottedPage) getSlot(slotNo int) *Slot {

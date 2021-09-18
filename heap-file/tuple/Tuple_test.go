@@ -9,10 +9,10 @@ func TestMarshalsAndUnMarshalsATupleWithSingleFieldOfTypeString(t *testing.T) {
 	tuple := NewTuple()
 	tuple.AddField(field.NewStringField("Database Systems"))
 
-	buffer, _ := tuple.MarshalBinary()
+	marshalledTuple := tuple.MarshalBinary()
 	fieldTypes := []field.FieldType{field.StringFieldType{}}
 
-	tuple.UnMarshalBinary(buffer, fieldTypes)
+	tuple.UnMarshalBinary(marshalledTuple.Buffer(), fieldTypes)
 	fieldValue := tuple.fields[0].Value()
 	expected := "Database Systems"
 
@@ -26,11 +26,11 @@ func TestMarshalsAndUnMarshalsATupleWithStringAndUint16Field(t *testing.T) {
 	tuple.AddField(field.NewStringField("Database Systems"))
 	tuple.AddField(field.NewUint16Field(3000))
 
-	buffer, _ := tuple.MarshalBinary()
+	marshalledTuple := tuple.MarshalBinary()
 	fieldTypes := []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}}
 
 	unmarshalledTuple := NewTuple()
-	unmarshalledTuple.UnMarshalBinary(buffer, fieldTypes)
+	unmarshalledTuple.UnMarshalBinary(marshalledTuple.Buffer(), fieldTypes)
 
 	stringFieldValue := unmarshalledTuple.fields[0].Value()
 	expectedStringFieldValue := "Database Systems"

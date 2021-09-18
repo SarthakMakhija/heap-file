@@ -17,17 +17,16 @@ func (tuple *Tuple) AddField(field field.Field) {
 	tuple.fields = append(tuple.fields, field)
 }
 
-func (tuple Tuple) MarshalBinary() ([]byte, int) {
+func (tuple Tuple) MarshalBinary() MarshalledTuple {
 	var buffer []byte
 	for _, aField := range tuple.fields {
 		buffer = append(buffer, aField.MarshalBinary()...)
 	}
-	return buffer, len(buffer)
+	return MarshalledTuple{buffer: buffer, size: len(buffer)}
 }
 
 func (tuple Tuple) Size() int {
-	_, size := tuple.MarshalBinary()
-	return size
+	return tuple.MarshalBinary().Size()
 }
 
 func (tuple *Tuple) UnMarshalBinary(buffer []byte, fieldTypes []field.FieldType) {
