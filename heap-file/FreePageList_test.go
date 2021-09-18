@@ -48,6 +48,15 @@ func TestAllocates4Pages(t *testing.T) {
 	}
 }
 
+func TestAllocates4PagesAndReturnsTrueAboutAllocation(t *testing.T) {
+	freePageList := InitializeFreePageList(5, 4)
+	isAvailable, _ := freePageList.allocateAndUpdate(4)
+
+	if isAvailable != true {
+		t.Fatalf("Expected 4 pages to be allocated")
+	}
+}
+
 func TestAllocates4PagesAndUpdatesFreePageList(t *testing.T) {
 	freePageList := InitializeFreePageList(5, 4)
 	freePageList.allocateAndUpdate(4)

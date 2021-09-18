@@ -25,7 +25,7 @@ func (freePageList *FreePageList) allocateContiguous(pages int) (bool, uint32, [
 	if len(freePageList.pageIds) < pages {
 		return false, 0, freePageList.pageIds
 	} else if pages == 1 {
-		return false, freePageList.pageIds[0], freePageList.pageIds[1:]
+		return true, freePageList.pageIds[0], freePageList.pageIds[1:]
 	}
 
 	startingIndex, endIndex := 0, 0
@@ -42,5 +42,5 @@ func (freePageList *FreePageList) allocateContiguous(pages int) (bool, uint32, [
 
 	firstFreePageId := freePageList.pageIds[startingIndex]
 	freePageList.pageIds = append(freePageList.pageIds[:startingIndex], freePageList.pageIds[endIndex+1:]...)
-	return false, firstFreePageId, freePageList.pageIds
+	return true, firstFreePageId, freePageList.pageIds
 }
