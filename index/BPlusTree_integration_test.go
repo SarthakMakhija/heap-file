@@ -25,15 +25,15 @@ func TestPutsAndGets1000KeyValuePairsWithDefaultOptions(t *testing.T) {
 		getResult := bPlusTree.Get(
 			key,
 		)
-		if getResult.keyValuePair.isEmpty() {
+		if getResult.KeyValuePair.isEmpty() {
 			t.Fatalf("Received empty key value pair for %v", string(key))
 		}
 		expected := KeyValuePair{
 			key:   key,
 			value: []byte("Value" + strconv.Itoa(index)),
 		}
-		if !expected.Equals(getResult.keyValuePair) {
-			t.Fatalf("Expected key value pair to be %v, received %v", expected, getResult.keyValuePair)
+		if !expected.Equals(getResult.KeyValuePair) {
+			t.Fatalf("Expected key value pair to be %v, received %v", expected, getResult.KeyValuePair)
 		}
 	}
 }
@@ -57,15 +57,15 @@ func TestPutsAndGets10000KeyValuePairsWithDefaultOptions(t *testing.T) {
 		getResult := bPlusTree.Get(
 			key,
 		)
-		if getResult.keyValuePair.isEmpty() {
+		if getResult.KeyValuePair.isEmpty() {
 			t.Fatalf("Received empty key value pair for %v", string(key))
 		}
 		expected := KeyValuePair{
 			key:   key,
 			value: []byte("Value" + strconv.Itoa(index)),
 		}
-		if !expected.Equals(getResult.keyValuePair) {
-			t.Fatalf("Expected key value pair to be %v, received %v", expected, getResult.keyValuePair)
+		if !expected.Equals(getResult.KeyValuePair) {
+			t.Fatalf("Expected key value pair to be %v, received %v", expected, getResult.KeyValuePair)
 		}
 	}
 }
@@ -94,15 +94,15 @@ func TestPutsAndGets10000KeyValuePairsWithCustomOptionsToForceSplits(t *testing.
 		getResult := bPlusTree.Get(
 			key,
 		)
-		if getResult.keyValuePair.isEmpty() {
+		if getResult.KeyValuePair.isEmpty() {
 			t.Fatalf("Received empty key value pair for %v", string(key))
 		}
 		expected := KeyValuePair{
 			key:   key,
 			value: []byte("Value" + strconv.Itoa(index)),
 		}
-		if !expected.Equals(getResult.keyValuePair) {
-			t.Fatalf("Expected key value pair to be %v, received %v", expected, getResult.keyValuePair)
+		if !expected.Equals(getResult.KeyValuePair) {
+			t.Fatalf("Expected key value pair to be %v, received %v", expected, getResult.KeyValuePair)
 		}
 	}
 }

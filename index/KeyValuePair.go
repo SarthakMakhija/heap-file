@@ -18,6 +18,10 @@ func (keyValuePair KeyValuePair) PrettyValue() string {
 	return string(keyValuePair.value)
 }
 
+func (keyValuePair KeyValuePair) RawValue() []byte {
+	return keyValuePair.value
+}
+
 func (keyValuePair KeyValuePair) PrettyKey() string {
 	return string(keyValuePair.key)
 }

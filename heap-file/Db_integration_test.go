@@ -36,7 +36,7 @@ func TestPutsAndGets1000Tuples(t *testing.T) {
 	}
 
 	for iterator, tupleId := range tupleIds {
-		readTuple := db.GetBy(tupleId)
+		readTuple := db.GetByTupleId(tupleId)
 
 		stringFieldValue := readTuple.AllFields()[0].Value()
 		expectedStringFieldValue := "Database Systems" + strconv.Itoa(iterator)

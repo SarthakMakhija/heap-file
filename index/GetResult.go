@@ -1,7 +1,7 @@
 package index
 
 type GetResult struct {
-	keyValuePair KeyValuePair
+	KeyValuePair KeyValuePair
 	index        int
 	page         *Page
 	found        bool
@@ -10,7 +10,7 @@ type GetResult struct {
 
 func NewKeyAvailableGetResult(pair KeyValuePair, index int, page *Page) GetResult {
 	return GetResult{
-		keyValuePair: pair,
+		KeyValuePair: pair,
 		index:        index,
 		page:         page,
 		found:        true,
@@ -20,7 +20,7 @@ func NewKeyAvailableGetResult(pair KeyValuePair, index int, page *Page) GetResul
 
 func NewKeyMissingGetResult(index int, page *Page) GetResult {
 	return GetResult{
-		keyValuePair: KeyValuePair{},
+		KeyValuePair: KeyValuePair{},
 		index:        index,
 		page:         page,
 		found:        false,

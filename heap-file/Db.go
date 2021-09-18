@@ -1,6 +1,7 @@
 package heap_file
 
 import (
+	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
 	"github.com/SarthakMakhija/b-plus-tree/index"
 	"os"
@@ -30,10 +31,25 @@ func Open(options DbOptions) (*Db, error) {
 }
 
 func (db *Db) Put(tuple *tuple.Tuple) (tuple.TupleId, error) {
-	return db.heapFile.Put(tuple)
+	tupleId, err := db.heapFile.Put(tuple)
+	if err == nil {
+		err = db.bPlusTree.Put(tuple.KeyField().MarshalBinary(), tupleId.MarshalBinary())
+		return tupleId, err
+	}
+	return tupleId, err
 }
 
-func (db *Db) GetBy(tupleId tuple.TupleId) *tuple.Tuple {
+func (db *Db) GetByKey(key field.Field) (*tuple.Tuple, error) {
+	getResult := db.bPlusTree.Get(key.MarshalBinary())
+	if getResult.Err == nil {
+		tupleId := &tuple.TupleId{}
+		tupleId.UnMarshalBinary(getResult.KeyValuePair.RawValue())
+		return db.GetByTupleId(*tupleId), nil
+	}
+	return nil, getResult.Err
+}
+
+func (db *Db) GetByTupleId(tupleId tuple.TupleId) *tuple.Tuple {
 	return db.heapFile.GetBy(tupleId)
 }
 

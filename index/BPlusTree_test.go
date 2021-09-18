@@ -130,8 +130,8 @@ func TestGetsByKeyGivenKeyIsFoundInTheNonLeafPage(t *testing.T) {
 	}
 	getResult := tree.Get([]byte("B"))
 
-	if !expectedKeyValuePair.Equals(getResult.keyValuePair) {
-		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, getResult.keyValuePair)
+	if !expectedKeyValuePair.Equals(getResult.KeyValuePair) {
+		t.Fatalf("Expected KeyValuePair to be %v, received %v", expectedKeyValuePair, getResult.KeyValuePair)
 	}
 }
 
