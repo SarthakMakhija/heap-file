@@ -26,13 +26,14 @@ func NewHeapFile(bufferPool *BufferPool, freePageList *FreePageList, options Opt
 	}
 }
 
-func (heapFile *HeapFile) Put(tuple *tuple.Tuple) tuple.TupleId {
+func (heapFile *HeapFile) Put(tuple *tuple.Tuple) (tuple.TupleId, error) {
 	marshalledTuple := tuple.MarshalBinary()
 	if !heapFile.isCurrentSlottedPageLargeEnoughToHold(marshalledTuple) {
 		heapFile.currentPage = heapFile.newCurrentPage()
 	}
-	return heapFile.currentPage.Put(tuple)
-	//write to file ..
+	tupleId := heapFile.currentPage.Put(tuple)
+	err := heapFile.bufferPool.Write(heapFile.currentPage)
+	return tupleId, err
 }
 
 func (heapFile *HeapFile) GetAt(slotNo int) *tuple.Tuple {
