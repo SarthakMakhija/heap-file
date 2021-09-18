@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestPutsAndGets1000TuplesByTupleId(t *testing.T) {
+func TestPutsAndGets10000TuplesByTupleId(t *testing.T) {
 	options := DbOptions{
 		HeapFileOptions: HeapFileOptions{
 			PageSize:                 os.Getpagesize(),
@@ -25,8 +25,8 @@ func TestPutsAndGets1000TuplesByTupleId(t *testing.T) {
 	defer deleteFile(db.bufferPool.file)
 	defer deleteFileByName(options.IndexOptions.FileName)
 
-	tupleIds := make([]tuple.TupleId, 1000)
-	for iterator := 0; iterator < 1000; iterator++ {
+	tupleIds := make([]tuple.TupleId, 10000)
+	for iterator := 0; iterator < 10000; iterator++ {
 		aTuple := tuple.NewTuple()
 		aTuple.AddField(field.NewStringField("Database Systems" + strconv.Itoa(iterator)))
 		aTuple.AddField(field.NewUint16Field(uint16(iterator)))
@@ -54,7 +54,7 @@ func TestPutsAndGets1000TuplesByTupleId(t *testing.T) {
 	}
 }
 
-func TestPutsAndGets1000TuplesByKey(t *testing.T) {
+func TestPutsAndGets10000TuplesByKey(t *testing.T) {
 	options := DbOptions{
 		HeapFileOptions: HeapFileOptions{
 			PageSize:                 os.Getpagesize(),
@@ -70,8 +70,8 @@ func TestPutsAndGets1000TuplesByKey(t *testing.T) {
 	defer deleteFile(db.bufferPool.file)
 	defer deleteFileByName(options.IndexOptions.FileName)
 
-	tuples := make([]*tuple.Tuple, 1000)
-	for iterator := 0; iterator < 1000; iterator++ {
+	tuples := make([]*tuple.Tuple, 10000)
+	for iterator := 0; iterator < 10000; iterator++ {
 		aTuple := tuple.NewTuple()
 		aTuple.AddField(field.NewStringField("Database Systems" + strconv.Itoa(iterator)))
 		aTuple.AddField(field.NewStringField("ISBN-" + strconv.Itoa(iterator)))
