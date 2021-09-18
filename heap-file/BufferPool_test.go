@@ -7,7 +7,7 @@ import (
 
 func TestReturnsThePageCountInAFile(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 4096)
+	bufferPool := NewBufferPool(file, DefaultOptions())
 	defer deleteFile(file)
 
 	expectedPageCount := 0
@@ -20,7 +20,7 @@ func TestReturnsThePageCountInAFile(t *testing.T) {
 
 func TestReturnsTrueGivenFileContainsZeroPages(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 4096)
+	bufferPool := NewBufferPool(file, DefaultOptions())
 	defer deleteFile(file)
 
 	containsZeroPages := bufferPool.ContainsZeroPages()
@@ -32,9 +32,9 @@ func TestReturnsTrueGivenFileContainsZeroPages(t *testing.T) {
 
 func TestReturnsFalseGivenFileContainsMoreThanZeroPages(t *testing.T) {
 	file := createTestFile("./heap.db")
-
-	writeToATestFileWithEmptyPage(file.Name(), 4096)
-	bufferPool := NewBufferPool(file, 4096)
+	options := DefaultOptions()
+	writeToATestFileWithEmptyPage(file.Name(), options.PageSize)
+	bufferPool := NewBufferPool(file, options)
 
 	defer deleteFile(file)
 
@@ -47,7 +47,7 @@ func TestReturnsFalseGivenFileContainsMoreThanZeroPages(t *testing.T) {
 
 func TestAllocates5Pages(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 4096)
+	bufferPool := NewBufferPool(file, DefaultOptions())
 	defer deleteFile(file)
 
 	_, _ = bufferPool.Allocate(5)
@@ -61,7 +61,7 @@ func TestAllocates5Pages(t *testing.T) {
 
 func TestReturnsTheCurrentPageIdAndAllocates5Pages(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 4096)
+	bufferPool := NewBufferPool(file, DefaultOptions())
 	defer deleteFile(file)
 
 	pageId, _ := bufferPool.Allocate(5)
@@ -74,7 +74,7 @@ func TestReturnsTheCurrentPageIdAndAllocates5Pages(t *testing.T) {
 
 func TestReturnsTheNextPageIdAfterAllocating5Pages(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 4096)
+	bufferPool := NewBufferPool(file, DefaultOptions())
 	defer deleteFile(file)
 
 	_, _ = bufferPool.Allocate(5)
@@ -88,7 +88,7 @@ func TestReturnsTheNextPageIdAfterAllocating5Pages(t *testing.T) {
 
 func TestAllocationOf5PagesShouldIncreaseTheFileSize(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 4096)
+	bufferPool := NewBufferPool(file, DefaultOptions())
 	defer deleteFile(file)
 
 	_, _ = bufferPool.Allocate(5)

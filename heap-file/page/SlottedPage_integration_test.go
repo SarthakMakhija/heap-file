@@ -8,8 +8,12 @@ import (
 	"testing"
 )
 
+var twoFieldTestTupleDescriptor = tuple.TupleDescriptor{
+	FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+}
+
 func TestPutsMultipleTuplesInASlottedPageAndReadsThemBack(t *testing.T) {
-	slottedPage := NewSlottedPage(100, os.Getpagesize())
+	slottedPage := NewSlottedPage(100, os.Getpagesize(), twoFieldTestTupleDescriptor)
 
 	tupleIds := add5Tuples(slottedPage)
 	tuples := readTuples(tupleIds, slottedPage)

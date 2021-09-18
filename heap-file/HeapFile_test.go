@@ -8,7 +8,7 @@ import (
 
 func TestCreatesAHeapFileWithACurrentPage(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 4096)
+	bufferPool := NewBufferPool(file, DefaultOptions())
 	_, _ = bufferPool.Allocate(10)
 	defer deleteFile(file)
 
@@ -23,7 +23,7 @@ func TestCreatesAHeapFileWithACurrentPage(t *testing.T) {
 
 func TestPutsAndGetsATupleInAPage(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 4096)
+	bufferPool := NewBufferPool(file, DefaultOptions())
 	_, _ = bufferPool.Allocate(10)
 	defer deleteFile(file)
 
@@ -53,7 +53,7 @@ func TestPutsAndGetsATupleInAPage(t *testing.T) {
 
 func TestPutsAndATupleInAPageAndReadsThePageBack(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 4096)
+	bufferPool := NewBufferPool(file, DefaultOptions())
 	_, _ = bufferPool.Allocate(10)
 	defer deleteFile(file)
 
@@ -84,15 +84,18 @@ func TestPutsAndATupleInAPageAndReadsThePageBack(t *testing.T) {
 
 func TestRequiresANewPageForPuttingATuple(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 30)
+	options := Options{
+		FileName:                 "./heap.db",
+		PageSize:                 30,
+		PreAllocatedPagePoolSize: 10,
+		TupleDescriptor: tuple.TupleDescriptor{
+			FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+		},
+	}
+	bufferPool := NewBufferPool(file, options)
 	_, _ = bufferPool.Allocate(10)
 	defer deleteFile(file)
 
-	options := Options{
-		PageSize:                 30,
-		FileName:                 file.Name(),
-		PreAllocatedPagePoolSize: 10,
-	}
 	heapFile := NewHeapFile(bufferPool, InitializeFreePageList(0, 10), options)
 
 	aTuple := tuple.NewTuple()
@@ -115,15 +118,18 @@ func TestRequiresANewPageForPuttingATuple(t *testing.T) {
 
 func TestPutsAndGetsATupleInAPageAfterRequiringANewPage(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 30)
+	options := Options{
+		FileName:                 "./heap.db",
+		PageSize:                 30,
+		PreAllocatedPagePoolSize: 10,
+		TupleDescriptor: tuple.TupleDescriptor{
+			FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+		},
+	}
+	bufferPool := NewBufferPool(file, options)
 	_, _ = bufferPool.Allocate(10)
 	defer deleteFile(file)
 
-	options := Options{
-		PageSize:                 30,
-		FileName:                 file.Name(),
-		PreAllocatedPagePoolSize: 10,
-	}
 	heapFile := NewHeapFile(bufferPool, InitializeFreePageList(0, 10), options)
 
 	aTuple := tuple.NewTuple()

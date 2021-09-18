@@ -7,10 +7,11 @@ import (
 )
 
 type HeapFile struct {
-	bufferPool   *BufferPool
-	freePageList *FreePageList
-	currentPage  *page.SlottedPage
-	pageSize     int
+	bufferPool      *BufferPool
+	freePageList    *FreePageList
+	currentPage     *page.SlottedPage
+	pageSize        int
+	tupleDescriptor tuple.TupleDescriptor
 }
 
 func NewHeapFile(bufferPool *BufferPool, freePageList *FreePageList, options Options) *HeapFile {
@@ -19,10 +20,11 @@ func NewHeapFile(bufferPool *BufferPool, freePageList *FreePageList, options Opt
 		panic("No free page available for allocation during creation of NewHeapFile")
 	}
 	return &HeapFile{
-		bufferPool:   bufferPool,
-		freePageList: freePageList,
-		currentPage:  page.NewSlottedPage(pageId, options.PageSize),
-		pageSize:     options.PageSize,
+		bufferPool:      bufferPool,
+		freePageList:    freePageList,
+		currentPage:     page.NewSlottedPage(pageId, options.PageSize, options.TupleDescriptor),
+		pageSize:        options.PageSize,
+		tupleDescriptor: options.TupleDescriptor,
 	}
 }
 
@@ -47,12 +49,12 @@ func (heapFile *HeapFile) isCurrentSlottedPageLargeEnoughToHold(marshalledTuple 
 func (heapFile *HeapFile) newCurrentPage() *page.SlottedPage {
 	isAvailable, newPageId := heapFile.freePageList.allocateAndUpdate(1)
 	if isAvailable {
-		return page.NewSlottedPage(newPageId, heapFile.pageSize)
+		return page.NewSlottedPage(newPageId, heapFile.pageSize, heapFile.tupleDescriptor)
 	} else {
 		pageId, err := heapFile.bufferPool.Allocate(1) //might change
 		if err != nil {
 			panic(fmt.Sprintf("Error while allocating a page %v", err))
 		}
-		return page.NewSlottedPage(uint32(pageId), heapFile.pageSize)
+		return page.NewSlottedPage(uint32(pageId), heapFile.pageSize, heapFile.tupleDescriptor)
 	}
 }

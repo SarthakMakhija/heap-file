@@ -8,7 +8,7 @@ import (
 )
 
 func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingPageId(t *testing.T) {
-	slottedPage := NewSlottedPage(100, os.Getpagesize())
+	slottedPage := NewSlottedPage(100, os.Getpagesize(), twoFieldTestTupleDescriptor)
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
@@ -23,7 +23,7 @@ func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingPageId(t *testing.T)
 }
 
 func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingSlotNo(t *testing.T) {
-	slottedPage := NewSlottedPage(100, os.Getpagesize())
+	slottedPage := NewSlottedPage(100, os.Getpagesize(), twoFieldTestTupleDescriptor)
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
@@ -38,7 +38,7 @@ func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingSlotNo(t *testing.T)
 }
 
 func TestPutsATupleInASlottedPageAndReadsItBack(t *testing.T) {
-	slottedPage := NewSlottedPage(100, os.Getpagesize())
+	slottedPage := NewSlottedPage(100, os.Getpagesize(), twoFieldTestTupleDescriptor)
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
@@ -63,7 +63,7 @@ func TestPutsATupleInASlottedPageAndReadsItBack(t *testing.T) {
 }
 
 func TestReturnsTheSizeAvailableInAPage(t *testing.T) {
-	slottedPage := NewSlottedPage(100, os.Getpagesize())
+	slottedPage := NewSlottedPage(100, os.Getpagesize(), twoFieldTestTupleDescriptor)
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))

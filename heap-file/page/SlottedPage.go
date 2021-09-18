@@ -2,7 +2,6 @@ package page
 
 import (
 	"encoding/binary"
-	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
 	"unsafe"
 )
@@ -11,29 +10,32 @@ var littleEndian = binary.LittleEndian
 var pageIdSize = unsafe.Sizeof(SlottedPage{}.id)
 
 type SlottedPage struct {
-	pageSize  int
-	id        uint32
-	buffer    []byte
-	slotCount int
+	pageSize        int
+	id              uint32
+	buffer          []byte
+	slotCount       int
+	tupleDescriptor tuple.TupleDescriptor
 }
 
 //revisit data types of SlottedPage
 
-func NewSlottedPage(id uint32, pageSize int) *SlottedPage {
+func NewSlottedPage(id uint32, pageSize int, tupleDescriptor tuple.TupleDescriptor) *SlottedPage {
 	slottedPage := &SlottedPage{
-		pageSize:  pageSize,
-		buffer:    make([]byte, pageSize),
-		id:        id,
-		slotCount: 0,
+		pageSize:        pageSize,
+		buffer:          make([]byte, pageSize),
+		id:              id,
+		slotCount:       0,
+		tupleDescriptor: tupleDescriptor,
 	}
 	slottedPage.writePageId(id)
 	return slottedPage
 }
 
-func NewReadonlySlottedPageFrom(buffer []byte) *SlottedPage {
+func NewReadonlySlottedPageFrom(buffer []byte, tupleDescriptor tuple.TupleDescriptor) *SlottedPage {
 	slottedPage := &SlottedPage{
-		buffer: buffer,
-		id:     littleEndian.Uint32(buffer),
+		buffer:          buffer,
+		id:              littleEndian.Uint32(buffer),
+		tupleDescriptor: tupleDescriptor,
 	}
 	return slottedPage
 }
@@ -57,7 +59,7 @@ func (slottedPage *SlottedPage) GetAt(slotNo int) *tuple.Tuple {
 	}
 	aTuple.UnMarshalBinary(
 		slottedPage.buffer[slot.tupleOffset:slot.tupleOffset+slot.tupleSize],
-		[]field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+		slottedPage.tupleDescriptor.FieldTypes,
 	)
 	return aTuple
 }

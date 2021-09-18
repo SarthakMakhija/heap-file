@@ -13,6 +13,9 @@ func TestCreatesADbByPreAllocatingPages(t *testing.T) {
 		PageSize:                 os.Getpagesize(),
 		FileName:                 "./heap.db",
 		PreAllocatedPagePoolSize: 6,
+		TupleDescriptor: tuple.TupleDescriptor{
+			FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+		},
 	}
 	db, _ := Open(options)
 	defer deleteFile(db.bufferPool.file)
@@ -47,6 +50,9 @@ func TestPutsAndGetsATuple(t *testing.T) {
 		PageSize:                 os.Getpagesize(),
 		FileName:                 "./heap.db",
 		PreAllocatedPagePoolSize: 6,
+		TupleDescriptor: tuple.TupleDescriptor{
+			FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+		},
 	}
 	db, _ := Open(options)
 	defer deleteFile(db.bufferPool.file)

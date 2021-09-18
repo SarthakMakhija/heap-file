@@ -2,20 +2,23 @@ package heap_file
 
 import (
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/page"
+	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
 	"os"
 )
 
 type BufferPool struct {
-	file      *os.File
-	pageSize  int
-	pageCount int
+	file            *os.File
+	pageSize        int
+	pageCount       int
+	tupleDescriptor tuple.TupleDescriptor
 }
 
-func NewBufferPool(file *os.File, pageSize int) *BufferPool {
+func NewBufferPool(file *os.File, options Options) *BufferPool {
 	bufferPool := &BufferPool{
 		file: file,
 	}
-	bufferPool.pageSize = pageSize
+	bufferPool.pageSize = options.PageSize
+	bufferPool.tupleDescriptor = options.TupleDescriptor
 	bufferPool.pageCount = bufferPool.numberOfPages()
 
 	return bufferPool
@@ -37,7 +40,7 @@ func (bufferPool BufferPool) Read(pageId uint32) (*page.SlottedPage, error) {
 	if err != nil {
 		return nil, err
 	}
-	return page.NewReadonlySlottedPageFrom(buffer), nil
+	return page.NewReadonlySlottedPageFrom(buffer, bufferPool.tupleDescriptor), nil
 }
 
 func (bufferPool *BufferPool) Write(page *page.SlottedPage) error {

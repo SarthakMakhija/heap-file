@@ -17,7 +17,7 @@ func Open(options Options) (*Db, error) {
 		return nil, err
 	}
 
-	bufferPool := NewBufferPool(dbFile, options.PageSize)
+	bufferPool := NewBufferPool(dbFile, options)
 	db := &Db{
 		bufferPool: bufferPool,
 	}

@@ -4,16 +4,16 @@ import (
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/page"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
-	"os"
 	"testing"
 )
 
 func TestWritesAndReadsSlottedPage(t *testing.T) {
 	file := createTestFile("./heap.db")
-	bufferPool := NewBufferPool(file, 4096)
+	options := DefaultOptions()
+	bufferPool := NewBufferPool(file, options)
 	defer deleteFile(file)
 
-	slottedPage := fillASlottedPage()
+	slottedPage := fillASlottedPage(options)
 
 	_ = bufferPool.Write(slottedPage)
 	readSlottedPage, _ := bufferPool.Read(slottedPage.PageId())
@@ -34,12 +34,12 @@ func TestWritesAndReadsSlottedPage(t *testing.T) {
 	}
 }
 
-func fillASlottedPage() *page.SlottedPage {
+func fillASlottedPage(options Options) *page.SlottedPage {
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
 	aTuple.AddField(field.NewUint16Field(uint16(100)))
 
-	slottedPage := page.NewSlottedPage(0, os.Getpagesize())
+	slottedPage := page.NewSlottedPage(0, options.PageSize, options.TupleDescriptor)
 	slottedPage.Put(aTuple.MarshalBinary())
 
 	return slottedPage
