@@ -11,7 +11,7 @@ type Db struct {
 	heapFile     *HeapFile
 }
 
-func Open(options HeapFileOptions) (*Db, error) {
+func Open(options DbOptions) (*Db, error) {
 	dbFile, err := openFile(options.FileName)
 	if err != nil {
 		return nil, err
@@ -40,14 +40,14 @@ func openFile(fileName string) (*os.File, error) {
 	return os.OpenFile(fileName, fileMode, 0644)
 }
 
-func (db *Db) create(options HeapFileOptions) error {
+func (db *Db) create(options DbOptions) error {
 	if db.bufferPool.ContainsZeroPages() {
 		return db.initialize(options)
 	}
 	return nil
 }
 
-func (db *Db) initialize(options HeapFileOptions) error {
+func (db *Db) initialize(options DbOptions) error {
 	_, err := db.bufferPool.Allocate(options.PreAllocatedPagePoolSize)
 	if err != nil {
 		return err

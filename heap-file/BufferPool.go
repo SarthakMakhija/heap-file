@@ -14,7 +14,7 @@ type BufferPool struct {
 	slottedPageCache *SlottedPageCache
 }
 
-func NewBufferPool(file *os.File, options HeapFileOptions) *BufferPool {
+func NewBufferPool(file *os.File, options DbOptions) *BufferPool {
 	bufferPool := &BufferPool{
 		file:             file,
 		pageSize:         options.PageSize,

@@ -14,7 +14,7 @@ type HeapFile struct {
 	tupleDescriptor tuple.TupleDescriptor
 }
 
-func NewHeapFile(bufferPool *BufferPool, freePageList *FreePageList, options HeapFileOptions) *HeapFile {
+func NewHeapFile(bufferPool *BufferPool, freePageList *FreePageList, options DbOptions) *HeapFile {
 	isAvailable, pageId := freePageList.allocateAndUpdate(1)
 	if !isAvailable {
 		panic("No free page available for allocation during creation of NewHeapFile")
