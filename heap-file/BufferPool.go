@@ -7,20 +7,21 @@ import (
 )
 
 type BufferPool struct {
-	file            *os.File
-	pageSize        int
-	pageCount       int
-	tupleDescriptor tuple.TupleDescriptor
+	file             *os.File
+	pageSize         int
+	pageCount        int
+	tupleDescriptor  tuple.TupleDescriptor
+	slottedPageCache *SlottedPageCache
 }
 
 func NewBufferPool(file *os.File, options Options) *BufferPool {
 	bufferPool := &BufferPool{
-		file: file,
+		file:             file,
+		pageSize:         options.PageSize,
+		tupleDescriptor:  options.TupleDescriptor,
+		slottedPageCache: NewSlottedPageCache(),
 	}
-	bufferPool.pageSize = options.PageSize
-	bufferPool.tupleDescriptor = options.TupleDescriptor
 	bufferPool.pageCount = bufferPool.numberOfPages()
-
 	return bufferPool
 }
 
@@ -35,15 +36,34 @@ func (bufferPool *BufferPool) Allocate(pages int) (int, error) {
 }
 
 func (bufferPool BufferPool) Read(pageId uint32) (*page.SlottedPage, error) {
-	buffer := make([]byte, bufferPool.pageSize)
-	_, err := bufferPool.file.ReadAt(buffer, bufferPool.offsetOf(pageId))
-	if err != nil {
-		return nil, err
+	slottedPage, found := bufferPool.slottedPageCache.GetBy(pageId)
+	if found {
+		return slottedPage, nil
 	}
-	return page.NewReadonlySlottedPageFrom(buffer, bufferPool.tupleDescriptor), nil
+	readPage := func(pageId uint32) (*page.SlottedPage, error) {
+		buffer := make([]byte, bufferPool.pageSize)
+		_, err := bufferPool.file.ReadAt(buffer, bufferPool.offsetOf(pageId))
+		if err != nil {
+			return nil, err
+		}
+		return page.NewReadonlySlottedPageFrom(buffer, bufferPool.tupleDescriptor), nil
+	}
+	cachePage := func(pageId uint32, slottedPage *page.SlottedPage) {
+		bufferPool.slottedPageCache.Put(pageId, slottedPage)
+	}
+	readAndCachePage := func(pageId uint32) (*page.SlottedPage, error) {
+		slottedPage, err := readPage(pageId)
+		if err != nil {
+			return nil, err
+		}
+		cachePage(pageId, slottedPage)
+		return slottedPage, nil
+	}
+	return readAndCachePage(pageId)
 }
 
 func (bufferPool *BufferPool) Write(page *page.SlottedPage) error {
+	bufferPool.slottedPageCache.Evict(page.PageId())
 	_, err := bufferPool.file.WriteAt(page.Buffer(), bufferPool.offsetOf(page.PageId()))
 	if err != nil {
 		return err
