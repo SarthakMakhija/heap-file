@@ -41,3 +41,8 @@ func (tuple *Tuple) UnMarshalBinary(buffer []byte, fieldTypes []field.FieldType)
 func (tuple Tuple) AllFields() []field.Field {
 	return tuple.fields
 }
+
+func (tuple Tuple) KeyField() field.Field {
+	//for now it just returns the last field as a key field
+	return tuple.fields[len(tuple.fields)-1]
+}

@@ -46,3 +46,16 @@ func TestMarshalsAndUnMarshalsATupleWithStringAndUint16Field(t *testing.T) {
 		t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
 	}
 }
+
+func TestReturnsTheLastFieldAsTheKeyField(t *testing.T) {
+	tuple := NewTuple()
+	tuple.AddField(field.NewStringField("Database Systems"))
+	tuple.AddField(field.NewUint16Field(100))
+
+	keyField := tuple.KeyField()
+	expected := uint16(100)
+
+	if keyField.Value() != expected {
+		t.Fatalf("Expected field value to be %v, received %v", expected, keyField.Value())
+	}
+}
