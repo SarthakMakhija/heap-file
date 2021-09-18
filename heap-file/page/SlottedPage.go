@@ -2,7 +2,7 @@ package page
 
 import (
 	"encoding/binary"
-	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
+	"github.com/SarthakMakhija/heap-file/heap-file/tuple"
 	"unsafe"
 )
 

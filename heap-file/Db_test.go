@@ -1,9 +1,9 @@
 package heap_file
 
 import (
-	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
-	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
-	"github.com/SarthakMakhija/b-plus-tree/index"
+	"github.com/SarthakMakhija/heap-file/heap-file/field"
+	"github.com/SarthakMakhija/heap-file/heap-file/tuple"
+	"github.com/SarthakMakhija/heap-file/index"
 	"os"
 	"reflect"
 	"testing"

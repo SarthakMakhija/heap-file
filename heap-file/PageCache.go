@@ -1,6 +1,6 @@
 package heap_file
 
-import "github.com/SarthakMakhija/b-plus-tree/heap-file/page"
+import "github.com/SarthakMakhija/heap-file/heap-file/page"
 
 type SlottedPageCache struct {
 	pageById map[uint32]*page.SlottedPage

@@ -1,8 +1,8 @@
 package page
 
 import (
-	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
-	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
+	"github.com/SarthakMakhija/heap-file/heap-file/field"
+	"github.com/SarthakMakhija/heap-file/heap-file/tuple"
 	"os"
 	"testing"
 )

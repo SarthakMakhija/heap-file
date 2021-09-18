@@ -1,7 +1,7 @@
 package tuple
 
 import (
-	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
+	"github.com/SarthakMakhija/heap-file/heap-file/field"
 	"testing"
 )
 

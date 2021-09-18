@@ -1,7 +1,7 @@
 package b_plus_tree_test
 
 import (
-	"github.com/SarthakMakhija/b-plus-tree/index"
+	"github.com/SarthakMakhija/heap-file/index"
 	"math/rand"
 	"os"
 	"strconv"

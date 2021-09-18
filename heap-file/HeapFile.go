@@ -2,8 +2,8 @@ package heap_file
 
 import (
 	"fmt"
-	"github.com/SarthakMakhija/b-plus-tree/heap-file/page"
-	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
+	"github.com/SarthakMakhija/heap-file/heap-file/page"
+	"github.com/SarthakMakhija/heap-file/heap-file/tuple"
 )
 
 type HeapFile struct {
