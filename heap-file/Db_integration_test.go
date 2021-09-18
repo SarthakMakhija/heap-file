@@ -10,7 +10,7 @@ import (
 
 func TestPutsAndGets1000Tuples(t *testing.T) {
 	options := DbOptions{
-		HeapFileOptions{
+		HeapFileOptions: HeapFileOptions{
 			PageSize:                 os.Getpagesize(),
 			FileName:                 "./heap.db",
 			PreAllocatedPagePoolSize: 6,

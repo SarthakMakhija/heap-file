@@ -3,11 +3,13 @@ package heap_file
 import (
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/field"
 	"github.com/SarthakMakhija/b-plus-tree/heap-file/tuple"
+	"github.com/SarthakMakhija/b-plus-tree/index"
 	"os"
 )
 
 type DbOptions struct {
 	HeapFileOptions HeapFileOptions
+	IndexOptions    index.Options
 }
 
 func (dbOptions DbOptions) PageSize() int {
@@ -53,5 +55,6 @@ func DefaultOptions() DbOptions {
 				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
 			},
 		},
+		IndexOptions: index.DefaultOptions(),
 	}
 }
