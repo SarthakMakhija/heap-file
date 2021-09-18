@@ -10,17 +10,19 @@ import (
 
 func TestCreatesADbByPreAllocatingPages(t *testing.T) {
 	options := DbOptions{
-		PageSize:                 os.Getpagesize(),
-		FileName:                 "./heap.db",
-		PreAllocatedPagePoolSize: 6,
-		TupleDescriptor: tuple.TupleDescriptor{
-			FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+		HeapFileOptions{
+			PageSize:                 os.Getpagesize(),
+			FileName:                 "./heap.db",
+			PreAllocatedPagePoolSize: 6,
+			TupleDescriptor: tuple.TupleDescriptor{
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+			},
 		},
 	}
 	db, _ := Open(options)
 	defer deleteFile(db.bufferPool.file)
 
-	expectedPageCount := options.PreAllocatedPagePoolSize
+	expectedPageCount := options.PreAllocatedPagePoolSize()
 	actualPageCount := db.bufferPool.pageCount
 
 	if actualPageCount != expectedPageCount {
@@ -30,9 +32,11 @@ func TestCreatesADbByPreAllocatingPages(t *testing.T) {
 
 func TestCreatesADbWithFreePageListAndUsesTheFirstPageForHeapFile(t *testing.T) {
 	options := DbOptions{
-		PageSize:                 os.Getpagesize(),
-		FileName:                 "./heap.db",
-		PreAllocatedPagePoolSize: 6,
+		HeapFileOptions{
+			PageSize:                 os.Getpagesize(),
+			FileName:                 "./heap.db",
+			PreAllocatedPagePoolSize: 6,
+		},
 	}
 	db, _ := Open(options)
 	defer deleteFile(db.bufferPool.file)
@@ -47,11 +51,13 @@ func TestCreatesADbWithFreePageListAndUsesTheFirstPageForHeapFile(t *testing.T) 
 
 func TestPutsAndGetsATuple(t *testing.T) {
 	options := DbOptions{
-		PageSize:                 os.Getpagesize(),
-		FileName:                 "./heap.db",
-		PreAllocatedPagePoolSize: 6,
-		TupleDescriptor: tuple.TupleDescriptor{
-			FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+		HeapFileOptions{
+			PageSize:                 os.Getpagesize(),
+			FileName:                 "./heap.db",
+			PreAllocatedPagePoolSize: 6,
+			TupleDescriptor: tuple.TupleDescriptor{
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+			},
 		},
 	}
 	db, _ := Open(options)

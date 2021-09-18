@@ -33,7 +33,7 @@ func TestReturnsTrueGivenFileContainsZeroPages(t *testing.T) {
 func TestReturnsFalseGivenFileContainsMoreThanZeroPages(t *testing.T) {
 	file := createTestFile("./heap.db")
 	options := DefaultOptions()
-	writeToATestFileWithEmptyPage(file.Name(), options.PageSize)
+	writeToATestFileWithEmptyPage(file.Name(), options.PageSize())
 	bufferPool := NewBufferPool(file, options)
 
 	defer deleteFile(file)

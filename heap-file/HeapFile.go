@@ -22,9 +22,9 @@ func NewHeapFile(bufferPool *BufferPool, freePageList *FreePageList, options DbO
 	return &HeapFile{
 		bufferPool:      bufferPool,
 		freePageList:    freePageList,
-		currentPage:     page.NewSlottedPage(pageId, options.PageSize, options.TupleDescriptor),
-		pageSize:        options.PageSize,
-		tupleDescriptor: options.TupleDescriptor,
+		currentPage:     page.NewSlottedPage(pageId, options.PageSize(), options.TupleDescriptor()),
+		pageSize:        options.PageSize(),
+		tupleDescriptor: options.TupleDescriptor(),
 	}
 }
 

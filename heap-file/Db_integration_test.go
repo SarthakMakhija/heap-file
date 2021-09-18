@@ -10,11 +10,13 @@ import (
 
 func TestPutsAndGets1000Tuples(t *testing.T) {
 	options := DbOptions{
-		PageSize:                 os.Getpagesize(),
-		FileName:                 "./heap.db",
-		PreAllocatedPagePoolSize: 6,
-		TupleDescriptor: tuple.TupleDescriptor{
-			FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+		HeapFileOptions{
+			PageSize:                 os.Getpagesize(),
+			FileName:                 "./heap.db",
+			PreAllocatedPagePoolSize: 6,
+			TupleDescriptor: tuple.TupleDescriptor{
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+			},
 		},
 	}
 	db, _ := Open(options)

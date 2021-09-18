@@ -12,7 +12,7 @@ type Db struct {
 }
 
 func Open(options DbOptions) (*Db, error) {
-	dbFile, err := openFile(options.FileName)
+	dbFile, err := openFile(options.FileName())
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +48,11 @@ func (db *Db) create(options DbOptions) error {
 }
 
 func (db *Db) initialize(options DbOptions) error {
-	_, err := db.bufferPool.Allocate(options.PreAllocatedPagePoolSize)
+	_, err := db.bufferPool.Allocate(options.PreAllocatedPagePoolSize())
 	if err != nil {
 		return err
 	}
-	db.freePageList = InitializeFreePageList(0, options.PreAllocatedPagePoolSize)
+	db.freePageList = InitializeFreePageList(0, options.PreAllocatedPagePoolSize())
 	db.heapFile = NewHeapFile(db.bufferPool, db.freePageList, options)
 	return nil
 }

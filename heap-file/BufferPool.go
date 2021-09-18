@@ -17,8 +17,8 @@ type BufferPool struct {
 func NewBufferPool(file *os.File, options DbOptions) *BufferPool {
 	bufferPool := &BufferPool{
 		file:             file,
-		pageSize:         options.PageSize,
-		tupleDescriptor:  options.TupleDescriptor,
+		pageSize:         options.PageSize(),
+		tupleDescriptor:  options.TupleDescriptor(),
 		slottedPageCache: NewSlottedPageCache(),
 	}
 	bufferPool.pageCount = bufferPool.numberOfPages()

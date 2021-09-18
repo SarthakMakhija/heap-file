@@ -85,11 +85,13 @@ func TestPutsAndATupleInAPageAndReadsThePageBack(t *testing.T) {
 func TestRequiresANewPageForPuttingATuple(t *testing.T) {
 	file := createTestFile("./heap.db")
 	options := DbOptions{
-		FileName:                 "./heap.db",
-		PageSize:                 30,
-		PreAllocatedPagePoolSize: 10,
-		TupleDescriptor: tuple.TupleDescriptor{
-			FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+		HeapFileOptions{
+			FileName:                 "./heap.db",
+			PageSize:                 30,
+			PreAllocatedPagePoolSize: 10,
+			TupleDescriptor: tuple.TupleDescriptor{
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+			},
 		},
 	}
 	bufferPool := NewBufferPool(file, options)
@@ -119,11 +121,13 @@ func TestRequiresANewPageForPuttingATuple(t *testing.T) {
 func TestPutsAndGetsATupleInAPageAfterRequiringANewPage(t *testing.T) {
 	file := createTestFile("./heap.db")
 	options := DbOptions{
-		FileName:                 "./heap.db",
-		PageSize:                 30,
-		PreAllocatedPagePoolSize: 10,
-		TupleDescriptor: tuple.TupleDescriptor{
-			FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+		HeapFileOptions{
+			FileName:                 "./heap.db",
+			PageSize:                 30,
+			PreAllocatedPagePoolSize: 10,
+			TupleDescriptor: tuple.TupleDescriptor{
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+			},
 		},
 	}
 	bufferPool := NewBufferPool(file, options)

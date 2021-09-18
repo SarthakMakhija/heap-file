@@ -39,7 +39,7 @@ func fillASlottedPage(options DbOptions) *page.SlottedPage {
 	aTuple.AddField(field.NewStringField("Database Systems"))
 	aTuple.AddField(field.NewUint16Field(uint16(100)))
 
-	slottedPage := page.NewSlottedPage(0, options.PageSize, options.TupleDescriptor)
+	slottedPage := page.NewSlottedPage(0, options.PageSize(), options.TupleDescriptor())
 	slottedPage.Put(aTuple.MarshalBinary())
 
 	return slottedPage
