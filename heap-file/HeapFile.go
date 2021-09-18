@@ -30,7 +30,7 @@ func NewHeapFile(bufferPool *BufferPool, freePageList *FreePageList, options DbO
 
 func (heapFile *HeapFile) Put(tuple *tuple.Tuple) (tuple.TupleId, error) {
 	marshalledTuple := tuple.MarshalBinary()
-	if !heapFile.isCurrentSlottedPageLargeEnoughToHold(marshalledTuple) {
+	if !heapFile.currentPage.HasSizeLargeEnoughToHold(marshalledTuple) {
 		heapFile.currentPage = heapFile.newCurrentPage()
 	}
 	tupleId := heapFile.currentPage.Put(marshalledTuple)
@@ -44,10 +44,6 @@ func (heapFile *HeapFile) GetBy(tupleId tuple.TupleId) *tuple.Tuple {
 		return nil
 	}
 	return slottedPage.GetAt(tupleId.SlotNo)
-}
-
-func (heapFile *HeapFile) isCurrentSlottedPageLargeEnoughToHold(marshalledTuple tuple.MarshalledTuple) bool {
-	return uint16(marshalledTuple.Size()) <= heapFile.currentPage.SizeAvailable()
 }
 
 func (heapFile *HeapFile) newCurrentPage() *page.SlottedPage {

@@ -78,3 +78,31 @@ func TestReturnsTheSizeAvailableInAPage(t *testing.T) {
 		t.Fatalf("Expected page available size to be %v, recevied %v", availableSize, expectedSize)
 	}
 }
+
+func TestReturnsFalseGivenPageIsNotLarEnoughForTheTuple(t *testing.T) {
+	slottedPage := NewSlottedPage(100, 40, twoFieldTestTupleDescriptor)
+
+	aTuple := tuple.NewTuple()
+	aTuple.AddField(field.NewStringField("Database Systems"))
+	aTuple.AddField(field.NewUint16Field(3000)) //20 byte tuple
+
+	slottedPage.Put(aTuple.MarshalBinary())
+
+	isPageLargeEnough := slottedPage.HasSizeLargeEnoughToHold(aTuple.MarshalBinary())
+	if isPageLargeEnough != false {
+		t.Fatalf("Expected page to not be large enough for the tuple")
+	}
+}
+
+func TestReturnsTrueGivenPageIsLarEnoughForTheTuple(t *testing.T) {
+	slottedPage := NewSlottedPage(100, 40, twoFieldTestTupleDescriptor)
+
+	aTuple := tuple.NewTuple()
+	aTuple.AddField(field.NewStringField("Database Systems"))
+	aTuple.AddField(field.NewUint16Field(3000)) //20 byte tuple
+
+	isPageLargeEnough := slottedPage.HasSizeLargeEnoughToHold(aTuple.MarshalBinary())
+	if isPageLargeEnough != true {
+		t.Fatalf("Expected page to be large enough for the tuple")
+	}
+}

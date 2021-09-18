@@ -45,10 +45,7 @@ func (slottedPage *SlottedPage) Put(aTuple tuple.MarshalledTuple) tuple.TupleId 
 	slottedPage.addSlot(slot)
 	slottedPage.increaseSlotCount()
 
-	return tuple.TupleId{
-		PageId: slottedPage.id,
-		SlotNo: slottedPage.slotCount,
-	}
+	return tuple.TupleId{PageId: slottedPage.id, SlotNo: slottedPage.slotCount}
 }
 
 func (slottedPage *SlottedPage) GetAt(slotNo int) *tuple.Tuple {
@@ -65,12 +62,19 @@ func (slottedPage *SlottedPage) GetAt(slotNo int) *tuple.Tuple {
 }
 
 func (slottedPage SlottedPage) SizeAvailable() uint16 {
-	size := uint16(pageIdSize)
+	size := uint16(0)
 	for slotNo := 1; slotNo <= slottedPage.slotCount; slotNo++ {
 		slot := slottedPage.getSlot(slotNo)
 		size = size + slot.tupleSize + uint16(slotSize)
 	}
-	return uint16(slottedPage.pageSize) - size
+	return uint16(slottedPage.pageSize) - size - uint16(pageIdSize)
+}
+
+func (slottedPage *SlottedPage) HasSizeLargeEnoughToHold(marshalledTuple tuple.MarshalledTuple) bool {
+	if slottedPage.SizeAvailable() >= uint16(marshalledTuple.Size())+uint16(slotSize) {
+		return true
+	}
+	return false
 }
 
 func (slottedPage SlottedPage) PageId() uint32 {
