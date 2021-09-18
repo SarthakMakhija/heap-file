@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-type Options struct {
+type HeapFileOptions struct {
 	// PageSize for file I/O. All reads and writes will always
 	// be done with pages of this size. Must be multiple of os.Getpagesize().
 	PageSize int
@@ -23,8 +23,8 @@ type Options struct {
 	TupleDescriptor tuple.TupleDescriptor
 }
 
-func DefaultOptions() Options {
-	return Options{
+func DefaultOptions() HeapFileOptions {
+	return HeapFileOptions{
 		PageSize:                 os.Getpagesize(),
 		FileName:                 "heap.db",
 		PreAllocatedPagePoolSize: 10,

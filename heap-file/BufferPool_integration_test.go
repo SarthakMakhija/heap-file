@@ -34,7 +34,7 @@ func TestWritesAndReadsSlottedPage(t *testing.T) {
 	}
 }
 
-func fillASlottedPage(options Options) *page.SlottedPage {
+func fillASlottedPage(options HeapFileOptions) *page.SlottedPage {
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
 	aTuple.AddField(field.NewUint16Field(uint16(100)))

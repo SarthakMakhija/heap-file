@@ -84,7 +84,7 @@ func TestPutsAndATupleInAPageAndReadsThePageBack(t *testing.T) {
 
 func TestRequiresANewPageForPuttingATuple(t *testing.T) {
 	file := createTestFile("./heap.db")
-	options := Options{
+	options := HeapFileOptions{
 		FileName:                 "./heap.db",
 		PageSize:                 30,
 		PreAllocatedPagePoolSize: 10,
@@ -118,7 +118,7 @@ func TestRequiresANewPageForPuttingATuple(t *testing.T) {
 
 func TestPutsAndGetsATupleInAPageAfterRequiringANewPage(t *testing.T) {
 	file := createTestFile("./heap.db")
-	options := Options{
+	options := HeapFileOptions{
 		FileName:                 "./heap.db",
 		PageSize:                 30,
 		PreAllocatedPagePoolSize: 10,

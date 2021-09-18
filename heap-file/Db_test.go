@@ -9,7 +9,7 @@ import (
 )
 
 func TestCreatesADbByPreAllocatingPages(t *testing.T) {
-	options := Options{
+	options := HeapFileOptions{
 		PageSize:                 os.Getpagesize(),
 		FileName:                 "./heap.db",
 		PreAllocatedPagePoolSize: 6,
@@ -29,7 +29,7 @@ func TestCreatesADbByPreAllocatingPages(t *testing.T) {
 }
 
 func TestCreatesADbWithFreePageListAndUsesTheFirstPageForHeapFile(t *testing.T) {
-	options := Options{
+	options := HeapFileOptions{
 		PageSize:                 os.Getpagesize(),
 		FileName:                 "./heap.db",
 		PreAllocatedPagePoolSize: 6,
@@ -46,7 +46,7 @@ func TestCreatesADbWithFreePageListAndUsesTheFirstPageForHeapFile(t *testing.T) 
 }
 
 func TestPutsAndGetsATuple(t *testing.T) {
-	options := Options{
+	options := HeapFileOptions{
 		PageSize:                 os.Getpagesize(),
 		FileName:                 "./heap.db",
 		PreAllocatedPagePoolSize: 6,
