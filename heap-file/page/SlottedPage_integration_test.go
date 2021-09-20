@@ -9,7 +9,7 @@ import (
 )
 
 var twoFieldTestTupleDescriptor = tuple.TupleDescriptor{
-	FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+	FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint32FieldType{}},
 }
 
 func TestPutsMultipleTuplesInASlottedPageAndReadsThemBack(t *testing.T) {
@@ -25,11 +25,11 @@ func TestPutsMultipleTuplesInASlottedPageAndReadsThemBack(t *testing.T) {
 		if stringFieldValue != expectedStringFieldValue {
 			t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 		}
-		uint16FieldValue := aTuple.AllFields()[1].Value()
-		expectedUint16FieldValue := uint16(index)
+		uint32FieldValue := aTuple.AllFields()[1].Value()
+		expectedUint32FieldValue := uint32(index)
 
-		if uint16FieldValue != expectedUint16FieldValue {
-			t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
+		if uint32FieldValue != expectedUint32FieldValue {
+			t.Fatalf("Expected field value to be %v, received %v", expectedUint32FieldValue, uint32FieldValue)
 		}
 	}
 }
@@ -40,7 +40,7 @@ func add5Tuples(slottedPage *SlottedPage) []tuple.TupleId {
 	for index := 0; index < 5; index++ {
 		aTuple := tuple.NewTuple()
 		aTuple.AddField(field.NewStringField("Database Systems" + strconv.Itoa(index)))
-		aTuple.AddField(field.NewUint16Field(uint16(index)))
+		aTuple.AddField(field.NewUint32Field(uint32(index)))
 
 		tupleIds[index] = slottedPage.Put(aTuple.MarshalBinary())
 	}

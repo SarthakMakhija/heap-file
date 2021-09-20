@@ -16,7 +16,7 @@ func TestPutsAndGets10000TuplesByTupleId(t *testing.T) {
 			FileName:                 "./heap.db",
 			PreAllocatedPagePoolSize: 6,
 			TupleDescriptor: tuple.TupleDescriptor{
-				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint32FieldType{}},
 			},
 		},
 		IndexOptions: index.DefaultOptions(),
@@ -29,7 +29,7 @@ func TestPutsAndGets10000TuplesByTupleId(t *testing.T) {
 	for iterator := 0; iterator < 10000; iterator++ {
 		aTuple := tuple.NewTuple()
 		aTuple.AddField(field.NewStringField("Database Systems" + strconv.Itoa(iterator)))
-		aTuple.AddField(field.NewUint16Field(uint16(iterator)))
+		aTuple.AddField(field.NewUint32Field(uint32(iterator)))
 
 		tupleId, _ := db.Put(aTuple)
 		tupleIds[iterator] = tupleId
@@ -45,11 +45,11 @@ func TestPutsAndGets10000TuplesByTupleId(t *testing.T) {
 			t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 		}
 
-		uint16FieldValue := readTuple.AllFields()[1].Value()
-		expectedUint16FieldValue := uint16(iterator)
+		uint32FieldValue := readTuple.AllFields()[1].Value()
+		expectedUint32FieldValue := uint32(iterator)
 
-		if uint16FieldValue != expectedUint16FieldValue {
-			t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
+		if uint32FieldValue != expectedUint32FieldValue {
+			t.Fatalf("Expected field value to be %v, received %v", expectedUint32FieldValue, uint32FieldValue)
 		}
 	}
 }
@@ -61,7 +61,7 @@ func TestPutsAndGets10000TuplesByKey(t *testing.T) {
 			FileName:                 "./heap.db",
 			PreAllocatedPagePoolSize: 6,
 			TupleDescriptor: tuple.TupleDescriptor{
-				FieldTypes: []field.FieldType{field.StringFieldType{}, field.StringFieldType{}, field.Uint16FieldType{}},
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.StringFieldType{}, field.Uint32FieldType{}},
 			},
 		},
 		IndexOptions: index.DefaultOptions(),
@@ -75,7 +75,7 @@ func TestPutsAndGets10000TuplesByKey(t *testing.T) {
 		aTuple := tuple.NewTuple()
 		aTuple.AddField(field.NewStringField("Database Systems" + strconv.Itoa(iterator)))
 		aTuple.AddField(field.NewStringField("ISBN-" + strconv.Itoa(iterator)))
-		aTuple.AddField(field.NewUint16Field(uint16(iterator)))
+		aTuple.AddField(field.NewUint32Field(uint32(iterator)))
 
 		_, _ = db.Put(aTuple)
 		tuples[iterator] = aTuple
@@ -98,11 +98,11 @@ func TestPutsAndGets10000TuplesByKey(t *testing.T) {
 			t.Fatalf("Expected field value to be %v, received %v", expectedFieldValue, secondFieldValue)
 		}
 
-		uint16FieldValue := readTuple.AllFields()[2].Value()
-		expectedUint16FieldValue := uint16(iterator)
+		uint32FieldValue := readTuple.AllFields()[2].Value()
+		expectedUint32FieldValue := uint32(iterator)
 
-		if uint16FieldValue != expectedUint16FieldValue {
-			t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
+		if uint32FieldValue != expectedUint32FieldValue {
+			t.Fatalf("Expected field value to be %v, received %v", expectedUint32FieldValue, uint32FieldValue)
 		}
 	}
 }

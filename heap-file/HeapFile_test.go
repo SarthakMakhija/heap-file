@@ -31,7 +31,7 @@ func TestPutsAndGetsATupleInAPage(t *testing.T) {
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000))
+	aTuple.AddField(field.NewUint32Field(3000))
 
 	tupleId, _ := heapFile.Put(aTuple)
 	readTuple := heapFile.GetBy(tupleId)
@@ -43,11 +43,11 @@ func TestPutsAndGetsATupleInAPage(t *testing.T) {
 		t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 	}
 
-	uint16FieldValue := readTuple.AllFields()[1].Value()
-	expectedUint16FieldValue := uint16(3000)
+	uint32FieldValue := readTuple.AllFields()[1].Value()
+	expectedUint32FieldValue := uint32(3000)
 
-	if uint16FieldValue != expectedUint16FieldValue {
-		t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
+	if uint32FieldValue != expectedUint32FieldValue {
+		t.Fatalf("Expected field value to be %v, received %v", expectedUint32FieldValue, uint32FieldValue)
 	}
 }
 
@@ -61,7 +61,7 @@ func TestPutsAndATupleInAPageAndReadsThePageBack(t *testing.T) {
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000))
+	aTuple.AddField(field.NewUint32Field(3000))
 
 	tupleId, _ := heapFile.Put(aTuple)
 	slottedPage, _ := bufferPool.Read(heapFile.currentPage.PageId())
@@ -74,11 +74,11 @@ func TestPutsAndATupleInAPageAndReadsThePageBack(t *testing.T) {
 		t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 	}
 
-	uint16FieldValue := readTuple.AllFields()[1].Value()
-	expectedUint16FieldValue := uint16(3000)
+	uint32FieldValue := readTuple.AllFields()[1].Value()
+	expectedUint32FieldValue := uint32(3000)
 
-	if uint16FieldValue != expectedUint16FieldValue {
-		t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
+	if uint32FieldValue != expectedUint32FieldValue {
+		t.Fatalf("Expected field value to be %v, received %v", expectedUint32FieldValue, uint32FieldValue)
 	}
 }
 
@@ -90,7 +90,7 @@ func TestRequiresANewPageForPuttingATuple(t *testing.T) {
 			PageSize:                 30,
 			PreAllocatedPagePoolSize: 10,
 			TupleDescriptor: tuple.TupleDescriptor{
-				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint32FieldType{}},
 			},
 		},
 	}
@@ -102,12 +102,12 @@ func TestRequiresANewPageForPuttingATuple(t *testing.T) {
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000))
+	aTuple.AddField(field.NewUint32Field(3000))
 	heapFile.currentPage.Put(aTuple.MarshalBinary()) //needs 20 bytes of space
 
 	copiedTuple := tuple.NewTuple()
 	copiedTuple.AddField(field.NewStringField("Database Systems"))
-	copiedTuple.AddField(field.NewUint16Field(3000))
+	copiedTuple.AddField(field.NewUint32Field(3000))
 
 	_, _ = heapFile.Put(copiedTuple)
 	currentPageId := heapFile.currentPage.PageId()
@@ -126,7 +126,7 @@ func TestPutsAndGetsATupleInAPageAfterRequiringANewPage(t *testing.T) {
 			PageSize:                 30,
 			PreAllocatedPagePoolSize: 10,
 			TupleDescriptor: tuple.TupleDescriptor{
-				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint32FieldType{}},
 			},
 		},
 	}
@@ -138,12 +138,12 @@ func TestPutsAndGetsATupleInAPageAfterRequiringANewPage(t *testing.T) {
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000))
+	aTuple.AddField(field.NewUint32Field(3000))
 	heapFile.currentPage.Put(aTuple.MarshalBinary()) //needs 20 bytes of space
 
 	copiedTuple := tuple.NewTuple()
 	copiedTuple.AddField(field.NewStringField("Database Systems"))
-	copiedTuple.AddField(field.NewUint16Field(3000))
+	copiedTuple.AddField(field.NewUint32Field(3000))
 
 	tupleId, _ := heapFile.Put(copiedTuple)
 	readTuple := heapFile.GetBy(tupleId)
@@ -155,10 +155,10 @@ func TestPutsAndGetsATupleInAPageAfterRequiringANewPage(t *testing.T) {
 		t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 	}
 
-	uint16FieldValue := readTuple.AllFields()[1].Value()
-	expectedUint16FieldValue := uint16(3000)
+	uint32FieldValue := readTuple.AllFields()[1].Value()
+	expectedUint32FieldValue := uint32(3000)
 
-	if uint16FieldValue != expectedUint16FieldValue {
-		t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
+	if uint32FieldValue != expectedUint32FieldValue {
+		t.Fatalf("Expected field value to be %v, received %v", expectedUint32FieldValue, uint32FieldValue)
 	}
 }

@@ -16,7 +16,7 @@ func TestCreatesADbByPreAllocatingPages(t *testing.T) {
 			FileName:                 "./heap.db",
 			PreAllocatedPagePoolSize: 6,
 			TupleDescriptor: tuple.TupleDescriptor{
-				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint32FieldType{}},
 			},
 		},
 		IndexOptions: index.DefaultOptions(),
@@ -40,7 +40,7 @@ func TestCreatesABPlusTreeWhenOpened(t *testing.T) {
 			FileName:                 "./heap.db",
 			PreAllocatedPagePoolSize: 6,
 			TupleDescriptor: tuple.TupleDescriptor{
-				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint32FieldType{}},
 			},
 		},
 		IndexOptions: index.DefaultOptions(),
@@ -83,7 +83,7 @@ func TestPutsAndGetsATupleByTupleId(t *testing.T) {
 			FileName:                 "./heap.db",
 			PreAllocatedPagePoolSize: 6,
 			TupleDescriptor: tuple.TupleDescriptor{
-				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint32FieldType{}},
 			},
 		},
 		IndexOptions: index.DefaultOptions(),
@@ -94,7 +94,7 @@ func TestPutsAndGetsATupleByTupleId(t *testing.T) {
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000))
+	aTuple.AddField(field.NewUint32Field(3000))
 
 	tupleId, _ := db.Put(aTuple)
 
@@ -107,11 +107,11 @@ func TestPutsAndGetsATupleByTupleId(t *testing.T) {
 		t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 	}
 
-	uint16FieldValue := readTuple.AllFields()[1].Value()
-	expectedUint16FieldValue := uint16(3000)
+	uint32FieldValue := readTuple.AllFields()[1].Value()
+	expectedUint32FieldValue := uint32(3000)
 
-	if uint16FieldValue != expectedUint16FieldValue {
-		t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
+	if uint32FieldValue != expectedUint32FieldValue {
+		t.Fatalf("Expected field value to be %v, received %v", expectedUint32FieldValue, uint32FieldValue)
 	}
 }
 
@@ -122,7 +122,7 @@ func TestPutsAndGetsATupleByKey(t *testing.T) {
 			FileName:                 "./heap.db",
 			PreAllocatedPagePoolSize: 6,
 			TupleDescriptor: tuple.TupleDescriptor{
-				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint32FieldType{}},
 			},
 		},
 		IndexOptions: index.DefaultOptions(),
@@ -133,7 +133,7 @@ func TestPutsAndGetsATupleByKey(t *testing.T) {
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000))
+	aTuple.AddField(field.NewUint32Field(3000))
 
 	_, _ = db.Put(aTuple)
 	readTuple, _ := db.GetByKey(aTuple.KeyField())
@@ -145,10 +145,10 @@ func TestPutsAndGetsATupleByKey(t *testing.T) {
 		t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 	}
 
-	uint16FieldValue := readTuple.AllFields()[1].Value()
-	expectedUint16FieldValue := uint16(3000)
+	uint32FieldValue := readTuple.AllFields()[1].Value()
+	expectedUint32FieldValue := uint32(3000)
 
-	if uint16FieldValue != expectedUint16FieldValue {
-		t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
+	if uint32FieldValue != expectedUint32FieldValue {
+		t.Fatalf("Expected field value to be %v, received %v", expectedUint32FieldValue, uint32FieldValue)
 	}
 }

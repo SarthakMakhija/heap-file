@@ -52,7 +52,7 @@ func DefaultOptions() DbOptions {
 			FileName:                 "heap.db",
 			PreAllocatedPagePoolSize: 10,
 			TupleDescriptor: tuple.TupleDescriptor{
-				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}},
+				FieldTypes: []field.FieldType{field.StringFieldType{}, field.Uint32FieldType{}},
 			},
 		},
 		IndexOptions: index.DefaultOptions(),

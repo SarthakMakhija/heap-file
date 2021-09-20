@@ -26,18 +26,18 @@ func TestWritesAndReadsSlottedPage(t *testing.T) {
 	if stringFieldValue != expectedStringFieldValue {
 		t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 	}
-	uint16FieldValue := aTuple.AllFields()[1].Value()
-	expectedUint16FieldValue := uint16(100)
+	uint32FieldValue := aTuple.AllFields()[1].Value()
+	expectedUint32FieldValue := uint32(100)
 
-	if uint16FieldValue != expectedUint16FieldValue {
-		t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
+	if uint32FieldValue != expectedUint32FieldValue {
+		t.Fatalf("Expected field value to be %v, received %v", expectedUint32FieldValue, uint32FieldValue)
 	}
 }
 
 func fillASlottedPage(options DbOptions) *page.SlottedPage {
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(uint16(100)))
+	aTuple.AddField(field.NewUint32Field(uint32(100)))
 
 	slottedPage := page.NewSlottedPage(0, options.PageSize(), options.TupleDescriptor())
 	slottedPage.Put(aTuple.MarshalBinary())

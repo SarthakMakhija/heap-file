@@ -12,7 +12,7 @@ func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingPageId(t *testing.T)
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000))
+	aTuple.AddField(field.NewUint32Field(3000))
 
 	tupleId := slottedPage.Put(aTuple.MarshalBinary())
 	expectedPageId := uint32(100)
@@ -27,7 +27,7 @@ func TestPutsATupleInASlottedPageAndReturnsTupleIdContainingSlotNo(t *testing.T)
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000))
+	aTuple.AddField(field.NewUint32Field(3000))
 
 	tupleId := slottedPage.Put(aTuple.MarshalBinary())
 	expectedSlotNo := 1
@@ -42,7 +42,7 @@ func TestPutsATupleInASlottedPageAndReadsItBack(t *testing.T) {
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000))
+	aTuple.AddField(field.NewUint32Field(3000))
 
 	slottedPage.Put(aTuple.MarshalBinary())
 	readTuple := slottedPage.GetAt(1)
@@ -54,11 +54,11 @@ func TestPutsATupleInASlottedPageAndReadsItBack(t *testing.T) {
 		t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 	}
 
-	uint16FieldValue := readTuple.AllFields()[1].Value()
-	expectedUint16FieldValue := uint16(3000)
+	uint32FieldValue := readTuple.AllFields()[1].Value()
+	expectedUint32FieldValue := uint32(3000)
 
-	if uint16FieldValue != expectedUint16FieldValue {
-		t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
+	if uint32FieldValue != expectedUint32FieldValue {
+		t.Fatalf("Expected field value to be %v, received %v", expectedUint32FieldValue, uint32FieldValue)
 	}
 }
 
@@ -67,7 +67,7 @@ func TestReturnsTheSizeAvailableInAPage(t *testing.T) {
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000))
+	aTuple.AddField(field.NewUint32Field(3000))
 
 	slottedPage.Put(aTuple.MarshalBinary())
 
@@ -84,7 +84,7 @@ func TestReturnsFalseGivenPageIsNotLarEnoughForTheTuple(t *testing.T) {
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000)) //20 byte tuple
+	aTuple.AddField(field.NewUint32Field(3000)) //20 byte tuple
 
 	slottedPage.Put(aTuple.MarshalBinary())
 
@@ -99,7 +99,7 @@ func TestReturnsTrueGivenPageIsLarEnoughForTheTuple(t *testing.T) {
 
 	aTuple := tuple.NewTuple()
 	aTuple.AddField(field.NewStringField("Database Systems"))
-	aTuple.AddField(field.NewUint16Field(3000)) //20 byte tuple
+	aTuple.AddField(field.NewUint32Field(3000)) //20 byte tuple
 
 	isPageLargeEnough := slottedPage.HasSizeLargeEnoughToHold(aTuple.MarshalBinary())
 	if isPageLargeEnough != true {

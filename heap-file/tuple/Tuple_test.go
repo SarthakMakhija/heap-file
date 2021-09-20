@@ -21,13 +21,13 @@ func TestMarshalsAndUnMarshalsATupleWithSingleFieldOfTypeString(t *testing.T) {
 	}
 }
 
-func TestMarshalsAndUnMarshalsATupleWithStringAndUint16Field(t *testing.T) {
+func TestMarshalsAndUnMarshalsATupleWithStringAndUint32Field(t *testing.T) {
 	tuple := NewTuple()
 	tuple.AddField(field.NewStringField("Database Systems"))
-	tuple.AddField(field.NewUint16Field(3000))
+	tuple.AddField(field.NewUint32Field(3000))
 
 	marshalledTuple := tuple.MarshalBinary()
-	fieldTypes := []field.FieldType{field.StringFieldType{}, field.Uint16FieldType{}}
+	fieldTypes := []field.FieldType{field.StringFieldType{}, field.Uint32FieldType{}}
 
 	unmarshalledTuple := NewTuple()
 	unmarshalledTuple.UnMarshalBinary(marshalledTuple.Buffer(), fieldTypes)
@@ -39,21 +39,21 @@ func TestMarshalsAndUnMarshalsATupleWithStringAndUint16Field(t *testing.T) {
 		t.Fatalf("Expected field value to be %v, received %v", expectedStringFieldValue, stringFieldValue)
 	}
 
-	uint16FieldValue := unmarshalledTuple.fields[1].Value()
-	expectedUint16FieldValue := uint16(3000)
+	uint32FieldValue := unmarshalledTuple.fields[1].Value()
+	expectedUint32FieldValue := uint32(3000)
 
-	if uint16FieldValue != expectedUint16FieldValue {
-		t.Fatalf("Expected field value to be %v, received %v", expectedUint16FieldValue, uint16FieldValue)
+	if uint32FieldValue != expectedUint32FieldValue {
+		t.Fatalf("Expected field value to be %v, received %v", expectedUint32FieldValue, uint32FieldValue)
 	}
 }
 
 func TestReturnsTheLastFieldAsTheKeyField(t *testing.T) {
 	tuple := NewTuple()
 	tuple.AddField(field.NewStringField("Database Systems"))
-	tuple.AddField(field.NewUint16Field(100))
+	tuple.AddField(field.NewUint32Field(100))
 
 	keyField := tuple.KeyField()
-	expected := uint16(100)
+	expected := uint32(100)
 
 	if keyField.Value() != expected {
 		t.Fatalf("Expected field value to be %v, received %v", expected, keyField.Value())
