@@ -1,4 +1,4 @@
-package b_plus_tree_test
+package index_test
 
 import (
 	"github.com/SarthakMakhija/heap-file/index"
