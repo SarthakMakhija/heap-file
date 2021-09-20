@@ -42,9 +42,12 @@ func (db *Db) Put(tuple *tuple.Tuple) (tuple.TupleId, error) {
 func (db *Db) GetByKey(key field.Field) (*tuple.Tuple, error) {
 	getResult := db.bPlusTree.Get(key.MarshalBinary())
 	if getResult.Err == nil {
-		tupleId := &tuple.TupleId{}
-		tupleId.UnMarshalBinary(getResult.KeyValuePair.RawValue())
-		return db.GetByTupleId(*tupleId), nil
+		if len(getResult.KeyValuePair.RawValue()) != 0 {
+			tupleId := &tuple.TupleId{}
+			tupleId.UnMarshalBinary(getResult.KeyValuePair.RawValue())
+			return db.GetByTupleId(*tupleId), nil
+		}
+		return tuple.NewTuple(), nil
 	}
 	return nil, getResult.Err
 }
