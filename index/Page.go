@@ -147,13 +147,11 @@ func (page *Page) insertAt(index int, keyValuePair KeyValuePair) DirtyPage {
 }
 
 func (page *Page) updateAt(index int, keyValuePair KeyValuePair) DirtyPage {
-	//page.MarkDirty()
 	page.keyValuePairs[index] = keyValuePair
 	return DirtyPage{page: page}
 }
 
 func (page *Page) insertChildAt(index int, childPage *Page) DirtyPage {
-	//page.MarkDirty()
 	page.childPageIds = append(page.childPageIds, 0)
 	copy(page.childPageIds[index+1:], page.childPageIds[index:])
 	page.childPageIds[index] = childPage.id
@@ -162,10 +160,8 @@ func (page *Page) insertChildAt(index int, childPage *Page) DirtyPage {
 }
 
 func (page *Page) split(parentPage *Page, siblingPage *Page, index int) ([]DirtyPage, error) {
-	//page.MarkDirty()
-	//parentPage.MarkDirty()
-	//siblingPage.MarkDirty()
 	dirtyPages := []DirtyPage{{page: page}, {page: siblingPage}, {page: parentPage}}
+
 	if page.isLeaf() {
 		pageKeyValuePairs := page.AllKeyValuePairs()
 		siblingPage.keyValuePairs = append(siblingPage.keyValuePairs, page.keyValuePairs[len(pageKeyValuePairs)/2:]...)
