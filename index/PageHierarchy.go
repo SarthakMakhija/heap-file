@@ -49,7 +49,8 @@ func (pageHierarchy *PageHierarchy) Put(keyValuePair KeyValuePair) error {
 		}
 		dirtyPages = append(dirtyPages, rootSplitDirtyPages...)
 	}
-	if _, err := pageHierarchy.put(keyValuePair, pageHierarchy.rootPage, dirtyPages); err != nil {
+	dirtyPages, err := pageHierarchy.put(keyValuePair, pageHierarchy.rootPage, dirtyPages)
+	if err != nil {
 		return err
 	}
 	pageHierarchy.Write(dirtyPages)
@@ -61,8 +62,12 @@ func (pageHierarchy *PageHierarchy) Get(key []byte) GetResult {
 }
 
 func (pageHierarchy *PageHierarchy) Write(dirtyPages []DirtyPage) {
+	writtenPageById := make(map[int]*Page)
 	for _, dirtyPage := range dirtyPages {
-		pageHierarchy.pagePool.Write(dirtyPage.page)
+		if writtenPageById[dirtyPage.page.id] == nil {
+			pageHierarchy.pagePool.Write(dirtyPage.page)
+			writtenPageById[dirtyPage.page.id] = dirtyPage.page
+		}
 	}
 }
 
