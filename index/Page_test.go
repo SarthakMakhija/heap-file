@@ -568,7 +568,7 @@ func TestReturnsTheSizeOfALeafPage(t *testing.T) {
 		keyValuePairs: []KeyValuePair{{key: []byte("A"), value: []byte("Database")}},
 	}
 	size := page.size()
-	expected := len(page.keyValuePairs[0].key) + len(page.keyValuePairs[0].value) + pageTypeSize + keyValuePairCountSize + keyLengthSize + valueLengthSize
+	expected := 13
 
 	if expected != size {
 		t.Fatalf("Expected leaf page size to be %v, received %v", expected, size)
@@ -582,7 +582,7 @@ func TestReturnsTheSizeOfANonLeafPage(t *testing.T) {
 		childPageIds:  []int{10, 11},
 	}
 	size := page.size()
-	expected := len(page.keyValuePairs[0].key) + pageTypeSize + keyValuePairCountSize + keyLengthSize + 2*childPageIdSize
+	expected := 14
 
 	if expected != size {
 		t.Fatalf("Expected non-leaf page size to be %v, received %v", expected, size)

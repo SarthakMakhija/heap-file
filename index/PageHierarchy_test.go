@@ -55,7 +55,7 @@ func TestReturnsTrueGivenPageIsEligibleForSplit(t *testing.T) {
 	}
 	indexFile, _ := OpenIndexFile(options)
 	pagePool := NewPagePool(indexFile, options)
-	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
+	pageHierarchy := NewPageHierarchy(pagePool, 2, DefaultFreePageList(options.PreAllocatedPagePoolSize))
 	page := &Page{
 		keyValuePairs: []KeyValuePair{
 			{key: []byte("A")},
@@ -481,7 +481,7 @@ func TestPutsAKeyValuePairAfterSplittingTheRootPage(t *testing.T) {
 
 func TestSplitsTheRootPageAndCreatesANewRootWithKeyValuePairs(t *testing.T) {
 	options := Options{
-		PageSize:                 300,
+		PageSize:                 200,
 		FileName:                 "./test",
 		PreAllocatedPagePoolSize: 8,
 	}
@@ -556,7 +556,7 @@ func TestSplitsTheRootPageAndWithKeyValuePairsInOldRoot(t *testing.T) {
 
 func TestSplitsTheRootPageAndWithKeyValuePairsInRightSiblingPage(t *testing.T) {
 	options := Options{
-		PageSize:                 300,
+		PageSize:                 200,
 		FileName:                 "./test",
 		PreAllocatedPagePoolSize: 8,
 	}

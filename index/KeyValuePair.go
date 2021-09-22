@@ -1,6 +1,9 @@
 package index
 
-import "bytes"
+import (
+	"bytes"
+	"github.com/SarthakMakhija/heap-file/index/schema"
+)
 
 type KeyValuePair struct {
 	key   []byte
@@ -35,4 +38,11 @@ func (keyValuePair KeyValuePair) isEmpty() bool {
 		return true
 	}
 	return false
+}
+
+func (keyValuePair KeyValuePair) toPersistentKeyValuePair() schema.PersistentKeyValuePair {
+	return schema.PersistentKeyValuePair{
+		Key:   keyValuePair.key,
+		Value: keyValuePair.value,
+	}
 }

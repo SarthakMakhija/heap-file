@@ -2,21 +2,9 @@ package index
 
 import (
 	"bytes"
-	"encoding/binary"
+	"github.com/SarthakMakhija/heap-file/index/schema"
 	"math"
 	"sort"
-)
-
-var littleEndian = binary.LittleEndian
-var (
-	pageTypeSize          = 1
-	keyValuePairCountSize = 2
-	keyLengthSize         = 2
-	valueLengthSize       = 2
-	childPageIdSize       = 4
-	childPageId0Size      = childPageIdSize
-	leafPageMetaSize      = pageTypeSize + keyValuePairCountSize
-	nonLeafPageMetaSize   = pageTypeSize + keyValuePairCountSize + childPageId0Size
 )
 
 const (
@@ -46,134 +34,83 @@ func (page Page) GetKeyValuePairAt(index int) KeyValuePair {
 }
 
 func (page Page) MarshalBinary() []byte {
-	buffer := make([]byte, page.size())
-	offset := 0
-
-	writePageType := func(pageType byte) {
-		buffer[offset] = pageType
-		offset++
-	}
-	writeKeyValuePairCount := func() {
-		littleEndian.PutUint16(buffer[offset:offset+2], uint16(len(page.keyValuePairs)))
-		offset += 2
-	}
-	writeValueLength := func(length uint16) {
-		littleEndian.PutUint16(buffer[offset:offset+2], length)
-		offset += 2
-	}
-	writeKeyLength := func(length uint16) {
-		littleEndian.PutUint16(buffer[offset:offset+2], length)
-		offset += 2
-	}
-	writeValue := func(value []byte) {
-		copy(buffer[offset:offset+len(value)], value)
-		offset += len(value)
-	}
-	writeKey := func(key []byte) {
-		copy(buffer[offset:], key)
-		offset += len(key)
-	}
-	writeChildPageId := func(childPageId uint32) {
-		littleEndian.PutUint32(buffer[offset:offset+4], childPageId)
-		offset += 4
-	}
-
 	if page.isLeaf() {
-		writePageType(LeafPage)
-		writeKeyValuePairCount()
-
-		for index := 0; index < len(page.keyValuePairs); index++ {
-			keyValuePair := page.keyValuePairs[index]
-
-			writeValueLength(uint16(len(keyValuePair.value)))
-			writeValue(keyValuePair.value)
-			writeKeyLength(uint16(len(keyValuePair.key)))
-			writeKey(keyValuePair.key)
-		}
+		buffer, _ := page.toPersistentLeafPage().Marshal(nil)
+		return buffer
 	} else {
-		writePageType(NonLeafPage)
-		writeKeyValuePairCount()
-		writeChildPageId(uint32(page.childPageIds[0]))
-
-		for index := 0; index < len(page.keyValuePairs); index++ {
-			keyValuePair := page.keyValuePairs[index]
-
-			writeChildPageId(uint32(page.childPageIds[index+1]))
-			writeKeyLength(uint16(len(keyValuePair.key)))
-			writeKey(keyValuePair.key)
-		}
+		buffer, _ := page.toPersistentNonLeafPage().Marshal(nil)
+		return buffer
 	}
-	return buffer
+}
+
+func (page Page) toPersistentLeafPage() *schema.PersistentLeafPage {
+	persistentKeyValuePairs := make([]schema.PersistentKeyValuePair, len(page.keyValuePairs))
+	for index, keyValuePair := range page.keyValuePairs {
+		persistentKeyValuePairs[index] = keyValuePair.toPersistentKeyValuePair()
+	}
+	return &schema.PersistentLeafPage{
+		PageType: LeafPage,
+		Pairs:    persistentKeyValuePairs,
+	}
+}
+
+func (page Page) toPersistentNonLeafPage() *schema.PersistentNonLeafPage {
+	persistentKeyValuePairs := make([]schema.PersistentKeyValuePair, len(page.keyValuePairs))
+	childPageIds := make([]uint32, len(page.childPageIds))
+
+	for index, keyValuePair := range page.keyValuePairs {
+		persistentKeyValuePairs[index] = keyValuePair.toPersistentKeyValuePair()
+	}
+	for index, childPageId := range page.childPageIds {
+		childPageIds[index] = uint32(childPageId)
+	}
+	return &schema.PersistentNonLeafPage{
+		PageType:     NonLeafPage,
+		Pairs:        persistentKeyValuePairs,
+		ChildPageIds: childPageIds,
+	}
 }
 
 func (page *Page) UnMarshalBinary(buffer []byte) {
-	offset := 1
-
-	readKeyValuePairCount := func() int {
-		keyValuePairCount := int(littleEndian.Uint16(buffer[offset : offset+2]))
-		offset += 2
-		return keyValuePairCount
-	}
-	readValue := func() []byte {
-		valueSize := int(littleEndian.Uint16(buffer[offset : offset+2]))
-		offset += 2
-
-		value := make([]byte, valueSize)
-		copy(value, buffer[offset:offset+valueSize])
-		offset += valueSize
-		return value
-	}
-	readKey := func() []byte {
-		keySize := int(littleEndian.Uint16(buffer[offset : offset+2]))
-		offset += 2
-
-		key := make([]byte, keySize)
-		copy(key, buffer[offset:offset+keySize])
-		offset += keySize
-		return key
-	}
-	readChildPageId := func() int {
-		pageId := int(littleEndian.Uint32(buffer[offset : offset+4]))
-		offset += 4
-		return pageId
-	}
-
 	if buffer[0]&NonLeafPage == 0 {
-		keyValuePairCount := readKeyValuePairCount()
-		for index := 0; index < keyValuePairCount; index++ {
-			pair := KeyValuePair{}
-			pair.value = readValue()
-			pair.key = readKey()
-			page.keyValuePairs = append(page.keyValuePairs, pair)
+		persistentLeafPage := schema.PersistentLeafPage{}
+		_, _ = persistentLeafPage.Unmarshal(buffer)
+
+		for _, persistentKeyValuePair := range persistentLeafPage.Pairs {
+			page.keyValuePairs = append(
+				page.keyValuePairs,
+				KeyValuePair{
+					key: persistentKeyValuePair.Key, value: persistentKeyValuePair.Value,
+				},
+			)
 		}
 	} else {
-		keyValuePairCount := readKeyValuePairCount()
-		page.childPageIds = append(page.childPageIds, readChildPageId())
+		persistentNonLeafPage := schema.PersistentNonLeafPage{}
+		_, _ = persistentNonLeafPage.Unmarshal(buffer)
 
-		for index := 0; index < keyValuePairCount; index++ {
-			childPageId := readChildPageId()
-			key := readKey()
-
-			page.childPageIds = append(page.childPageIds, childPageId)
-			page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{key: key})
+		for _, persistentKeyValuePair := range persistentNonLeafPage.Pairs {
+			page.keyValuePairs = append(
+				page.keyValuePairs,
+				KeyValuePair{
+					key: persistentKeyValuePair.Key, value: persistentKeyValuePair.Value,
+				},
+			)
+		}
+		for _, persistentChildPageId := range persistentNonLeafPage.ChildPageIds {
+			page.childPageIds = append(
+				page.childPageIds,
+				int(persistentChildPageId),
+			)
 		}
 	}
 }
 
 func (page Page) size() int {
-	size := 0
 	if page.isLeaf() {
-		size = leafPageMetaSize
-		for _, keyValuePair := range page.keyValuePairs {
-			size = size + keyLengthSize + valueLengthSize + len(keyValuePair.key) + len(keyValuePair.value)
-		}
+		return int(page.toPersistentLeafPage().Size())
 	} else {
-		size = nonLeafPageMetaSize
-		for _, keyValuePair := range page.keyValuePairs {
-			size = size + keyLengthSize + len(keyValuePair.key) + childPageIdSize
-		}
+		return int(page.toPersistentNonLeafPage().Size())
 	}
-	return size
 }
 
 func (page Page) binarySearch(key []byte) (int, bool) {
