@@ -849,8 +849,7 @@ func TestAllocatesPagesFromPagePoolGivenFreePageListIsEmpty(t *testing.T) {
 func TestWritesDirtyPagesToStorage(t *testing.T) {
 	pageA := func() *Page {
 		return &Page{
-			dirty: true,
-			id:    0,
+			id: 0,
 			keyValuePairs: []KeyValuePair{
 				{
 					key:   []byte("A"),
@@ -874,48 +873,12 @@ func TestWritesDirtyPagesToStorage(t *testing.T) {
 
 	defer deleteFile(pagePool.indexFile)
 
-	pageHierarchy.Write()
+	pageHierarchy.Write([]DirtyPage{{page: pageA()}})
 
 	readPage, _ := pagePool.Read(pageA().id)
 	expectedKeyValuePair := pageA().keyValuePairs[0]
 
 	if !expectedKeyValuePair.Equals(readPage.keyValuePairs[0]) {
 		t.Fatalf("Expected key value pair to be %v, received %v", expectedKeyValuePair, readPage.keyValuePairs[0])
-	}
-}
-
-func TestWritesDirtyPagesToStorageAndMarksThePageAsNonDirty(t *testing.T) {
-	pageA := func() *Page {
-		return &Page{
-			dirty: true,
-			id:    0,
-			keyValuePairs: []KeyValuePair{
-				{
-					key:   []byte("A"),
-					value: []byte("Database"),
-				},
-			},
-		}
-	}
-
-	options := Options{
-		PageSize:                 os.Getpagesize(),
-		FileName:                 "./test",
-		PreAllocatedPagePoolSize: 8,
-	}
-	indexFile, _ := OpenIndexFile(options)
-	pagePool := NewPagePool(indexFile, options)
-	_, _ = pagePool.Allocate(options.PreAllocatedPagePoolSize)
-	pageHierarchy := NewPageHierarchy(pagePool, 10, DefaultFreePageList(options.PreAllocatedPagePoolSize))
-
-	page := pageA()
-	pageHierarchy.pageById[0] = page
-
-	defer deleteFile(pagePool.indexFile)
-
-	pageHierarchy.Write()
-
-	if page.IsDirty() == true {
-		t.Fatalf("Expected page to not be dirty")
 	}
 }

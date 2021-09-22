@@ -16,7 +16,10 @@ type Page struct {
 	id            int
 	keyValuePairs []KeyValuePair
 	childPageIds  []int
-	dirty         bool
+}
+
+type DirtyPage struct {
+	page *Page
 }
 
 func NewPage(id int) *Page {
@@ -130,8 +133,8 @@ func (page Page) isLeaf() bool {
 	return len(page.childPageIds) == 0
 }
 
-func (page *Page) insertAt(index int, keyValuePair KeyValuePair) {
-	page.MarkDirty()
+func (page *Page) insertAt(index int, keyValuePair KeyValuePair) DirtyPage {
+	//page.MarkDirty()
 	page.keyValuePairs = append(page.keyValuePairs, KeyValuePair{})
 
 	copy(page.keyValuePairs[index+1:], page.keyValuePairs[index:])
@@ -140,33 +143,36 @@ func (page *Page) insertAt(index int, keyValuePair KeyValuePair) {
 	} else {
 		page.keyValuePairs[index] = KeyValuePair{key: keyValuePair.key}
 	}
+	return DirtyPage{page: page}
 }
 
-func (page Page) updateAt(index int, keyValuePair KeyValuePair) {
-	page.MarkDirty()
+func (page *Page) updateAt(index int, keyValuePair KeyValuePair) DirtyPage {
+	//page.MarkDirty()
 	page.keyValuePairs[index] = keyValuePair
+	return DirtyPage{page: page}
 }
 
-func (page *Page) insertChildAt(index int, childPage *Page) {
-	page.MarkDirty()
-
+func (page *Page) insertChildAt(index int, childPage *Page) DirtyPage {
+	//page.MarkDirty()
 	page.childPageIds = append(page.childPageIds, 0)
 	copy(page.childPageIds[index+1:], page.childPageIds[index:])
 	page.childPageIds[index] = childPage.id
+
+	return DirtyPage{page: page}
 }
 
-func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
-	page.MarkDirty()
-	parentPage.MarkDirty()
-	siblingPage.MarkDirty()
-
+func (page *Page) split(parentPage *Page, siblingPage *Page, index int) ([]DirtyPage, error) {
+	//page.MarkDirty()
+	//parentPage.MarkDirty()
+	//siblingPage.MarkDirty()
+	dirtyPages := []DirtyPage{{page: page}, {page: siblingPage}, {page: parentPage}}
 	if page.isLeaf() {
 		pageKeyValuePairs := page.AllKeyValuePairs()
 		siblingPage.keyValuePairs = append(siblingPage.keyValuePairs, page.keyValuePairs[len(pageKeyValuePairs)/2:]...)
 		page.keyValuePairs = page.keyValuePairs[:len(pageKeyValuePairs)/2]
 
-		parentPage.insertChildAt(index+1, siblingPage)
-		parentPage.insertAt(index, siblingPage.keyValuePairs[0])
+		dirtyPages = append(dirtyPages, parentPage.insertChildAt(index+1, siblingPage))
+		dirtyPages = append(dirtyPages, parentPage.insertAt(index, siblingPage.keyValuePairs[0]))
 	} else {
 		parentKey := page.keyValuePairs[len(page.AllKeyValuePairs())/2]
 
@@ -181,24 +187,12 @@ func (page *Page) split(parentPage *Page, siblingPage *Page, index int) error {
 			page.childPageIds = page.childPageIds[len(page.childPageIds)/2:]
 		}
 
-		parentPage.insertChildAt(index, siblingPage)
-		parentPage.insertAt(index, parentKey)
+		dirtyPages = append(dirtyPages, parentPage.insertChildAt(index, siblingPage))
+		dirtyPages = append(dirtyPages, parentPage.insertAt(index, parentKey))
 	}
-	return nil
+	return dirtyPages, nil
 }
 
 func (page *Page) AllKeyValuePairs() []KeyValuePair {
 	return page.keyValuePairs
-}
-
-func (page *Page) MarkDirty() {
-	page.dirty = true
-}
-
-func (page *Page) ClearDirty() {
-	page.dirty = false
-}
-
-func (page *Page) IsDirty() bool {
-	return page.dirty
 }

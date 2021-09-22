@@ -272,7 +272,7 @@ func TestSplitsALeafPageWithKeyValuePairs(t *testing.T) {
 	parentPage.childPageIds = []int{0}
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 0)
+	_, _ = page.split(parentPage, siblingPage, 0)
 
 	keyValuePairsAfterSplit := page.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("A"), value: []byte("Database")}}
@@ -291,7 +291,7 @@ func TestSplitsALeafPageWithKeyValuePairsInParent(t *testing.T) {
 	parentPage.childPageIds = []int{0}
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 0)
+	_, _ = page.split(parentPage, siblingPage, 0)
 
 	keyValuePairsAfterSplit := parentPage.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("B")}}
@@ -310,7 +310,7 @@ func TestSplitsALeafPageWithKeyValuePairsInSibling(t *testing.T) {
 	parentPage.childPageIds = []int{0}
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 0)
+	_, _ = page.split(parentPage, siblingPage, 0)
 
 	keyValuePairsAfterSplit := siblingPage.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("B"), value: []byte("Systems")}}
@@ -332,7 +332,7 @@ func TestSplitsANonLeafPageWithKeyValuePairsWithEvenNumberOfKeyValuePairs(t *tes
 
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 1)
+	_, _ = page.split(parentPage, siblingPage, 1)
 
 	keyValuePairsAfterSplit := page.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("Q")}}
@@ -354,7 +354,7 @@ func TestSplitsANonLeafPageWithKeyValuePairsWithOddNumberOfKeyValuePairs(t *test
 
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 1)
+	_, _ = page.split(parentPage, siblingPage, 1)
 
 	keyValuePairsAfterSplit := page.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("O")}}
@@ -376,7 +376,7 @@ func TestSplitsANonLeafPageWithKeyValuePairsInSiblingWithEvenNumberOfKeyValuePai
 
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 1)
+	_, _ = page.split(parentPage, siblingPage, 1)
 
 	keyValuePairsAfterSplit := siblingPage.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("J")}, {key: []byte("L")}}
@@ -398,7 +398,7 @@ func TestSplitsANonLeafPageWithKeyValuePairsInSiblingWithOddNumberOfKeyValuePair
 
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 1)
+	_, _ = page.split(parentPage, siblingPage, 1)
 
 	keyValuePairsAfterSplit := siblingPage.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("J")}}
@@ -420,7 +420,7 @@ func TestSplitsANonLeafPageWithChildPageIdsWithEvenNumberOfChildPageIds(t *testi
 
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 1)
+	_, _ = page.split(parentPage, siblingPage, 1)
 
 	childPageIdsAfterSplit := page.childPageIds
 	expected := []int{12, 13}
@@ -442,7 +442,7 @@ func TestSplitsANonLeafPageWithChildPageIdsInSiblingPageWithEvenNumberOfChildPag
 
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 1)
+	_, _ = page.split(parentPage, siblingPage, 1)
 
 	childPageIdsAfterSplit := siblingPage.childPageIds
 	expected := []int{10, 11}
@@ -464,7 +464,7 @@ func TestSplitsANonLeafPageWithChildPageIdsWithOddNumberOfChildPageIds(t *testin
 
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 1)
+	_, _ = page.split(parentPage, siblingPage, 1)
 
 	childPageIdsAfterSplit := page.childPageIds
 	expected := []int{13, 14}
@@ -486,7 +486,7 @@ func TestSplitsANonLeafPageWithChildPageIdsInSiblingPageWithOddNumberOfChildPage
 
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 1)
+	_, _ = page.split(parentPage, siblingPage, 1)
 
 	childPageIdsAfterSplit := siblingPage.childPageIds
 	expected := []int{10, 11, 12}
@@ -508,7 +508,7 @@ func TestSplitsANonLeafPageWithAKeyValuePairAddedToParent(t *testing.T) {
 
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 1)
+	_, _ = page.split(parentPage, siblingPage, 1)
 
 	parentPageKeyValuePairs := parentPage.keyValuePairs
 	expected := []KeyValuePair{{key: []byte("S")}, {key: []byte("O")}}
@@ -530,7 +530,7 @@ func TestSplitsANonLeafPageWithKeyValuePairsInParent(t *testing.T) {
 
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 1)
+	_, _ = page.split(parentPage, siblingPage, 1)
 
 	keyValuePairsAfterSplit := parentPage.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("S")}, {key: []byte("O")}}
@@ -552,7 +552,7 @@ func TestSplitsANonLeafPageWithChildPageIdAdddedToParent(t *testing.T) {
 
 	siblingPage := NewPage(200)
 
-	_ = page.split(parentPage, siblingPage, 1)
+	_, _ = page.split(parentPage, siblingPage, 1)
 
 	childPageIdsOfParent := parentPage.childPageIds
 	expected := []int{5, 200}

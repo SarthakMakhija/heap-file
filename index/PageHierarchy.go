@@ -25,13 +25,14 @@ func NewPageHierarchy(pagePool *PagePool, allowedPageOccupancyPercentage int, fr
 }
 
 func (pageHierarchy *PageHierarchy) Put(keyValuePair KeyValuePair) error {
-	splitRoot := func() error {
+
+	splitRoot := func() ([]DirtyPage, error) {
 		siblingPageCount := 1
 		newRootPageCount := 1
 
 		pages, err := pageHierarchy.allocatePages(siblingPageCount + newRootPageCount)
 		if err != nil {
-			return err
+			return []DirtyPage{}, nil
 		}
 		newRootPage, rightSiblingPage, oldRootPage := pages[0], pages[1], pageHierarchy.rootPage
 		newRootPage.childPageIds = append(newRootPage.childPageIds, oldRootPage.id)
@@ -40,15 +41,18 @@ func (pageHierarchy *PageHierarchy) Put(keyValuePair KeyValuePair) error {
 		return oldRootPage.split(newRootPage, rightSiblingPage, 0)
 	}
 
+	var dirtyPages []DirtyPage
 	if pageHierarchy.isPageEligibleForSplit(pageHierarchy.rootPage) {
-		if err := splitRoot(); err != nil {
+		rootSplitDirtyPages, err := splitRoot()
+		if err != nil {
 			return err
 		}
+		dirtyPages = append(dirtyPages, rootSplitDirtyPages...)
 	}
-	if err := pageHierarchy.put(keyValuePair, pageHierarchy.rootPage); err != nil {
+	if _, err := pageHierarchy.put(keyValuePair, pageHierarchy.rootPage, dirtyPages); err != nil {
 		return err
 	}
-	pageHierarchy.Write()
+	pageHierarchy.Write(dirtyPages)
 	return nil
 }
 
@@ -56,12 +60,9 @@ func (pageHierarchy *PageHierarchy) Get(key []byte) GetResult {
 	return pageHierarchy.get(key, pageHierarchy.rootPage)
 }
 
-func (pageHierarchy *PageHierarchy) Write() {
-	for _, page := range pageHierarchy.pageById {
-		if page.IsDirty() {
-			pageHierarchy.pagePool.Write(page)
-			page.ClearDirty()
-		}
+func (pageHierarchy *PageHierarchy) Write(dirtyPages []DirtyPage) {
+	for _, dirtyPage := range dirtyPages {
+		pageHierarchy.pagePool.Write(dirtyPage.page)
 	}
 }
 
@@ -73,20 +74,20 @@ func (pageHierarchy PageHierarchy) PageById(id int) *Page {
 	return pageHierarchy.pageById[id]
 }
 
-func (pageHierarchy *PageHierarchy) put(keyValuePair KeyValuePair, page *Page) error {
+func (pageHierarchy *PageHierarchy) put(keyValuePair KeyValuePair, page *Page, dirtyPages []DirtyPage) ([]DirtyPage, error) {
 	if page.isLeaf() {
 		index, found := page.Get(keyValuePair.key)
 		if found {
-			page.updateAt(index, keyValuePair)
-			return nil
+			dirtyPages = append(dirtyPages, page.updateAt(index, keyValuePair))
+			return dirtyPages, nil
 		}
-		page.insertAt(index, keyValuePair)
-		return nil
+		dirtyPages = append(dirtyPages, page.insertAt(index, keyValuePair))
+		return dirtyPages, nil
 	}
-	return pageHierarchy.insertOrSplit(keyValuePair, page)
+	return pageHierarchy.insertOrSplit(keyValuePair, page, dirtyPages)
 }
 
-func (pageHierarchy *PageHierarchy) insertOrSplit(keyValuePair KeyValuePair, page *Page) error {
+func (pageHierarchy *PageHierarchy) insertOrSplit(keyValuePair KeyValuePair, page *Page, dirtyPages []DirtyPage) ([]DirtyPage, error) {
 	index, found := page.Get(keyValuePair.key)
 	if found {
 		index = index + 1
@@ -94,24 +95,26 @@ func (pageHierarchy *PageHierarchy) insertOrSplit(keyValuePair KeyValuePair, pag
 
 	childPage, err := pageHierarchy.fetchOrCachePage(page.childPageIds[index])
 	if err != nil {
-		return err
+		return []DirtyPage{}, nil
 	}
+	var localDirtyPages []DirtyPage
 	if pageHierarchy.isPageEligibleForSplit(childPage) {
 		sibling, err := pageHierarchy.allocateSinglePage()
 		if err != nil {
-			return err
+			return []DirtyPage{}, nil
 		}
-		if err := childPage.split(page, sibling, index); err != nil {
-			return err
+		localDirtyPages, err = childPage.split(page, sibling, index)
+		if err != nil {
+			return []DirtyPage{}, nil
 		}
 		if bytes.Compare(keyValuePair.key, page.keyValuePairs[index].key) >= 0 {
 			childPage, err = pageHierarchy.fetchOrCachePage(page.childPageIds[index+1])
 			if err != nil {
-				return err
+				return []DirtyPage{}, nil
 			}
 		}
 	}
-	return pageHierarchy.put(keyValuePair, childPage)
+	return pageHierarchy.put(keyValuePair, childPage, append(dirtyPages, localDirtyPages...))
 }
 
 func (pageHierarchy *PageHierarchy) get(key []byte, page *Page) GetResult {
