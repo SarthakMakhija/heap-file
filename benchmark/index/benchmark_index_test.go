@@ -24,7 +24,7 @@ var options = index.Options{
 	FileName:                       "./index.db",
 	PageSize:                       os.Getpagesize(),
 	PreAllocatedPagePoolSize:       8192,
-	AllowedPageOccupancyPercentage: 90,
+	AllowedPageOccupancyPercentage: 85,
 }
 var bPlusTree, _ = index.CreateBPlusTree(options)
 

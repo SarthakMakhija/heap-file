@@ -31,7 +31,7 @@ func (pagePool PagePool) Read(pageId int) (*Page, error) {
 	if err != nil {
 		return nil, err
 	}
-	page := &Page{}
+	page := &Page{id: pageId}
 	page.UnMarshalBinary(bytes)
 	return page, nil
 }
