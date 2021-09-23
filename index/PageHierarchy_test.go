@@ -583,8 +583,7 @@ func TestSplitsTheRootPageAndWithKeyValuePairsInRightSiblingPage(t *testing.T) {
 	}
 
 	_ = pageHierarchy.Put(KeyValuePair{key: []byte("D"), value: []byte("File System")})
-	rightSibling := pageHierarchy.PageById(pageHierarchy.rootPage.childPageIds[1])
-
+	rightSibling, _ := pagePool.Read(pageHierarchy.rootPage.childPageIds[1])
 	keyValuePairs := rightSibling.AllKeyValuePairs()
 	expected := []KeyValuePair{{key: []byte("C"), value: []byte("Systems")}, {key: []byte("D"), value: []byte("File System")}, {key: []byte("E"), value: []byte("OS")}}
 
@@ -798,7 +797,7 @@ func TestSplitsLeafPageAndAddsTheNewPageAsTheRightmostChildOfTheRootPage(t *test
 
 	_ = pageHierarchy.Put(KeyValuePair{key: []byte("E"), value: []byte("NFS")})
 	resultantPageId := pageHierarchy.rootPage.childPageIds[len(pageHierarchy.rootPage.childPageIds)-1]
-	resultantPage := pageHierarchy.PageById(resultantPageId)
+	resultantPage, _ := pagePool.Read(resultantPageId)
 
 	expected := []KeyValuePair{
 		{

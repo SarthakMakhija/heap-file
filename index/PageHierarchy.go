@@ -67,6 +67,7 @@ func (pageHierarchy *PageHierarchy) Write(dirtyPages []DirtyPage) {
 		if writtenPageById[dirtyPage.page.id] == nil {
 			pageHierarchy.pagePool.Write(dirtyPage.page)
 			writtenPageById[dirtyPage.page.id] = dirtyPage.page
+			delete(pageHierarchy.pageById, dirtyPage.page.id)
 		}
 	}
 }
