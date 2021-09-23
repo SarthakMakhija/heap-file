@@ -14,6 +14,7 @@ var (
 
 type PersistentLeafPage struct {
 	PageType byte
+	PageId   uint32
 	Pairs    []PersistentKeyValuePair
 }
 
@@ -42,7 +43,7 @@ func (d *PersistentLeafPage) Size() (s uint64) {
 		}
 
 	}
-	s += 1
+	s += 5
 	return
 }
 func (d *PersistentLeafPage) Marshal(buf []byte) ([]byte, error) {
@@ -60,6 +61,17 @@ func (d *PersistentLeafPage) Marshal(buf []byte) ([]byte, error) {
 		buf[0] = d.PageType
 	}
 	{
+
+		buf[0+1] = byte(d.PageId >> 0)
+
+		buf[1+1] = byte(d.PageId >> 8)
+
+		buf[2+1] = byte(d.PageId >> 16)
+
+		buf[3+1] = byte(d.PageId >> 24)
+
+	}
+	{
 		l := uint64(len(d.Pairs))
 
 		{
@@ -67,18 +79,18 @@ func (d *PersistentLeafPage) Marshal(buf []byte) ([]byte, error) {
 			t := uint64(l)
 
 			for t >= 0x80 {
-				buf[i+1] = byte(t) | 0x80
+				buf[i+5] = byte(t) | 0x80
 				t >>= 7
 				i++
 			}
-			buf[i+1] = byte(t)
+			buf[i+5] = byte(t)
 			i++
 
 		}
 		for k0 := range d.Pairs {
 
 			{
-				nbuf, err := d.Pairs[k0].Marshal(buf[i+1:])
+				nbuf, err := d.Pairs[k0].Marshal(buf[i+5:])
 				if err != nil {
 					return nil, err
 				}
@@ -87,7 +99,7 @@ func (d *PersistentLeafPage) Marshal(buf []byte) ([]byte, error) {
 
 		}
 	}
-	return buf[:i+1], nil
+	return buf[:i+5], nil
 }
 
 func (d *PersistentLeafPage) Unmarshal(buf []byte) (uint64, error) {
@@ -97,15 +109,20 @@ func (d *PersistentLeafPage) Unmarshal(buf []byte) (uint64, error) {
 		d.PageType = buf[i+0]
 	}
 	{
+
+		d.PageId = 0 | (uint32(buf[i+0+1]) << 0) | (uint32(buf[i+1+1]) << 8) | (uint32(buf[i+2+1]) << 16) | (uint32(buf[i+3+1]) << 24)
+
+	}
+	{
 		l := uint64(0)
 
 		{
 
 			bs := uint8(7)
-			t := uint64(buf[i+1] & 0x7F)
-			for buf[i+1]&0x80 == 0x80 {
+			t := uint64(buf[i+5] & 0x7F)
+			for buf[i+5]&0x80 == 0x80 {
 				i++
-				t |= uint64(buf[i+1]&0x7F) << bs
+				t |= uint64(buf[i+5]&0x7F) << bs
 				bs += 7
 			}
 			i++
@@ -121,7 +138,7 @@ func (d *PersistentLeafPage) Unmarshal(buf []byte) (uint64, error) {
 		for k0 := range d.Pairs {
 
 			{
-				ni, err := d.Pairs[k0].Unmarshal(buf[i+1:])
+				ni, err := d.Pairs[k0].Unmarshal(buf[i+5:])
 				if err != nil {
 					return 0, err
 				}
@@ -130,11 +147,12 @@ func (d *PersistentLeafPage) Unmarshal(buf []byte) (uint64, error) {
 
 		}
 	}
-	return i + 1, nil
+	return i + 5, nil
 }
 
 type PersistentNonLeafPage struct {
 	PageType     byte
+	PageId       uint32
 	Pairs        []PersistentKeyValuePair
 	ChildPageIds []uint32
 }
@@ -181,7 +199,7 @@ func (d *PersistentNonLeafPage) Size() (s uint64) {
 		s += 4 * l
 
 	}
-	s += 1
+	s += 5
 	return
 }
 func (d *PersistentNonLeafPage) Marshal(buf []byte) ([]byte, error) {
@@ -199,6 +217,17 @@ func (d *PersistentNonLeafPage) Marshal(buf []byte) ([]byte, error) {
 		buf[0] = d.PageType
 	}
 	{
+
+		buf[0+1] = byte(d.PageId >> 0)
+
+		buf[1+1] = byte(d.PageId >> 8)
+
+		buf[2+1] = byte(d.PageId >> 16)
+
+		buf[3+1] = byte(d.PageId >> 24)
+
+	}
+	{
 		l := uint64(len(d.Pairs))
 
 		{
@@ -206,18 +235,18 @@ func (d *PersistentNonLeafPage) Marshal(buf []byte) ([]byte, error) {
 			t := uint64(l)
 
 			for t >= 0x80 {
-				buf[i+1] = byte(t) | 0x80
+				buf[i+5] = byte(t) | 0x80
 				t >>= 7
 				i++
 			}
-			buf[i+1] = byte(t)
+			buf[i+5] = byte(t)
 			i++
 
 		}
 		for k0 := range d.Pairs {
 
 			{
-				nbuf, err := d.Pairs[k0].Marshal(buf[i+1:])
+				nbuf, err := d.Pairs[k0].Marshal(buf[i+5:])
 				if err != nil {
 					return nil, err
 				}
@@ -234,11 +263,11 @@ func (d *PersistentNonLeafPage) Marshal(buf []byte) ([]byte, error) {
 			t := uint64(l)
 
 			for t >= 0x80 {
-				buf[i+1] = byte(t) | 0x80
+				buf[i+5] = byte(t) | 0x80
 				t >>= 7
 				i++
 			}
-			buf[i+1] = byte(t)
+			buf[i+5] = byte(t)
 			i++
 
 		}
@@ -246,13 +275,13 @@ func (d *PersistentNonLeafPage) Marshal(buf []byte) ([]byte, error) {
 
 			{
 
-				buf[i+0+1] = byte(d.ChildPageIds[k0] >> 0)
+				buf[i+0+5] = byte(d.ChildPageIds[k0] >> 0)
 
-				buf[i+1+1] = byte(d.ChildPageIds[k0] >> 8)
+				buf[i+1+5] = byte(d.ChildPageIds[k0] >> 8)
 
-				buf[i+2+1] = byte(d.ChildPageIds[k0] >> 16)
+				buf[i+2+5] = byte(d.ChildPageIds[k0] >> 16)
 
-				buf[i+3+1] = byte(d.ChildPageIds[k0] >> 24)
+				buf[i+3+5] = byte(d.ChildPageIds[k0] >> 24)
 
 			}
 
@@ -260,7 +289,7 @@ func (d *PersistentNonLeafPage) Marshal(buf []byte) ([]byte, error) {
 
 		}
 	}
-	return buf[:i+1], nil
+	return buf[:i+5], nil
 }
 
 func (d *PersistentNonLeafPage) Unmarshal(buf []byte) (uint64, error) {
@@ -270,15 +299,20 @@ func (d *PersistentNonLeafPage) Unmarshal(buf []byte) (uint64, error) {
 		d.PageType = buf[i+0]
 	}
 	{
+
+		d.PageId = 0 | (uint32(buf[i+0+1]) << 0) | (uint32(buf[i+1+1]) << 8) | (uint32(buf[i+2+1]) << 16) | (uint32(buf[i+3+1]) << 24)
+
+	}
+	{
 		l := uint64(0)
 
 		{
 
 			bs := uint8(7)
-			t := uint64(buf[i+1] & 0x7F)
-			for buf[i+1]&0x80 == 0x80 {
+			t := uint64(buf[i+5] & 0x7F)
+			for buf[i+5]&0x80 == 0x80 {
 				i++
-				t |= uint64(buf[i+1]&0x7F) << bs
+				t |= uint64(buf[i+5]&0x7F) << bs
 				bs += 7
 			}
 			i++
@@ -294,7 +328,7 @@ func (d *PersistentNonLeafPage) Unmarshal(buf []byte) (uint64, error) {
 		for k0 := range d.Pairs {
 
 			{
-				ni, err := d.Pairs[k0].Unmarshal(buf[i+1:])
+				ni, err := d.Pairs[k0].Unmarshal(buf[i+5:])
 				if err != nil {
 					return 0, err
 				}
@@ -309,10 +343,10 @@ func (d *PersistentNonLeafPage) Unmarshal(buf []byte) (uint64, error) {
 		{
 
 			bs := uint8(7)
-			t := uint64(buf[i+1] & 0x7F)
-			for buf[i+1]&0x80 == 0x80 {
+			t := uint64(buf[i+5] & 0x7F)
+			for buf[i+5]&0x80 == 0x80 {
 				i++
-				t |= uint64(buf[i+1]&0x7F) << bs
+				t |= uint64(buf[i+5]&0x7F) << bs
 				bs += 7
 			}
 			i++
@@ -329,7 +363,7 @@ func (d *PersistentNonLeafPage) Unmarshal(buf []byte) (uint64, error) {
 
 			{
 
-				d.ChildPageIds[k0] = 0 | (uint32(buf[i+0+1]) << 0) | (uint32(buf[i+1+1]) << 8) | (uint32(buf[i+2+1]) << 16) | (uint32(buf[i+3+1]) << 24)
+				d.ChildPageIds[k0] = 0 | (uint32(buf[i+0+5]) << 0) | (uint32(buf[i+1+5]) << 8) | (uint32(buf[i+2+5]) << 16) | (uint32(buf[i+3+5]) << 24)
 
 			}
 
@@ -337,7 +371,7 @@ func (d *PersistentNonLeafPage) Unmarshal(buf []byte) (uint64, error) {
 
 		}
 	}
-	return i + 1, nil
+	return i + 5, nil
 }
 
 type PersistentKeyValuePair struct {

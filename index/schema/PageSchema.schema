@@ -1,10 +1,12 @@
 struct PersistentLeafPage {
 	PageType byte
+	PageId	 uint32
 	Pairs    []PersistentKeyValuePair
 }
 
 struct PersistentNonLeafPage {
 	PageType     byte
+	PageId	     uint32
 	Pairs        []PersistentKeyValuePair
 	ChildPageIds []uint32
 }

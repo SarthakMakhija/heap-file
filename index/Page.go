@@ -53,6 +53,7 @@ func (page Page) toPersistentLeafPage() *schema.PersistentLeafPage {
 	}
 	return &schema.PersistentLeafPage{
 		PageType: LeafPage,
+		PageId:   uint32(page.id),
 		Pairs:    persistentKeyValuePairs,
 	}
 }
@@ -69,6 +70,7 @@ func (page Page) toPersistentNonLeafPage() *schema.PersistentNonLeafPage {
 	}
 	return &schema.PersistentNonLeafPage{
 		PageType:     NonLeafPage,
+		PageId:       uint32(page.id),
 		Pairs:        persistentKeyValuePairs,
 		ChildPageIds: childPageIds,
 	}
@@ -79,6 +81,7 @@ func (page *Page) UnMarshalBinary(buffer []byte) {
 		persistentLeafPage := schema.PersistentLeafPage{}
 		_, _ = persistentLeafPage.Unmarshal(buffer)
 
+		page.id = int(persistentLeafPage.PageId)
 		for _, persistentKeyValuePair := range persistentLeafPage.Pairs {
 			page.keyValuePairs = append(
 				page.keyValuePairs,
@@ -91,6 +94,7 @@ func (page *Page) UnMarshalBinary(buffer []byte) {
 		persistentNonLeafPage := schema.PersistentNonLeafPage{}
 		_, _ = persistentNonLeafPage.Unmarshal(buffer)
 
+		page.id = int(persistentNonLeafPage.PageId)
 		for _, persistentKeyValuePair := range persistentNonLeafPage.Pairs {
 			page.keyValuePairs = append(
 				page.keyValuePairs,
