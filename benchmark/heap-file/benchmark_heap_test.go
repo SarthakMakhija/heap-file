@@ -7,7 +7,6 @@ import (
 	"github.com/SarthakMakhija/heap-file/index"
 	"math/rand"
 	"os"
-	"strconv"
 	"testing"
 )
 
@@ -23,7 +22,6 @@ func randStringBytes(n int) string {
 
 var stringField1Value = randStringBytes(500)
 var stringField2Value = randStringBytes(500)
-var stringField3Value = randStringBytes(300)
 var uint32FieldValue = uint32(1000)
 
 var indexOptions = index.Options{
@@ -51,10 +49,6 @@ var db, _ = heap_file.Open(dbOptions)
 
 func Benchmark_Put(b *testing.B) {
 	benchmarkPutKeys(b, db)
-}
-
-func Benchmark_Put_Large_Key(b *testing.B) {
-	benchmarkPutLargeKey(b, db, rand.Intn(b.N))
 }
 
 func Benchmark_GetFixedKey(b *testing.B) {
@@ -108,22 +102,6 @@ func benchmarkPutKeys(b *testing.B, db *heap_file.Db) {
 		aTuple.AddField(field.NewStringField(stringField2Value))
 		aTuple.AddField(field.NewUint32Field(uint32FieldValue))
 		uint32FieldValue = uint32FieldValue + 1
-
-		_, err := db.Put(aTuple)
-		if err != nil {
-			b.Fatalf("Failed while putting %v", err)
-		}
-	}
-}
-
-func benchmarkPutLargeKey(b *testing.B, db *heap_file.Db, keySuffix int) {
-	b.ResetTimer()
-	for iterator := 0; iterator < b.N; iterator++ {
-		aTuple := tuple.NewTuple()
-		aTuple.AddField(field.NewStringField(stringField1Value))
-		aTuple.AddField(field.NewStringField(stringField2Value))
-		stringFieldValue := stringField3Value + strconv.Itoa(keySuffix) + strconv.Itoa(iterator)
-		aTuple.AddField(field.NewStringField(stringFieldValue))
 
 		_, err := db.Put(aTuple)
 		if err != nil {
